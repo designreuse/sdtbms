@@ -1,0 +1,31 @@
+package com.bus.util;
+
+import java.security.MessageDigest;
+
+public class HRUtil {
+
+	public static String getStringMD5(String str) {
+		try {
+			str = str + "shundeqiche";
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			md.update(str.getBytes());
+			byte[] digest = md.digest();
+			StringBuffer sb = new StringBuffer();
+			for (byte b : digest) {
+				sb.append(Integer.toHexString((int) (b & 0xff)));
+			}
+			return sb.toString();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public static int getBit(byte b, int position){
+		return (int)((b >> position) & 1);
+	}
+	
+	public static byte setBit(byte b, int position){
+		return (byte)(b | (1 << position));
+	}
+}

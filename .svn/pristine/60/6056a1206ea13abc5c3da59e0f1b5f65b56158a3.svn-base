@@ -1,0 +1,110 @@
+package com.bus.util;
+
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Iterator;
+import java.util.Map;
+
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+
+public class ExcelFileSaver {
+	
+	private InputStream inputStream = null;
+	private HSSFWorkbook wb = null;
+	private HSSFSheet sheet = null;
+	private Iterator rows = null;
+	
+	private DataInputStream datais=null;
+	private BufferedReader bf=null;
+	private String strLine;
+	
+	public ExcelFileSaver(FileInputStream fis){
+		try{
+			datais = new DataInputStream(fis);
+			bf = new BufferedReader(new InputStreamReader(datais));
+		}catch (Exception e){//Catch exception if any
+			System.err.println("Error: " + e.getMessage());
+		}
+	}
+	
+	public boolean hasNextLine(){
+		try {
+			strLine = bf.readLine();
+			if(strLine == null)
+				return false;
+			else
+				return true;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	public Map<String,Object> getEmployeeObjects(){
+		System.out.println(strLine);
+		return null;
+	}
+	
+//	public ExcelFileSaver(File f){
+//		try{
+//			inputStream = new FileInputStream(f);
+//			wb = new HSSFWorkbook(inputStream);
+//		}catch(Exception e){
+//			e.printStackTrace();
+//		}
+//	}
+//	
+//	public ExcelFileSaver(InputStream is){
+//		try{
+//			this.inputStream = is;
+//			wb = new HSSFWorkbook(inputStream);
+//		}catch(Exception e){
+//			e.printStackTrace();
+//		}
+//	}
+	
+//	public void init(int sheetPosition){
+//		sheet = wb.getSheetAt(sheetPosition);
+//		rows = sheet.rowIterator();
+//	}
+	
+//	public boolean haveNextRow(){
+//		return rows.hasNext();
+//	}
+//	
+//	public Map<String,Object> getEmployeeObjects(){
+////		row = (HSSFRow) rows.next();
+////		Iterator cells = row.cellIterator();
+////		while(cells.hasNext()){
+////			cell=(HSSFCell) cells.next();
+////			
+////			if (cell.getCellType() == HSSFCell.CELL_TYPE_STRING)
+////			{
+////				System.out.print(cell.getStringCellValue()+" ");
+////			}
+////			else if(cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC)
+////			{
+////				System.out.print(cell.getNumericCellValue()+" ");
+////			}
+////			else
+////			{
+////				System.out.print(cell.getCellType()+" ");
+////			}	
+////		}
+////		System.out.println("Done");
+//		return null;
+//	}
+//	
+//	public void setWorkSheet(int position){
+//		sheet = wb.getSheetAt(position);
+//		rows = sheet.rowIterator();
+//	}
+}
