@@ -28,7 +28,7 @@ public class HRCoordinatorActionBean implements ActionBean{
 	private HRBean bean;
 	private List<Promoandtransfer> coordinates = new ArrayList<Promoandtransfer>();
 	private Promoandtransfer coordinate;
-	private List<SelectBoxOption> types = SelectBoxOptions.getCoordinatorType();
+	private List<SelectBoxOption> types;
 	private List<SelectBoxOption> departments;
 	private List<SelectBoxOption> positions;
 	
@@ -39,6 +39,7 @@ public class HRCoordinatorActionBean implements ActionBean{
 	private void getSelectBoxOptions(){
 		departments = SelectBoxOptions.getDepartment(bean.getAllDepartment());
 		positions = SelectBoxOptions.getPosition(bean.getAllPosition());
+		types = SelectBoxOptions.getSelectBoxFromFixOptions(bean.getOptionListById(6));
 	}
 	
 	public void initData(){

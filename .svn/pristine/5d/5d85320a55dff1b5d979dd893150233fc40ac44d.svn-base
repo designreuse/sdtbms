@@ -18,14 +18,10 @@ import com.bus.dto.Account;
 import com.bus.dto.Contract;
 import com.bus.dto.Department;
 import com.bus.dto.Employee;
-import com.bus.dto.Ethnic;
-import com.bus.dto.Fixoptions;
 import com.bus.dto.Hrimage;
 import com.bus.dto.Idmanagement;
 import com.bus.dto.Position;
 import com.bus.dto.Promoandtransfer;
-import com.bus.dto.Qualification;
-import com.bus.dto.Workertype;
 import com.bus.util.HRUtil;
 
 public class HRBean {
@@ -211,13 +207,9 @@ public class HRBean {
 	
 	public Map<String, Object> getEmployeesBySelector(int pagenum, int lotsize,
 			String statement) {
-		List<Employee> list = em.createQuery(statement).setFirstResult(pagenum*lotsize-lotsize).setMaxResults(lotsize).getResultList();
-		String str = "";
-		if(statement.indexOf("ORDER BY") == -1)
-			str = statement.substring(statement.indexOf("FROM"));
-		else
-			str = statement.substring(statement.indexOf("FROM"), statement.indexOf("ORDER BY"));
-		str = "SELECT COUNT(q) " + str;
+		List<Employee> list = em.createQuery(statement + " AND status=?").setFirstResult(pagenum*lotsize-lotsize).setParameter(1, "A").setMaxResults(lotsize).getResultList();
+		String str = statement.substring(statement.indexOf("FROM"));
+		str = "SELECT COUNT(q) " + str + " AND status='A'";
 		Long count = (Long)em.createQuery(str).getSingleResult();
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("count", count);
@@ -521,58 +513,5 @@ public class HRBean {
 			em.persist(service);
 		}
 	}
-
-	/**
-	 * Get the option list provided id in database
-	 * @param id
-	 * @return
-	 */
-	public Fixoptions getOptionListById(int id){
-		try{
-			Fixoptions fo = em.find(Fixoptions.class, id);
-			return fo;
-		}catch(Exception e){
-			e.printStackTrace();
-			return null;
-		}
-	}
 	
-	/**
-	 * Get the option list for qualification
-	 * @return
-	 */
-	public List<Qualification> getQualificationList(){
-		try{
-			List<Qualification> list = (List<Qualification>)em.createQuery("SELECT q FROM Qualification q").getResultList();
-			return list;
-		}catch(Exception e){
-			return null;
-		}
-	}
-	
-	/**
-	 * Get the option list for workertype
-	 * @return
-	 */
-	public List<Workertype> getWorkertypeList(){
-		try{
-			List<Workertype> list = (List<Workertype>)em.createQuery("SELECT q FROM Workertype q").getResultList();
-			return list;
-		}catch(Exception e){
-			return null;
-		}
-	}
-	
-	/**
-	 * get the option list for ethnic
-	 * @return
-	 */
-	public List<Ethnic> getEthnicList(){
-		try{
-			List<Ethnic> list = (List<Ethnic>)em.createQuery("SELECT q FROM Ethnic q").getResultList();
-			return list;
-		}catch(Exception e){
-			return null;
-		}
-	}
 }

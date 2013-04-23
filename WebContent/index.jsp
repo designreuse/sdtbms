@@ -194,7 +194,7 @@
 					<thead>
 					<stripes:form beanclass="com.bus.stripes.actionbean.EmployeeActionBean" focus="">
 						<tr>
-							<td colspan=15 style="text-align:left">
+							<td colspan=13 style="text-align:left">
 								<stripes:submit name="prevpage" value="上页"/> 页码: <stripes:text name="pagenum"/>/<stripes:label name="${actionBean.totalcount}"/>  <stripes:submit name="nextpage" value="下页"/>
 							
 							显示数量:<stripes:text name="lotsize"/>
@@ -203,14 +203,28 @@
 							</td>
 						</tr>
 						<tr>
-							<td colspan=15 style="text-align:left">
-								名称:<stripes:text name="employeeselector.name"/>
-								籍贯:<stripes:text name="employeeselector.pob"/>
-								工种:<stripes:select name="employeeselector.workertype"><stripes:option value="">不限</stripes:option><stripes:options-collection collection="${actionBean.workertype}" label="label" value="value"/></stripes:select>
-								职位:<stripes:select name="employeeselector.position"><stripes:option value="">不限</stripes:option><stripes:options-collection collection="${actionBean.position}" label="label" value="value"/></stripes:select>
-								部门:<stripes:select name="employeeselector.department"><stripes:option value="">不限</stripes:option><stripes:options-collection collection="${actionBean.department}" label="label" value="value"/></stripes:select>
-								学历:<stripes:select name="employeeselector.qualification"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.qualification}" label="label" value="value"/></stripes:select>
+							<td colspan=13 style="text-align:left">
+								<Label class='selector'>名称:</Label><stripes:text name="employeeselector.name"/>
+								<Label class='selector'>籍贯:</Label><stripes:text name="employeeselector.pob"/>
+								<Label class='selector'>工种:</Label><stripes:select name="employeeselector.workertype"><stripes:option value="">不限</stripes:option><stripes:options-collection collection="${actionBean.workertype}" label="label" value="value"/></stripes:select>
+								<Label class='selector'>职位:</Label><stripes:select name="employeeselector.position"><stripes:option value="">不限</stripes:option><stripes:options-collection collection="${actionBean.position}" label="label" value="value"/></stripes:select>
+								<Label class='selector'>部门:</Label><stripes:select name="employeeselector.department"><stripes:option value="">不限</stripes:option><stripes:options-collection collection="${actionBean.department}" label="label" value="value"/></stripes:select>
+								<Label class='selector'>学历:</Label><stripes:select name="employeeselector.qualification"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.qualification}" label="label" value="value"/></stripes:select>
 <%-- 								年龄:<stripes:text name="employeeselector.age"/> --%>
+							</td>
+						</tr>
+						<tr>
+							<td colspan=13 style="text-align: left">
+								<Label class='selector'>性别:</Label><stripes:radio value="男" name="employeeselector.sex"/>男<stripes:radio value="女" name="employeeselector.sex"/>女
+								<Label class='selector'>民族:</Label><stripes:select name="employeeselector.ethnic"><stripes:option value="">不限</stripes:option><stripes:options-collection collection="${actionBean.ethnic}" label="label" value="value"/></stripes:select>
+								<Label class='selector'>政治面貌:</Label><stripes:select name="employeeselector.politicalstatus"><stripes:option value="">不限</stripes:option><stripes:options-collection collection="${actionBean.politicalStatus}" label="label" value="value"/></stripes:select>
+								<Label class='selector'>婚姻:</Label><stripes:select name="employeeselector.marriage"><stripes:option value="">不限</stripes:option><stripes:options-collection collection="${actionBean.marriage}" label="label" value="value"/></stripes:select>
+								<Label class='selector'>职级:</Label><stripes:select name="employeeselector.joblevel"><stripes:option value="">不限</stripes:option><stripes:options-collection collection="${actionBean.joblevel}" label="label" value="value"/></stripes:select>
+								<Label class='selector'>所属镇街:</Label><stripes:text name="employeeselector.placebelong"/>
+								<Label class='selector'>户籍:</Label><stripes:select name="employeeselector.domiciletype"><stripes:option value="">不限</stripes:option><stripes:options-collection collection="${actionBean.domiciletypes}" label="label" value="value"/></stripes:select>
+								<Label class='selector'>军人:</Label><stripes:radio name="employeeselector.army" value="是"/>是<stripes:radio name="employeeselector.army" value="否"/>否
+								<Label class='selector'>日期:</Label><stripes:radio name="employeeselector.date" value="0"/>不限 <stripes:radio name="employeeselector.date" value="1"/>入职时间
+								<Label class='selector'>员工状态:</Label><stripes:radio name="employeeselector.status" value="A"/>在职<stripes:radio name="employeeselector.status" value="E"/>辞职<stripes:radio name="employeeselector.status" value="A,E"/>全部
 							</td>
 						</tr>
 					</stripes:form>
@@ -219,7 +233,6 @@
 						<th>编号</th>
 						<th>姓名</th>
 						<th>工号</th>
-						<th>入职日期</th>
 						<th>工龄</th>
 <!-- 						<th>民族</th> -->
 <!-- 						<th>婚姻</th> -->
@@ -234,7 +247,6 @@
 						<th>籍贯</th>
 <!-- 						<th>地址</th> -->
 <!-- 						<th>联系电话</th> -->
-						<th>手机</th>
 <!-- 						<th>户籍类型</th> -->
 <!-- 						<th>学历</th> -->
 <!-- 						<th>毕业校园</th> -->
@@ -274,7 +286,6 @@
 							</td>
 							<td>${emp.fullname}</td>
 							<td>${emp.workerid}</td>
-							<td>${emp.firstworktime}</td>
 							<td>${emp.workage}</td>
 							<td>${emp.age}岁</td>
 							<td>${emp.dob}</td>
@@ -283,7 +294,6 @@
 							<td>${emp.position.name}</td>
 							<td>${emp.pob}</td>
 <%-- 							<td>${emp.homenumber}</td> --%>
-							<td>${emp.mobilenumber}</td>
 							<td>${emp.workertype}</td>
 							<td>${emp.createtime}</td>
 						</tr>

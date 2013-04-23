@@ -53,16 +53,16 @@ public class EmployeeActionBean implements ActionBean, ValidationErrorHandler{
 	private Employee employee;
 	private EmployeeSelector employeeselector;
 	private Contract contract;
-	private List<SelectBoxOption> contracttype;
-	private List<SelectBoxOption> domiciletypes;
+	private List<SelectBoxOption> contracttype = SelectBoxOptions.getContractType();
+	private List<SelectBoxOption> domiciletypes = SelectBoxOptions.getDomicileType();
 	private List<Employee> employeeList = new ArrayList<Employee>();
-	private List<SelectBoxOption> marriage;
-	private List<SelectBoxOption> ethnic;
-	private List<SelectBoxOption> politicalStatus;
-	private List<SelectBoxOption> qualification;
+	private List<SelectBoxOption> marriage = SelectBoxOptions.getMarriage();
+	private List<SelectBoxOption> ethnic = SelectBoxOptions.getEthnics();
+	private List<SelectBoxOption> politicalStatus= SelectBoxOptions.getPoliticalStatus();
+	private List<SelectBoxOption> qualification= SelectBoxOptions.getQualification();
 	private List<SelectBoxOption> department;
-	private List<SelectBoxOption> joblevel;
-	private List<SelectBoxOption> workertype;
+	private List<SelectBoxOption> joblevel= SelectBoxOptions.getJobLevel();
+	private List<SelectBoxOption> workertype= SelectBoxOptions.getWorkerType();
 	private List<SelectBoxOption> position;
 	
 	
@@ -146,19 +146,12 @@ public class EmployeeActionBean implements ActionBean, ValidationErrorHandler{
 	private void loadOptionList(){
 		this.department = SelectBoxOptions.getDepartment(bean.getAllDepartment());
 		this.position= SelectBoxOptions.getPosition(bean.getAllPosition());
-		this.domiciletypes = SelectBoxOptions.getSelectBoxFromFixOptions(bean.getOptionListById(2));
-		this.marriage = SelectBoxOptions.getSelectBoxFromFixOptions(bean.getOptionListById(4));
-		this.ethnic = SelectBoxOptions.getEthnics(bean.getEthnicList());
-		this.politicalStatus= SelectBoxOptions.getSelectBoxFromFixOptions(bean.getOptionListById(1));
-		this.qualification= SelectBoxOptions.getQualification(bean.getQualificationList());
-		this.joblevel= SelectBoxOptions.getSelectBoxFromFixOptions(bean.getOptionListById(3));
-		this.workertype= SelectBoxOptions.getWorkerType(bean.getWorkertypeList());
-		this.contracttype = SelectBoxOptions.getSelectBoxFromFixOptions(bean.getOptionListById(5));
 	}
 	
 	
 	
 	public void initData(){
+		loadOptionList();
 		if(pagenum <= 0 || lotsize <= 0){
 			pagenum = 1;
 			lotsize = 20;
@@ -182,7 +175,6 @@ public class EmployeeActionBean implements ActionBean, ValidationErrorHandler{
 	}
 	@DefaultHandler
 	public Resolution defaultAction(){
-		loadOptionList();
 		initData();
 		employee = TestData.getEmployeeTestData();
 		return new ForwardResolution("/index.jsp").addParameter("pagenum", pagenum);
@@ -261,10 +253,6 @@ public class EmployeeActionBean implements ActionBean, ValidationErrorHandler{
 			if(employeeexcel == null){
 				return defaultAction();
 			}
-			//departments and positions
-			ExcelFileSaver saverAddList  = new ExcelFileSaver(((FileInputStream)employeeexcel.getInputStream()));
-			saverAddList.addList(bean);
-			
 			ExcelFileSaver saver  = new ExcelFileSaver(((FileInputStream)employeeexcel.getInputStream()));
 			while(saver.hasNextLine()){
 				Map<String,Object> map = saver.getEmployeeObjects();
@@ -292,10 +280,6 @@ public class EmployeeActionBean implements ActionBean, ValidationErrorHandler{
 	public Resolution employeeresignfileupload(){
 		try{
 			if(employeeexcel != null){
-				//departments and positions
-				ExcelFileSaver saverAddList  = new ExcelFileSaver(((FileInputStream)employeeexcel.getInputStream()));
-				saverAddList.addList(bean);
-				
 				ExcelFileSaver saver  = new ExcelFileSaver(((FileInputStream)employeeexcel.getInputStream()));
 				String str = saver.resignedEmployees(bean,context.getUser());
 				if(!str.equals("")){

@@ -50,8 +50,9 @@
 						</tr>
 						<tr>
 							<td colspan=9 style="text-align:left">
-								员工名字:<stripes:text name="employeeselector.name"/>
-								type:<stripes:select name="contractselector.type"><stripes:option value="">不限</stripes:option><stripes:options-collection collection="${actionBean.contracttype}" label="label" value="value"/></stripes:select>
+								<Label class='selector'>员工名字:</Label><stripes:text name="employeeselector.name"/>
+								<Label class='selector'>合同类型:</Label><stripes:select name="contractselector.type"><stripes:option value="">不限</stripes:option><stripes:options-collection collection="${actionBean.contracttype}" label="label" value="value"/></stripes:select>
+								<Label class='selector'>日期:</Label>
 								<stripes:radio name="contractselector.dateselector" value="0"/>不限日期 
 								<stripes:radio name="contractselector.dateselector" value="1"/>结束日期 
 								<stripes:radio name="contractselector.dateselector" value="2"/>生效日期

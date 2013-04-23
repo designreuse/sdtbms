@@ -21,6 +21,10 @@
  <class>com.bus.dto.Position</class>
  <class>com.bus.dto.Promoandtransfer</class>
  <class>com.bus.dto.Socialrelation</class>
+ <class>com.bus.dto.Qualification</class>
+ <class>com.bus.dto.Workertype</class>
+ <class>com.bus.dto.Ethnic</class>
+ <class>com.bus.dto.Fixoptions</class>
 
  
 <!--     <exclude-unlisted-classes>false</exclude-unlisted-classes> -->

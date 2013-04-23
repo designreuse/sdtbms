@@ -28,7 +28,7 @@ public class IdmanagementActionBean implements ActionBean{
 	private IdmanagementSelector selector;
 	
 	private List<Idmanagement> idmanagements;
-	private List<SelectBoxOption> idcardtypes = SelectBoxOptions.getIdcardType();
+	private List<SelectBoxOption> idcardtypes;
 	
 	private int pagenum;
 	private int lotsize;
@@ -42,7 +42,12 @@ public class IdmanagementActionBean implements ActionBean{
 		return this.bean;
 	}
 	
+	private void loadOptionList(){
+		idcardtypes = SelectBoxOptions.getSelectBoxFromFixOptions(bean.getOptionListById(7));
+	}
+	
 	private void initData(){
+		loadOptionList();
 		if(pagenum <= 0 || lotsize <= 0){
 			pagenum = 1;
 			lotsize = 20;

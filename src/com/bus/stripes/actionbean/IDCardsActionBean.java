@@ -26,13 +26,18 @@ public class IDCardsActionBean implements ActionBean{
 	private HRBean bean;
 	
 	private List<Idmanagement> idcards = new ArrayList<Idmanagement>();
-	private List<SelectBoxOption> typeoptions = SelectBoxOptions.getIdcardType();
+	private List<SelectBoxOption> typeoptions;
 	private Idmanagement idcard;
 	
 	private String targetId;
 	
+	private void loadOptionList(){
+		typeoptions = SelectBoxOptions.getSelectBoxFromFixOptions(bean.getOptionListById(7));
+	}
+	
 	@DefaultHandler
 	public Resolution defaultAction(){
+		loadOptionList();
 		setTargetId(context.getRequest().getParameter("targetId"));
 		if(targetId != null)
 			setIdcards(bean.getIdcardsByEmployeeId(targetId));

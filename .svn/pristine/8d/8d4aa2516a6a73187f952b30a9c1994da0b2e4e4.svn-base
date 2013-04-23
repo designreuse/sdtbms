@@ -145,6 +145,61 @@ public class ExcelFileSaver {
 		return str;
 	}
 	
+	/**
+	 * For driver license
+	 * @param bean
+	 * @return
+	 */
+//	public String getDriverIds(HRBean bean){
+//		String str="\n";
+//		while(hasNextLine()){
+//			String[] cols = strLine.split(",");
+//			if(cols.length < 15){
+//				continue;
+//			}else if(index == 1){
+//				continue;
+//			}
+//			try {
+//				String name = cols[0].trim();
+//				String workerid = cols[1];
+//				Date bod = HRUtil.parseDate(cols[4], "yyyy.MM.dd");
+//				Employee employee = getEmployee(bean,name,workerid,bod);
+//				if(employee != null){
+//					Idmanagement driverLicense = new Idmanagement();
+//					driverLicense.setEmployee(employee);
+//					driverLicense.setType("驾驶证");
+//					driverLicense.setNumber(cols[7]);
+//					driverLicense.setRemark("准驾车型:"+cols[8]+";");
+//					if(!cols[9].trim().equals("") && !cols[10].trim().equals("")){
+//						driverLicense.setValidfrom(HRUtil.parseDate(cols[9], "yyyy.MM.dd"));
+//						driverLicense.setExpiredate(HRUtil.parseDate(cols[10], "yyyy.MM.dd"));
+//					}
+//					
+//					Idmanagement serviceLicense = new Idmanagement();
+//					serviceLicense.setEmployee(employee);
+//					serviceLicense.setType("从业资格证");
+//					serviceLicense.setRemark(cols[12]);
+//					serviceLicense.setNumber(cols[11]);
+//					if(!cols[13].equals(""))
+//						serviceLicense.setValidfrom(HRUtil.parseDate(cols[13], "yyyy.MM.dd"));
+//					
+//					Idmanagement service = null;
+//					if(!cols[14].equals("")){
+//						service = new Idmanagement();
+//						service.setEmployee(employee);
+//						service.setType("服务资格证");
+//						service.setNumber(cols[14]);
+//					}
+//					bean.saveIdsFromFile(driverLicense, serviceLicense,service);
+//				}else{
+//					str += "证件添加失败:" + cols[0]+" 不存在或者相同名字出现!!请自行添加.<br/>\n";
+//				}
+//			} catch (Exception e) {
+//				str += "证件添加失败:" + cols[0]+"数据转换出错.请自行添加."+ e.getMessage() +"<br/>\n";
+//			}
+//		}
+//		return str;
+//	}
 	
 	/**
 	 * For driver license
@@ -155,16 +210,16 @@ public class ExcelFileSaver {
 		String str="\n";
 		int rowindex = 0;
 		while(hasNextLine()){
-			rowindex++;
 			String[] cols = strLine.split(",");
 			if(cols.length < 12){
-				str += "Now parsing Index:"+rowindex++ + " But length less then 12 so ignore\n";
+				System.out.println("Now parsing Index:"+rowindex++ + " But length less then 12 so ignore\n");
 				continue;
 			}else if(index == 1){
-				str += "Now parsing Index:"+rowindex++ + " But index is 1 so ignore\n";
+				System.out.println("Now parsing Index:"+rowindex++ + " But index is 1 so ignore\n");
 				continue;
 			}
 			try {
+				System.out.println("Now parsing Index:"+rowindex++);
 				String name = cols[0].trim();
 				List<Employee> employees = bean.getEmployeeByName(name, true);
 				if(employees.size() != 1){

@@ -30,7 +30,7 @@ public class ContractActionBean implements  ActionBean{
 	private HRBean bean;
 	private List<Contract> contracts  = new ArrayList<Contract>();
 	private Contract contract;
-	private List<SelectBoxOption> contracttype = SelectBoxOptions.getContractType();
+	private List<SelectBoxOption> contracttype;
 	
 	private EmployeeSelector employeeselector;
 	private ContractSelector contractselector;
@@ -56,8 +56,12 @@ public class ContractActionBean implements  ActionBean{
 	}
 
 	
+	private void loadOptionList(){
+		this.contracttype = SelectBoxOptions.getSelectBoxFromFixOptions(bean.getOptionListById(5));
+	}
 	
 	private void initData(){
+		loadOptionList();
 		if(pagenum <= 0 || lotsize <= 0){
 			pagenum = 1;
 			lotsize = 20;

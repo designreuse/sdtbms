@@ -5,7 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bus.dto.Department;
+import com.bus.dto.Ethnic;
+import com.bus.dto.Fixoptions;
 import com.bus.dto.Position;
+import com.bus.dto.Qualification;
+import com.bus.dto.Workertype;
 
 public class SelectBoxOptions {
 
@@ -147,5 +151,56 @@ public class SelectBoxOptions {
 				e.printStackTrace();
 				return new ArrayList<SelectBoxOption>();
 			}
+	}
+
+	public static List<SelectBoxOption> getSelectBoxFromFixOptions(
+			Fixoptions optionListById) {
+		if(optionListById == null){
+			return new ArrayList<SelectBoxOption>();
+		}
+		String[] cols = optionListById.getContent().split(",");
+		List<SelectBoxOption> list = new ArrayList<SelectBoxOption>();
+		for(int i=0;i<cols.length;i++){
+			list.add(new SelectBoxOption(cols[i],cols[i]));
+		}
+		return list;
+	}
+
+	public static List<SelectBoxOption> getEthnics(List<Ethnic> ethnicList) {
+		List<SelectBoxOption> list = new ArrayList<SelectBoxOption>();
+		if(ethnicList == null){
+			return list;
+		}else{
+			for(Ethnic d:ethnicList){
+				list.add(new SelectBoxOption(d.getName(),d.getName()));
+			}
+		}
+		return list;
+	}
+
+	public static List<SelectBoxOption> getQualification(
+			List<Qualification> qualificationList) {
+		List<SelectBoxOption> list = new ArrayList<SelectBoxOption>();
+		if(qualificationList == null){
+			return list;
+		}else{
+			for(Qualification d:qualificationList){
+				list.add(new SelectBoxOption(d.getName(),d.getName()));
+			}
+		}
+		return list;
+	}
+
+	public static List<SelectBoxOption> getWorkerType(
+			List<Workertype> workertypeList) {
+		List<SelectBoxOption> list = new ArrayList<SelectBoxOption>();
+		if(workertypeList == null){
+			return list;
+		}else{
+			for(Workertype d:workertypeList){
+				list.add(new SelectBoxOption(d.getName(),d.getName()));
+			}
+		}
+		return list;
 	}
 }
