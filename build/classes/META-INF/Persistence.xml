@@ -25,6 +25,15 @@
  <class>com.bus.dto.Workertype</class>
  <class>com.bus.dto.Ethnic</class>
  <class>com.bus.dto.Fixoptions</class>
+ 
+ <class>com.bus.dto.score.Scoremember</class>
+ <class>com.bus.dto.score.Scorerecord</class>
+ <class>com.bus.dto.score.Scoresheetmapper</class>
+ <class>com.bus.dto.score.Scoresheets</class>
+ <class>com.bus.dto.score.Scoretype</class>
+ 
+ <class>com.bus.dto.logger.Scorelog</class>
+ <class>com.bus.dto.logger.AccountLog</class>
 
  
 <!--     <exclude-unlisted-classes>false</exclude-unlisted-classes> -->

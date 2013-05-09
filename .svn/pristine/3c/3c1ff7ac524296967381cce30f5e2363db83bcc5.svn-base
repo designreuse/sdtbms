@@ -1,0 +1,68 @@
+package com.bus.util;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.List;
+
+import com.bus.dto.Employee;
+import com.bus.services.HRBean;
+
+public class ExcelFileWriter {
+
+	
+	public ExcelFileWriter(){
+	}
+	
+	public String writeEmployees(HRBean bean, String type) throws IOException{
+		List<Employee> list = (List<Employee>)bean.getAllEmployee(type);
+		String str = "";
+		for(Employee e:list){
+//			str="";
+			str += toStr(e.getDocumentkey())+",";
+			str += toStr(e.getFullname()) + ",";
+			str += toStr(e.getWorkerid())+",";
+			str += toStr(e.getFirstworktime()) + ",";
+			str += toStr(e.getIdentitycode()) + ",";
+			str += toStr(e.getEthnic()) + ",";
+			str += toStr(e.getMarriage()) + ",";
+			str += toStr(e.getDob()) + ",";
+			str += toStr(e.getSex()) + ",";
+			str += toStr(e.getAge()) + ",";
+			str += toStr(e.getWorkage()) + ",";
+			if(e.getDepartment() != null)
+				str += toStr(e.getDepartment().getName()) + ",";
+			else
+				str += ",";
+			if(e.getPosition() != null)
+				str += toStr(e.getPosition().getName()) + ",";
+			else
+				str += ",";
+			str += toStr(e.getPlacebelong()) + ",";
+			str += toStr(e.getPob()) + ",";
+			str += toStr(e.getHomeaddress()) + ",";
+			str += toStr(e.getMobilenumber()) + ",";
+			str += toStr(e.getDomiciletype()) + ",";
+			str += toStr(e.getQualification()) + ",";
+			str += toStr(e.getColleage()) + ",";
+			str += toStr(e.getMajor()) + ",";
+			str += toStr(e.getPoliticalstatus()) + ",";
+			str += toStr(e.getTimeofjoinrpc())+",";
+			str += toStr(e.getWorkertype()) + ",";
+			str += toStr(e.getArmy()) + ",";
+			str += toStr(e.getJoblevel()) + ",";
+//			str += toStr(e.getContracts()) +",";
+			str += ",";
+			str += toStr(e.getFirstworktime()) + ",";
+			str += toStr(e.getRemark());
+			str +="\n";
+		}
+		return str;
+	}
+	
+	private String toStr(Object obj){
+		if(obj == null)
+			return "";
+		return obj.toString();
+	}
+}
