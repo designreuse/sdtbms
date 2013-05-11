@@ -1,0 +1,64 @@
+package com.bus.stripes.actionbean.score;
+
+import java.util.List;
+
+import com.bus.dto.Account;
+import com.bus.dto.Accountgroup;
+import com.bus.dto.Action;
+import com.bus.dto.Actiongroup;
+import com.bus.services.AccountBean;
+import com.bus.services.HRBean;
+import com.bus.stripes.actionbean.MyActionBeanContext;
+import com.bus.stripes.actionbean.Permission;
+
+import net.sourceforge.stripes.action.ActionBean;
+import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.integration.spring.SpringBean;
+
+@UrlBinding(value="/actionbean/Scoreitems.action")
+public class ScoreitemsActionBean implements ActionBean,Permission{
+
+	private MyActionBeanContext context;
+	public MyActionBeanContext getContext() { return context; }
+	public void setContext(ActionBeanContext context) { this.context = (MyActionBeanContext)context; }
+	
+	private AccountBean accBean;
+	public AccountBean getAccBean() {return accBean;}
+	@SpringBean
+	public void setAccBean(AccountBean bean) {this.accBean = bean;}
+
+	private HRBean hrBean;
+	public HRBean getHrBean(){return hrBean;}
+	@SpringBean
+	public void setHrBean(HRBean bean){this.hrBean = bean;}
+	
+	@DefaultHandler
+	public Resolution defaultAction(){
+		return new ForwardResolution("/score/home.jsp");
+	}
+	
+	@Override
+	public boolean allowToAccess(Account user) {
+		try{
+			Account a = context.getUser();
+			if(a == null)
+				return false;
+			a = accBean.getAccountById(a.getId()+"");
+			for(Accountgroup ag:a.getGroups()){
+				for(Actiongroup actiong:ag.getGroups().getActions()){
+					if(actiong.getAction().getName().indexOf("score_") == 0)
+						return true;
+				}
+			}
+			return false;
+		}catch(Exception e){
+			return false;
+		}
+	}
+	
+	
+}

@@ -32,7 +32,7 @@
  <class>com.bus.dto.score.Scoresheets</class>
  <class>com.bus.dto.score.Scoretype</class>
  
- <class>com.bus.dto.logger.Scorelog</class>
+ <class>com.bus.dto.logger.ScoreLog</class>
  <class>com.bus.dto.logger.AccountLog</class>
 
  
