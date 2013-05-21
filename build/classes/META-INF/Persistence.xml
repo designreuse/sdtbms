@@ -5,7 +5,11 @@
    http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
     version="2.0">
  
-<persistence-unit name="ShunDeBusPersistenceUnit" transaction-type="RESOURCE_LOCAL">
+<persistence-unit name="shundebuspersistenceunit" transaction-type="RESOURCE_LOCAL">
+	<!--     <exclude-unlisted-classes>false</exclude-unlisted-classes> -->
+	 <provider>org.hibernate.ejb.HibernatePersistence</provider>
+<!-- 	<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider> -->
+
 <!--  <jta-data-source>sdbms</jta-data-source>     -->
  <class>com.bus.dto.Employee</class>
  <class>com.bus.dto.Account</class>
@@ -37,9 +41,7 @@
  <class>com.bus.dto.logger.ScoreLog</class>
  <class>com.bus.dto.logger.AccountLog</class>
 
- 
-<!--     <exclude-unlisted-classes>false</exclude-unlisted-classes> -->
-<properties>
+ <properties>
   <property name="hibernate.show_sql" value="false" />
   <property name="hibernate.format_sql" value="true" />
   <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
@@ -55,6 +57,7 @@
   <property name="hibernate.c3p0.max_statements" value="50" />
   <property name="hibernate.c3p0.idle_test_period" value="3000" />
 </properties>
+
 </persistence-unit>
  
 </persistence>

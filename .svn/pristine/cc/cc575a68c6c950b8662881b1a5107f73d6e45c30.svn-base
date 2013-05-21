@@ -22,7 +22,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceUtil;
 import javax.persistence.spi.PersistenceProvider;
 
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bus.dto.Account;
@@ -41,7 +40,7 @@ import com.bus.util.HRUtil;
 
 public class HRBean {
 
-//	@PersistenceContext
+	@PersistenceContext
 	protected EntityManager em;
 
 	public EntityManager getEntityManager() {
@@ -53,9 +52,9 @@ public class HRBean {
 	}
 
 	public HRBean() {
-		 ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		 try {
-//			String abcd = "/META-INF/persistence.xml";
+//		 ClassLoader loader = Thread.currentThread().getContextClassLoader();
+//		 try {
+//			String abcd = "/WEB-INF/classes/META-INF/persistence.xml";
 //			Enumeration<URL> resources1 = loader.getResources(abcd);
 //			URL seurl = resources1.nextElement();
 //			System.out.println("seurl:"+ seurl.toString());
@@ -83,25 +82,13 @@ public class HRBean {
 //				             is.close();
 //				           }
 ////				       }
-			 String abcd = "/META-INF/persistence.xml";
-				Enumeration<URL> resources1 = loader.getResources(abcd);
-				URL seurl = resources1.nextElement();
-				System.out.println("seurl:"+ seurl.toString());
-				
-				LocalContainerEntityManagerFactoryBean lcemf = new LocalContainerEntityManagerFactoryBean ();
-				lcemf.setPersistenceUnitName("shundebuspersistenceunit");
-				lcemf.setPersistenceXmlLocation(seurl.toString());
-				
-				EntityManagerFactory emf = lcemf.getObject();
-				em = emf.createEntityManager();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 //		 
-		
 //		 
-//		EntityManagerFactory emf = Persistence.createEntityManagerFactory( "shundebuspersistenceunit" );
-		
+//		EntityManagerFactory emf = Persistence.createEntityManagerFactory( "ShunDeBusPersistenceUnit" );
+//		em = emf.createEntityManager();
 	}
 
 	public Object getObjectByClassAndId(Class cls, int id) {
