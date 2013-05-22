@@ -91,7 +91,6 @@ public class ScoreExcelFileProcessor extends ExcelFileProcessor {
 			}
 			try {
 				Date scoredate = HRUtil.parseDate(cols[1], "yyyy-MM-dd");
-				System.out.println(cols[2]);
 				Scoretype st = scoreBean.getScoreTypeByReference(cols[2]);
 				if(st ==null){
 					str += "" + "第" + index + "行" + "录入失败,id" + cols[0]+".编号不存在."  + "\n<br/>";

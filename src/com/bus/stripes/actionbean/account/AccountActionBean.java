@@ -66,6 +66,9 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	
 	@HandlesEvent(value="createaccount")
 	public Resolution createaccount(){
+		if(!getPermission(context.getUser(), "account_createaccount")){
+			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
+		}
 		try{
 			if(empworkerid != null && !hrBean.isEmployeeWorkerIdExist(empworkerid)){
 				return defaultAction();
@@ -86,6 +89,9 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	
 	@HandlesEvent(value="creategroup")
 	public Resolution creategroup(){
+		if(!getPermission(context.getUser(), "account_creategroup")){
+			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
+		}
 		try{
 			if(groupname == null || groupname.trim().equals(""))
 				return defaultAction();
@@ -101,6 +107,9 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	
 	@HandlesEvent(value="assigngroups")
 	public Resolution assigngroups(){
+		if(!getPermission(context.getUser(), "account_assigngroup")){
+			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
+		}
 		try{
 			if(userids == null || groupids == null)
 				return defaultAction();
@@ -119,6 +128,9 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	
 	@HandlesEvent(value="removeusers")
 	public Resolution removeusers(){
+		if(!getPermission(context.getUser(), "account_removeaccount")){
+			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
+		}
 		try{
 			if(userids == null)
 				return defaultAction();
@@ -134,6 +146,9 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	
 	@HandlesEvent(value="resignusers")
 	public Resolution resignusers(){
+		if(!getPermission(context.getUser(), "account_resignaccount")){
+			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
+		}
 		try{
 			if(userids == null)
 				return defaultAction();
@@ -149,6 +164,9 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	
 	@HandlesEvent(value="removegroups")
 	public Resolution removegroups(){
+		if(!getPermission(context.getUser(), "account_removegroup")){
+			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
+		}
 		try{
 			if(groupids == null)
 				return defaultAction();
@@ -165,6 +183,9 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	
 	@HandlesEvent(value="accountgroups")
 	public Resolution accountgroups(){
+		if(!getPermission(context.getUser(), "account_viewaccountgroups")){
+			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
+		}
 		String targetId = context.getRequest().getParameter("targetId");
 		try{
 			account = accBean.getAccountById(targetId);
@@ -178,6 +199,9 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	
 	@HandlesEvent(value="groupactions")
 	public Resolution groupactions(){
+		if(!getPermission(context.getUser(), "account_viewgroupactions")){
+			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
+		}
 		String targetId = context.getRequest().getParameter("targetId");
 		try{
 			group = accBean.getGroupById(targetId);
@@ -200,6 +224,9 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	
 	@HandlesEvent("removeusergroup")
 	public Resolution removeusergroup(){
+		if(!getPermission(context.getUser(), "account_removegroupfromuser")){
+			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
+		}
 		String usergroupid = context.getRequest().getParameter("usergroupid");
 		String targetId = context.getRequest().getParameter("targetId");
 		try{
@@ -213,6 +240,9 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	
 	@HandlesEvent("assignactionstogroup")
 	public Resolution assignactionstogroup(){
+		if(!getPermission(context.getUser(), "account_assignactiontogroup")){
+			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
+		}
 		if(groupactions == null)
 			groupactions = new ArrayList<Action>();
 		String groupid = context.getRequest().getParameter("targetId");

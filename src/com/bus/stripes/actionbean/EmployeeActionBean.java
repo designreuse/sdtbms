@@ -261,6 +261,7 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 		try{
 			if(employeeexcel != null){
 				//departments and positions
+				System.out.println("Content-type is :"+employeeexcel.getContentType());
 				ExcelFileSaver saverAddList  = new ExcelFileSaver(((FileInputStream)employeeexcel.getInputStream()));
 				saverAddList.addList(bean);
 				

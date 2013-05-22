@@ -82,7 +82,6 @@ public class ScoredetailActionBean extends CustomActionBean{
 
 	@HandlesEvent(value="deleteRecords")
 	public Resolution deleteRecords(){
-		System.out.println("In delete");
 		if(!getPermission(context.getUser(), "scoredetail_remove_record")){
 			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
 		}

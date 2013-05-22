@@ -34,14 +34,14 @@ public class ScoreFileUploadActionBean extends CustomActionBean{
 	
 	@DefaultHandler
 	public Resolution defaultAction(){
-		if(!getPermission(context.getUser(), "scorefileupload_upload")){
-			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
-		}
 		return new ForwardResolution("/score/batchitems.jsp");
 	}
 
 	@HandlesEvent(value="itemsupload")
 	public Resolution itemsupload(){
+		if(!getPermission(context.getUser(), "scorefileupload_uploaditems")){
+			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
+		}
 		try{
 			if(itemsfile != null){
 				ScoreExcelFileProcessor saver  = new ScoreExcelFileProcessor(((FileInputStream)itemsfile.getInputStream()));
@@ -60,6 +60,9 @@ public class ScoreFileUploadActionBean extends CustomActionBean{
 	
 	@HandlesEvent(value="scoreupload")
 	public Resolution scoreupload(){
+		if(!getPermission(context.getUser(), "scorefileupload_uploadscores")){
+			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
+		}
 		try{
 			if(scorefile != null){
 				ScoreExcelFileProcessor saver  = new ScoreExcelFileProcessor(((FileInputStream)scorefile.getInputStream()));

@@ -52,43 +52,6 @@ public class HRBean {
 	}
 
 	public HRBean() {
-//		 ClassLoader loader = Thread.currentThread().getContextClassLoader();
-//		 try {
-//			String abcd = "/WEB-INF/classes/META-INF/persistence.xml";
-//			Enumeration<URL> resources1 = loader.getResources(abcd);
-//			URL seurl = resources1.nextElement();
-//			System.out.println("seurl:"+ seurl.toString());
-//			InputStream is1 = seurl.openStream();
-//			BufferedReader str1 = new BufferedReader(new InputStreamReader(is1));
-//			System.out.println(str1.readLine());
-			
-			
-//			String abc = "META-INF/";
-//			Enumeration<URL> resources = loader.getResources(abc);
-//			
-//			while (resources.hasMoreElements()) {
-//				    URL url = resources.nextElement();
-//				    System.out.println(url.toString());
-//				       InputStream is = url.openStream();
-//				    try {
-//				    	BufferedReader str = new BufferedReader(new InputStreamReader(is));
-//				              System.out.println(new BufferedReader(new InputStreamReader(is)).readLine());
-//				              String line = "";
-//				              while(line != null){
-//				            	  System.out.println(line);
-//				            	  line =str.readLine();
-//				              }
-//				           } finally {
-//				             is.close();
-//				           }
-////				       }
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		 
-//		 
-//		EntityManagerFactory emf = Persistence.createEntityManagerFactory( "ShunDeBusPersistenceUnit" );
-//		em = emf.createEntityManager();
 	}
 
 	public Object getObjectByClassAndId(Class cls, int id) {
