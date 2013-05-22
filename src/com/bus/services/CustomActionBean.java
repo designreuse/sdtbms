@@ -1,5 +1,7 @@
 package com.bus.services;
 
+import security.controller.StripesSecurityFilter;
+
 import com.bus.dto.Account;
 import com.bus.dto.Accountgroup;
 import com.bus.dto.Actiongroup;
@@ -42,7 +44,7 @@ public class CustomActionBean implements ActionBean,Permission{
 		}
 	}
 	@Override
-	public boolean getPermission(Account user, String action) {
+	public boolean getPermission(String action) {
 		try{
 			Account a = context.getUser();
 			if(a == null)
@@ -62,4 +64,13 @@ public class CustomActionBean implements ActionBean,Permission{
 		}
 	}
 	
+	@Override
+	public boolean getScoreSystemPermission(){
+		try{
+			StripesSecurityFilter m = new StripesSecurityFilter();
+			return true;
+		}catch(Exception e){
+			return false;
+		}
+	}
 }

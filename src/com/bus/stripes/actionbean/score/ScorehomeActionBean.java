@@ -48,7 +48,7 @@ public class ScorehomeActionBean extends CustomActionBean implements Permission{
 	
 	@DefaultHandler
 	public Resolution defaultAction(){
-		if(!getPermission(context.getUser(),"scorehome_view")){
+		if(!getPermission("scorehome_view")){
 			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
 		}
 		loadLogs();

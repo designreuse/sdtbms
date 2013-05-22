@@ -66,7 +66,7 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	
 	@HandlesEvent(value="createaccount")
 	public Resolution createaccount(){
-		if(!getPermission(context.getUser(), "account_createaccount")){
+		if(!getPermission("account_createaccount")){
 			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
 		}
 		try{
@@ -89,7 +89,7 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	
 	@HandlesEvent(value="creategroup")
 	public Resolution creategroup(){
-		if(!getPermission(context.getUser(), "account_creategroup")){
+		if(!getPermission("account_creategroup")){
 			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
 		}
 		try{
@@ -107,7 +107,7 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	
 	@HandlesEvent(value="assigngroups")
 	public Resolution assigngroups(){
-		if(!getPermission(context.getUser(), "account_assigngroup")){
+		if(!getPermission("account_assigngroup")){
 			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
 		}
 		try{
@@ -128,7 +128,7 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	
 	@HandlesEvent(value="removeusers")
 	public Resolution removeusers(){
-		if(!getPermission(context.getUser(), "account_removeaccount")){
+		if(!getPermission("account_removeaccount")){
 			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
 		}
 		try{
@@ -146,7 +146,7 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	
 	@HandlesEvent(value="resignusers")
 	public Resolution resignusers(){
-		if(!getPermission(context.getUser(), "account_resignaccount")){
+		if(!getPermission("account_resignaccount")){
 			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
 		}
 		try{
@@ -164,7 +164,7 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	
 	@HandlesEvent(value="removegroups")
 	public Resolution removegroups(){
-		if(!getPermission(context.getUser(), "account_removegroup")){
+		if(!getPermission("account_removegroup")){
 			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
 		}
 		try{
@@ -183,7 +183,7 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	
 	@HandlesEvent(value="accountgroups")
 	public Resolution accountgroups(){
-		if(!getPermission(context.getUser(), "account_viewaccountgroups")){
+		if(!getPermission("account_viewaccountgroups")){
 			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
 		}
 		String targetId = context.getRequest().getParameter("targetId");
@@ -199,7 +199,7 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	
 	@HandlesEvent(value="groupactions")
 	public Resolution groupactions(){
-		if(!getPermission(context.getUser(), "account_viewgroupactions")){
+		if(!getPermission("account_viewgroupactions")){
 			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
 		}
 		String targetId = context.getRequest().getParameter("targetId");
@@ -224,7 +224,7 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	
 	@HandlesEvent("removeusergroup")
 	public Resolution removeusergroup(){
-		if(!getPermission(context.getUser(), "account_removegroupfromuser")){
+		if(!getPermission("account_removegroupfromuser")){
 			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
 		}
 		String usergroupid = context.getRequest().getParameter("usergroupid");
@@ -240,7 +240,7 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	
 	@HandlesEvent("assignactionstogroup")
 	public Resolution assignactionstogroup(){
-		if(!getPermission(context.getUser(), "account_assignactiontogroup")){
+		if(!getPermission("account_assignactiontogroup")){
 			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
 		}
 		if(groupactions == null)

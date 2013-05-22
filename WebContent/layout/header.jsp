@@ -32,8 +32,10 @@
 						<a href="${pageContext.request.contextPath}/actionbean/Employee.action" class="sf-with-ul">人事系统</a>
 						
 					</li>
+					<c:if test="${actionBean.scoreSystemPermission}">
 					<li>
 						<a href="${pageContext.request.contextPath}/actionbean/Scorehome.action" class="sf-with-ul">积分系统</a>
 					</li>
+					</c:if>
 			</div>
 		</div>

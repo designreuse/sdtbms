@@ -39,7 +39,7 @@ public class ScoreFileUploadActionBean extends CustomActionBean{
 
 	@HandlesEvent(value="itemsupload")
 	public Resolution itemsupload(){
-		if(!getPermission(context.getUser(), "scorefileupload_uploaditems")){
+		if(!getPermission("scorefileupload_uploaditems")){
 			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
 		}
 		try{
@@ -60,7 +60,7 @@ public class ScoreFileUploadActionBean extends CustomActionBean{
 	
 	@HandlesEvent(value="scoreupload")
 	public Resolution scoreupload(){
-		if(!getPermission(context.getUser(), "scorefileupload_uploadscores")){
+		if(!getPermission("scorefileupload_uploadscores")){
 			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
 		}
 		try{

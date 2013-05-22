@@ -97,7 +97,7 @@ public class ScoreitemsActionBean extends CustomActionBean{
 	
 	@DefaultHandler
 	public Resolution defaultAction(){
-		if(!getPermission(context.getUser(), "scoreitems_view")){
+		if(!getPermission("scoreitems_view")){
 			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
 		}
 		initData();
@@ -106,7 +106,7 @@ public class ScoreitemsActionBean extends CustomActionBean{
 	
 	@HandlesEvent(value="createscoretype")
 	public Resolution createscoretype(){
-		if(!getPermission(context.getUser(),"scoreitems_create")){
+		if(!getPermission("scoreitems_create")){
 			return context.errorResolutionAjax("权限错误","你没有权限进行该操作,请联系管理员");
 		}
 		if(scoretype == null){
@@ -124,7 +124,7 @@ public class ScoreitemsActionBean extends CustomActionBean{
 	
 	@HandlesEvent(value="deletescoretype")
 	public Resolution deletescoretype(){
-		if(!getPermission(context.getUser(),"scoreitems_edit")){
+		if(!getPermission("scoreitems_edit")){
 			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
 		}
 		try{
@@ -143,7 +143,7 @@ public class ScoreitemsActionBean extends CustomActionBean{
 	
 	@HandlesEvent(value="editscoretype")
 	public Resolution editscoretype(){
-		if(!getPermission(context.getUser(),"scoreitems_edit")){
+		if(!getPermission("scoreitems_edit")){
 			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
 		}
 		try{
@@ -162,7 +162,7 @@ public class ScoreitemsActionBean extends CustomActionBean{
 	
 	@HandlesEvent(value="givescores")
 	public Resolution givescores(){
-		if(!getPermission(context.getUser(),"scoreitems_givescore")){
+		if(!getPermission("scoreitems_givescore")){
 			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
 		}
 		if(employee == null || selectedScoreTypes == null){

@@ -32,9 +32,9 @@
 
 	<!-- Stripes -->
 	<filter>
-		<display-name>Stripes Filter</display-name>
-		<filter-name>StripesFilter</filter-name>
-		<filter-class>net.sourceforge.stripes.controller.StripesFilter</filter-class>
+		<display-name>Stripes Security Filter</display-name>
+		<filter-name>StripesSecurityFilter</filter-name>
+		<filter-class>security.controller.StripesSecurityFilter</filter-class>
 		<init-param>
     		<param-name>LocalePicker.Locales</param-name>
     		<param-value>zh_CN:UTF-8,ZH_TW,ZH_CN</param-value>
@@ -46,19 +46,19 @@
 		<init-param>
 			<param-name>Interceptor.Classes</param-name>
 				<param-value>
+						net.sourceforge.stripes.controller.BeforeAfterMethodInterceptor
 			    	net.sourceforge.stripes.integration.spring.SpringInterceptor,
 			    	com.bus.interceptor.SecurityInterceptor,
-			    	net.sourceforge.stripes.controller.BeforeAfterMethodInterceptor
 			    </param-value>
 		</init-param>
 		<!-- <init-param> -->
 		<!-- <param-name>Extension.Packages</param-name> -->
 		<!-- <param-value>org.stripesstuff.plugin.security</param-value> -->
 		<!-- </init-param> -->
-		<!-- <init-param> -->
-		<!-- <param-name>SecurityManager.Class</param-name> -->
-		<!-- <param-value>org.stripesstuff.plugin.security.J2EESecurityManager</param-value> -->
-		<!-- </init-param> -->
+		<init-param>
+		<param-name>SecurityManager.Class</param-name>
+		<param-value>com.bus.securitymanager.BusSecurityManager</param-value>
+		</init-param>
 		<init-param>
 			<param-name>ActionResolver.Packages</param-name>
 			<param-value>com.bus.stripes.actionbean</param-value>
@@ -67,13 +67,13 @@
 	</filter>
 
 	<filter-mapping>
-		<filter-name>StripesFilter</filter-name>
+		<filter-name>StripesSecurityFilter</filter-name>
 		<url-pattern>*.jsp</url-pattern>
 		<dispatcher>REQUEST</dispatcher>
 	</filter-mapping>
 
 	<filter-mapping>
-		<filter-name>StripesFilter</filter-name>
+		<filter-name>StripesSecurityFilter</filter-name>
 		<servlet-name>StripesDispatcher</servlet-name>
 		<dispatcher>REQUEST</dispatcher>
 	</filter-mapping>
