@@ -32,6 +32,10 @@ public class ScoreLog {
 	public final static int CREATE_SCORE_MEMBER = 15;
 	public final static int CREATE_SCORE_SUMMARY = 16;
 	public final static int UPDATE_SCORE_SUMMARY = 17;
+	public static final int NEW_SCORE_SHEET = 18;
+	public static final int RM_SCORE_SHEET = 19;
+	public static final int RM_SCORE_SHEET_ST = 20;
+	public static final int ADD_SCORE_SHEET_ST = 21;
 	
 	private Integer id;
 	private Account who;
@@ -121,6 +125,14 @@ public class ScoreLog {
 			return "新建了月积分";
 		case UPDATE_SCORE_SUMMARY:
 			return "更新了月积分";
+		case NEW_SCORE_SHEET:
+			return "新积分表单";
+		case RM_SCORE_SHEET:
+			return "删除积分表单";
+		case RM_SCORE_SHEET_ST:
+			return "从表单移除条例";
+		case ADD_SCORE_SHEET_ST:
+			return "从表单添加条例";
 			default:
 				return "未知";
 		}

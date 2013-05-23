@@ -2,9 +2,12 @@ package com.bus.stripes.actionbean.score;
 
 import java.io.FileInputStream;
 
+import security.action.Secure;
+
 import com.bus.services.CustomActionBean;
 import com.bus.services.HRBean;
 import com.bus.services.ScoreBean;
+import com.bus.util.Roles;
 import com.bus.util.ScoreExcelFileProcessor;
 
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -38,10 +41,8 @@ public class ScoreFileUploadActionBean extends CustomActionBean{
 	}
 
 	@HandlesEvent(value="itemsupload")
+	@Secure(roles=Roles.SCORE_ITEMS_FILE_UPLOAD)
 	public Resolution itemsupload(){
-		if(!getPermission(context.getUser(), "scorefileupload_uploaditems")){
-			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
-		}
 		try{
 			if(itemsfile != null){
 				ScoreExcelFileProcessor saver  = new ScoreExcelFileProcessor(((FileInputStream)itemsfile.getInputStream()));
@@ -59,10 +60,8 @@ public class ScoreFileUploadActionBean extends CustomActionBean{
 	}
 	
 	@HandlesEvent(value="scoreupload")
+	@Secure(roles=Roles.SCORE_SCORES_FILE_UPLOAD)
 	public Resolution scoreupload(){
-		if(!getPermission(context.getUser(), "scorefileupload_uploadscores")){
-			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
-		}
 		try{
 			if(scorefile != null){
 				ScoreExcelFileProcessor saver  = new ScoreExcelFileProcessor(((FileInputStream)scorefile.getInputStream()));

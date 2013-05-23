@@ -2,6 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ss" uri="/WEB-INF/StripesSecurityManager.tld" %>
 <stripes:layout-render name="../default.jsp">
 	
     <stripes:layout-component name="contents">
@@ -59,8 +60,10 @@
 								<input name="workerid" value="${actionBean.member.employee.workerid}" type="hidden"/>
 								日期:<stripes:text name="recordDate" formatPattern="yyyy-MM-dd" class="datepickerClass"/>
 								<stripes:submit name="memberDetail" value="查询"/>
-								<stripes:submit name="deleteRecords" value="删除选择"/>
 								
+								<ss:secure roles="scoredetail_remove_record">
+								  <stripes:submit name="deleteRecords" value="删除选择"/>
+								</ss:secure>
 							<div class="hastable">
 								<table>
 									<thead>

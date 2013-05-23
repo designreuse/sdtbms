@@ -1,6 +1,9 @@
 package com.bus.stripes.actionbean;
 
 import java.util.HashMap;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 
 import com.bus.dto.Account;
 
@@ -22,14 +25,15 @@ public class MyActionBeanContext extends ActionBeanContext {
     
     public void removeUser(){
     	getRequest().getSession().removeAttribute("account");
+    	getRequest().getSession().removeAttribute("roles");
     }
     
-    public void setPermission(HashMap<String,Integer> permissions){
-    	getRequest().getSession().setAttribute("permissions", permissions);
+    public void setRoles(List<String> roles){
+    	getRequest().getSession().setAttribute("roles", roles);
     }
     
-    public HashMap<String,Integer> getPermission(){
-    	return (HashMap<String,Integer>)(getRequest().getSession().getAttribute("permissions"));
+    public List<String> getRoles(){
+    	return (List<String>)(getRequest().getSession().getAttribute("roles"));
     }
     
     public Resolution errorResolution(String error,String detail){
@@ -38,5 +42,17 @@ public class MyActionBeanContext extends ActionBeanContext {
     
     public Resolution errorResolutionAjax(String error,String detail){
     	return new StreamingResolution("text;charset=utf-8;",error+"-"+detail);
+    }
+    
+    public String getFullURL() {
+    	HttpServletRequest request = this.getRequest();
+        StringBuffer requestURL = request.getRequestURL();
+        String queryString = request.getQueryString();
+
+        if (queryString == null) {
+            return requestURL.toString();
+        } else {
+            return requestURL.append('?').append(queryString).toString();
+        }
     }
 }

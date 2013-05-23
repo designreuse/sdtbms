@@ -2,6 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ss" uri="/WEB-INF/StripesSecurityManager.tld" %>
 <stripes:layout-render name="../default.jsp">
 	
     <stripes:layout-component name="contents">
@@ -32,9 +33,15 @@
 				<div>
 				文件上传
 				<stripes:form id="file_submit_form" beanclass="com.bus.stripes.actionbean.score.ScoreFileUploadActionBean">
-					<Label>条例 文件(csv):</Label><stripes:file name="itemsfile" id="file_scoreitem" /><stripes:submit name="itemsupload" value="提交"/>
+					<Label>条例 文件(csv):</Label><stripes:file name="itemsfile" id="file_scoreitem" />
+									<ss:secure roles="scorefileupload_uploaditems">
+											<stripes:submit name="itemsupload" value="提交"/>
+									</ss:secure>
 					<br/>
-					<Label>给分文件(csv):</Label><stripes:file name="scorefile"  id="file_score" /><stripes:submit name="scoreupload" value="提交"/>
+					<Label>给分文件(csv):</Label><stripes:file name="scorefile"  id="file_score" />
+									<ss:secure roles="scorefileupload_uploadscores">
+											<stripes:submit name="scoreupload" value="提交"/>
+									</ss:secure>
 					<br/>
 					<script type="text/javascript">
 					$("#file_submit_form").submit(function(){

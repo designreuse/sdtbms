@@ -5,11 +5,14 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
+import security.action.Secure;
+
 import com.bus.dto.Account;
 import com.bus.dto.Accountgroup;
 import com.bus.dto.Action;
 import com.bus.dto.Actiongroup;
 import com.bus.dto.Employee;
+import com.bus.dto.score.Scoresheets;
 import com.bus.dto.score.Scoretype;
 import com.bus.services.AccountBean;
 import com.bus.services.CustomActionBean;
@@ -18,6 +21,7 @@ import com.bus.services.ScoreBean;
 import com.bus.stripes.actionbean.MyActionBeanContext;
 import com.bus.stripes.actionbean.Permission;
 import com.bus.stripes.selector.ScoreitemSelector;
+import com.bus.util.Roles;
 
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
@@ -47,6 +51,7 @@ public class ScoreitemsActionBean extends CustomActionBean{
 	private Scoretype scoretype;
 	private List<Scoretype> scoretypes;
 	private List<Scoretype> selectedScoreTypes;
+	private List<Scoresheets> sheetList;
 	private String itemlist;
 	private ScoreitemSelector selector;
 	private Employee employee;
@@ -64,6 +69,11 @@ public class ScoreitemsActionBean extends CustomActionBean{
 		if(pagenum <= 0 || lotsize <= 0){
 			pagenum = 1;
 			lotsize = 20;
+		}
+		try{
+			sheetList = scoreBean.getAllScoreSheets();
+		}catch(Exception e){
+			sheetList = new ArrayList<Scoresheets>();
 		}
 		getFromSelector();
 		if(pagenum > totalcount)
@@ -96,19 +106,15 @@ public class ScoreitemsActionBean extends CustomActionBean{
 	}
 	
 	@DefaultHandler
+	@Secure(roles=Roles.SCORE_ITEMS_VIEW)
 	public Resolution defaultAction(){
-		if(!getPermission(context.getUser(), "scoreitems_view")){
-			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
-		}
 		initData();
 		return new ForwardResolution("/score/items.jsp").addParameter("pagenum", pagenum);
 	}
 	
 	@HandlesEvent(value="createscoretype")
+	@Secure(roles=Roles.SCORE_ITEMS_CREATE)
 	public Resolution createscoretype(){
-		if(!getPermission(context.getUser(),"scoreitems_create")){
-			return context.errorResolutionAjax("权限错误","你没有权限进行该操作,请联系管理员");
-		}
 		if(scoretype == null){
 			return new StreamingResolution("text/html;charset=utf-8;","");
 		}
@@ -123,29 +129,25 @@ public class ScoreitemsActionBean extends CustomActionBean{
 	}
 	
 	@HandlesEvent(value="deletescoretype")
+	@Secure(roles=Roles.SCORE_ITEMS_EDIT)
 	public Resolution deletescoretype(){
-		if(!getPermission(context.getUser(),"scoreitems_edit")){
-			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
-		}
 		try{
 			if(selectedScoreTypes == null)
 				return defaultAction();
 			for(Scoretype st:selectedScoreTypes){
+				if(st != null && st.getId() != null)
 				scoreBean.removeScoreType(context.getUser(), st);
 			}
 			return defaultAction();
 		}catch (Exception e) {
-			e.printStackTrace();
 			return context.errorResolution("删除错误","可能要删除的条例已经列入条例表单中，请先从该条例单中删除。" +
-					"或者该条例已经赋值过给员工，无法删除");
+					"或者该条例已经赋值过给员工，无法删除."+e.getMessage());
 		}
 	}
 	
 	@HandlesEvent(value="editscoretype")
+	@Secure(roles=Roles.SCORE_ITEMS_EDIT)
 	public Resolution editscoretype(){
-		if(!getPermission(context.getUser(),"scoreitems_edit")){
-			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
-		}
 		try{
 			if(scoretype == null){
 				String targetId = context.getRequest().getParameter("targetId");
@@ -161,10 +163,8 @@ public class ScoreitemsActionBean extends CustomActionBean{
 	}
 	
 	@HandlesEvent(value="givescores")
+	@Secure(roles=Roles.SCORE_GIVE_SCORE)
 	public Resolution givescores(){
-		if(!getPermission(context.getUser(),"scoreitems_givescore")){
-			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
-		}
 		if(employee == null || selectedScoreTypes == null){
 			return defaultAction();
 		}
@@ -178,12 +178,32 @@ public class ScoreitemsActionBean extends CustomActionBean{
 					scoreBean.createScoreMember(context.getUser(),scorer);
 			}
 			for(Scoretype st:selectedScoreTypes){
-				if(st != null)
+				if(st != null && st.getId() != null)
 					scoreBean.assignScoreTypeToScoreMember(context.getUser(),employee.getWorkerid(),scorer.getWorkerid(),st, Calendar.getInstance().getTime(),score);
 			}
 		}catch(Exception e){
 			e.printStackTrace();
 			return context.errorResolution("打分错误","请确认输入员工信息正确再试一次，或联系管理员");
+		}
+		return defaultAction();
+	}
+	
+	@HandlesEvent(value="assignToScoreSheet")
+	@Secure(roles=Roles.SCORE_SHEET_ADD_ST)
+	public Resolution assignToScoreSheet(){
+		if(selectedScoreTypes == null || itemlist == null){
+			return defaultAction();
+		}
+		try{
+			for(Scoretype st:selectedScoreTypes){
+				if(st != null && st.getId() != null){
+					if(!scoreBean.isScoretypeExistForSheet(st.getId(),Integer.parseInt(itemlist))){
+						scoreBean.assignScoreTypeToSheet(context.getUser(),st.getId(),Integer.parseInt(itemlist));
+					}
+				}
+			}
+		}catch(Exception e){
+			return context.errorResolution("添加出错","请确认选择了正确的积分表单和条例，或联系管理员."+e.getMessage());
 		}
 		return defaultAction();
 	}
@@ -276,5 +296,11 @@ public class ScoreitemsActionBean extends CustomActionBean{
 	}
 	public void setScore(Integer score) {
 		this.score = score;
+	}
+	public List<Scoresheets> getSheetList() {
+		return sheetList;
+	}
+	public void setSheetList(List<Scoresheets> sheetList) {
+		this.sheetList = sheetList;
 	}
 }

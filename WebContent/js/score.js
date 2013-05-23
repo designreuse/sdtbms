@@ -1,11 +1,18 @@
 $(document).ready(function(){
-	//New Item button and dialog
+				//New Item button and dialog
     $("#btn_new_item_link").click(function() {
-    	$('#btn_new_item_dialog').dialog('open');
-		return true;
-    });
+    		$('#btn_new_item_dialog').dialog('open');
+    			return true;
+    		});
     buildNewItemDialog('form_new_item','btn_new_item_dialog',450,300,'&createscoretype=');
     
+    		//New item sheet button and dialog
+    	$('#btn_new_itemsheet_link').click(function(){
+    			$('#btn_new_itemsheet_dialog').dialog('open');
+    			return true;
+    		});
+    buildNewItemDialog('form_new_itemsheet','btn_new_itemsheet_dialog',450,300,'&createSheet=');
+    	
     $('#checkWorkerId').click(function(){
     	var getGenerationUrl = $(this).next().val();
     	var workerId = $(this).prev().val();

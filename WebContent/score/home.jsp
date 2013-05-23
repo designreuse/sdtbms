@@ -2,6 +2,8 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ss" uri="/WEB-INF/StripesSecurityManager.tld" %>
+
 <stripes:layout-render name="../default.jsp">
 	
     <stripes:layout-component name="contents">
@@ -18,9 +20,8 @@
 			<!-- Side bar ****************************************************************** -->
 			<jsp:include page="/score/sidebar.jsp" />
 			
-			
-			
 		<!-- Side bar ****************************************************************** -->
+		
 				<!-- Start of main content -->
 				<div id="rightcontent">
 				

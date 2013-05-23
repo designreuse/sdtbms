@@ -90,6 +90,7 @@ $(document).ready(function() {
 								</li>
 								<li class="buttons">
 									<div>
+										<stripes:hidden name="url"/>
 										<stripes:submit name="login"  value ="登陆" class="ui-state-default ui-corner-all float-right ui-button"></stripes:submit>
 									</div>
 								</li>

@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld" %>
+<%@ taglib prefix="ss" uri="/WEB-INF/StripesSecurityManager.tld" %>
 <div id="sidebar">
 			<div class="sidebar-content">
 				<a id="close_sidebar" class="btn ui-state-default full-link ui-corner-all" href="#drill">
@@ -13,21 +14,37 @@
 						<div class="portlet-header ui-widget-header">积分管理专栏<span class="ui-icon ui-icon-circle-arrow-s"></span></div>
 						<div class="portlet-content">
 							<ul id="style-switcher" class="side-menu">
+							
+								<ss:secure roles="scorehome_view">
 								<li>
 									<a href="${pageContext.request.contextPath}/actionbean/Scorehome.action" title="积分主页">积分主页</a>
 								</li>
+								</ss:secure>
+								
+								<ss:secure roles="scoreitems_view">
 								<li>
 									<a href="${pageContext.request.contextPath}/actionbean/Scoreitems.action" title="积分主页">条例管理</a>
 								</li>
+								</ss:secure>
+								
+								<ss:secure roles="scoreitems_create,scoreitems_givescore">
 								<li>
 									<a href="${pageContext.request.contextPath}/actionbean/Scorefile.action" title="积分主页">批量积分添加/删除</a>
 								</li>
+								</ss:secure>
+								
+								<ss:secure roles="scoresheet_view">
 								<li>
-									<a href="${pageContext.request.contextPath}/actionbean/Scorehome.action" title="积分主页">积分单管理</a>
+									<a href="${pageContext.request.contextPath}/actionbean/Scoresheet.action" title="积分主页">积分单管理</a>
 								</li>
+								</ss:secure>
+								
+								<ss:secure roles="scoredetail_view">
 								<li>
 									<a href="${pageContext.request.contextPath}/actionbean/Scoredetail.action" title="积分主页">积分详细信息</a>
 								</li>
+								</ss:secure>
+
 								<li>
 									<a href="${pageContext.request.contextPath}/actionbean/Empscore.action?ranking=" title="积分主页">积分排名查看</a>
 								</li>

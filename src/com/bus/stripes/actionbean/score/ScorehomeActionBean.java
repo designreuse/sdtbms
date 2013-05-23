@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import security.action.Secure;
+
 import com.bus.dto.Account;
 import com.bus.dto.Accountgroup;
 import com.bus.dto.Actiongroup;
@@ -14,6 +16,7 @@ import com.bus.services.HRBean;
 import com.bus.services.ScoreBean;
 import com.bus.stripes.actionbean.MyActionBeanContext;
 import com.bus.stripes.actionbean.Permission;
+import com.bus.util.Roles;
 
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
@@ -24,8 +27,10 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 
+
 @UrlBinding("/actionbean/Scorehome.action")
-public class ScorehomeActionBean extends CustomActionBean implements Permission{
+@Secure(roles = Roles.SCORE_SYSTEM)
+public class ScorehomeActionBean extends CustomActionBean{
 
 	private ScoreBean scoreBean;
 	public ScoreBean getScoreBean(){return this.scoreBean;}
@@ -47,10 +52,8 @@ public class ScorehomeActionBean extends CustomActionBean implements Permission{
 	}
 	
 	@DefaultHandler
+	@Secure(roles=Roles.SCORE_HOME_VIEW)
 	public Resolution defaultAction(){
-		if(!getPermission(context.getUser(),"scorehome_view")){
-			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
-		}
 		loadLogs();
 		return new ForwardResolution("/score/home.jsp");
 	}

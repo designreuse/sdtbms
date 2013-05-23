@@ -1,7 +1,10 @@
 package com.bus.stripes.actionbean.account;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import security.action.Secure;
 
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
@@ -22,10 +25,12 @@ import com.bus.services.HRBean;
 import com.bus.stripes.actionbean.MyActionBeanContext;
 import com.bus.stripes.actionbean.Permission;
 import com.bus.stripes.typeconverter.PasswordTypeConverter;
+import com.bus.util.Roles;
 import com.bus.util.SelectBoxOption;
 import com.bus.util.SelectBoxOptions;
 
 @UrlBinding(value="/actionbean/account/Account.action")
+@Secure(roles = Roles.ACCOUNT_SYSTEM)
 public class AccountActionBean extends CustomActionBean implements Permission{
 
 	private HRBean hrBean;
@@ -65,10 +70,8 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	}
 	
 	@HandlesEvent(value="createaccount")
+	@Secure(roles = Roles.ACCOUNT_ACCOUNT_CREATE)
 	public Resolution createaccount(){
-		if(!getPermission(context.getUser(), "account_createaccount")){
-			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
-		}
 		try{
 			if(empworkerid != null && !hrBean.isEmployeeWorkerIdExist(empworkerid)){
 				return defaultAction();
@@ -88,10 +91,8 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	}
 	
 	@HandlesEvent(value="creategroup")
+	@Secure(roles = Roles.ACCOUNT_GROUP_CREATE)
 	public Resolution creategroup(){
-		if(!getPermission(context.getUser(), "account_creategroup")){
-			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
-		}
 		try{
 			if(groupname == null || groupname.trim().equals(""))
 				return defaultAction();
@@ -106,10 +107,8 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	}
 	
 	@HandlesEvent(value="assigngroups")
+	@Secure(roles = Roles.ACCOUNT_ASSIGN_ACC_TO_GP)
 	public Resolution assigngroups(){
-		if(!getPermission(context.getUser(), "account_assigngroup")){
-			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
-		}
 		try{
 			if(userids == null || groupids == null)
 				return defaultAction();
@@ -127,10 +126,8 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	}
 	
 	@HandlesEvent(value="removeusers")
+	@Secure(roles = Roles.ACCOUNT_REMOVE_ACC)
 	public Resolution removeusers(){
-		if(!getPermission(context.getUser(), "account_removeaccount")){
-			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
-		}
 		try{
 			if(userids == null)
 				return defaultAction();
@@ -145,10 +142,8 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	}
 	
 	@HandlesEvent(value="resignusers")
+	@Secure(roles = Roles.ACCOUNT_RESIGN_ACC)
 	public Resolution resignusers(){
-		if(!getPermission(context.getUser(), "account_resignaccount")){
-			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
-		}
 		try{
 			if(userids == null)
 				return defaultAction();
@@ -163,10 +158,8 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	}
 	
 	@HandlesEvent(value="removegroups")
+	@Secure(roles = Roles.ACCOUNT_REMOVE_GP)
 	public Resolution removegroups(){
-		if(!getPermission(context.getUser(), "account_removegroup")){
-			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
-		}
 		try{
 			if(groupids == null)
 				return defaultAction();
@@ -182,10 +175,8 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	}
 	
 	@HandlesEvent(value="accountgroups")
+	@Secure(roles = Roles.ACCOUNT_VIEW_ACC_GPS)
 	public Resolution accountgroups(){
-		if(!getPermission(context.getUser(), "account_viewaccountgroups")){
-			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
-		}
 		String targetId = context.getRequest().getParameter("targetId");
 		try{
 			account = accBean.getAccountById(targetId);
@@ -198,10 +189,8 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	}
 	
 	@HandlesEvent(value="groupactions")
+	@Secure(roles = Roles.ACCOUNT_VIEW_GP_ACTIONS)
 	public Resolution groupactions(){
-		if(!getPermission(context.getUser(), "account_viewgroupactions")){
-			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
-		}
 		String targetId = context.getRequest().getParameter("targetId");
 		try{
 			group = accBean.getGroupById(targetId);
@@ -214,6 +203,7 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 				}
 			}
 			groupactions = null;
+			allactions = sortActions(allactions);
 			return new ForwardResolution("/acc/groupactions.jsp");
 		}catch(Exception e){
 			return new ForwardResolution("/actionbean/Error.action").addParameter("error", "获取用户组信息失败")
@@ -223,10 +213,8 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	
 	
 	@HandlesEvent("removeusergroup")
+	@Secure(roles = Roles.ACCOUNT_REMOVE_GP_FROM_USER)
 	public Resolution removeusergroup(){
-		if(!getPermission(context.getUser(), "account_removegroupfromuser")){
-			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
-		}
 		String usergroupid = context.getRequest().getParameter("usergroupid");
 		String targetId = context.getRequest().getParameter("targetId");
 		try{
@@ -239,10 +227,8 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 	}
 	
 	@HandlesEvent("assignactionstogroup")
+	@Secure(roles = Roles.ACCOUNT_ASSIGN_ACTION_TO_GP)
 	public Resolution assignactionstogroup(){
-		if(!getPermission(context.getUser(), "account_assignactiontogroup")){
-			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
-		}
 		if(groupactions == null)
 			groupactions = new ArrayList<Action>();
 		String groupid = context.getRequest().getParameter("targetId");
@@ -271,6 +257,41 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 			return new ForwardResolution("/actionbean/Error.action").addParameter("error", "更新组失败")
 					.addParameter("description", "无法更新组ID:"+groupid+"的组信息，请联系管理员。"+e.getMessage());
 		}
+	}
+	
+	/**
+	 * Sort the actions so that can display nicely in UI
+	 * @param allactions2
+	 * @return
+	 */
+	private List<Action> sortActions(List<Action> actions) {
+		List<String> systems = new ArrayList<String>();
+		HashMap<String, List<Action>> mappedActions = new HashMap<String, List<Action>>();
+		
+		for(Action action:actions){
+			if(action.getName().indexOf("system") != -1){
+				systems.add(action.getName());
+				List<Action> actionsarr = new ArrayList<Action>();
+				actionsarr.add(action);
+				mappedActions.put(action.getName(),actionsarr);
+			}
+		}
+		
+		for(Action action:actions){
+			String name = action.getName().substring(0,action.getName().indexOf("_"));
+			for(String sys:systems){
+				String sysname = sys.substring(0,sys.indexOf("_"));
+				if(sysname.equals(name) && action.getName().indexOf("system") == -1){
+						mappedActions.get(sys).add(action);
+				}
+			}
+		}
+		
+		List<Action> ret = new ArrayList<Action>();
+		for(String system:systems){
+			ret.addAll(mappedActions.get(system));
+		}
+		return ret;
 	}
 	
 	public String getEmpworkerid() {

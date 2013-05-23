@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import security.action.Secure;
+
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.HandlesEvent;
@@ -19,6 +21,7 @@ import com.bus.services.CustomActionBean;
 import com.bus.services.HRBean;
 import com.bus.services.ScoreBean;
 import com.bus.stripes.selector.EmployeeSelector;
+import com.bus.util.Roles;
 
 @UrlBinding(value="/actionbean/Scoredetail.action")
 public class ScoredetailActionBean extends CustomActionBean{
@@ -42,10 +45,8 @@ public class ScoredetailActionBean extends CustomActionBean{
 	private List<Scorerecord> selectedRecord;
 	
 	@DefaultHandler
+	@Secure(roles=Roles.SCORE_DETAIL_VIEW)
 	public Resolution defaultAction(){
-		if(!getPermission(context.getUser(), "scoredetail_view")){
-			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
-		}
 		if(founds == null ){
 			founds = new ArrayList<Employee>();
 		}
@@ -81,10 +82,8 @@ public class ScoredetailActionBean extends CustomActionBean{
 	}
 
 	@HandlesEvent(value="deleteRecords")
+	@Secure(roles=Roles.SCORE_DETAIL_REMOVE_RECORD)
 	public Resolution deleteRecords(){
-		if(!getPermission(context.getUser(), "scoredetail_remove_record")){
-			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
-		}
 		try{
 			if(selectedRecord != null){
 				for(Scorerecord record:selectedRecord){

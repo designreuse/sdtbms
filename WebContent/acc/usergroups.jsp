@@ -2,6 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ss" uri="/WEB-INF/StripesSecurityManager.tld" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
@@ -25,7 +26,10 @@
 				<input type="hidden" name="usergroupid" value="${groups.value}"/>
 				<input type="hidden" name="targetId" value="${actionBean.account.id}"/>
 				${groups.label}
-				<stripes:submit name="removeusergroup" value="移除"/>
+				
+				<ss:secure roles="account_removegroupfromuser">
+						<stripes:submit name="removeusergroup" value="移除"/>
+				</ss:secure>
 			</stripes:form>
 		</div>
 	</c:forEach>

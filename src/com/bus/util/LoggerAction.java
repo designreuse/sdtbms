@@ -9,6 +9,7 @@ import com.bus.dto.logger.AccountLog;
 import com.bus.dto.logger.ScoreLog;
 import com.bus.dto.score.Scoremember;
 import com.bus.dto.score.Scorerecord;
+import com.bus.dto.score.Scoresheets;
 import com.bus.dto.score.Scoresummary;
 import com.bus.dto.score.Scoretype;
 
@@ -193,6 +194,48 @@ public class LoggerAction {
 		log.setCreatetime(Calendar.getInstance().getTime());
 		log.setRecordid(summary.getId()+"");
 		log.setRemark("更新了月总积分日期："+HRUtil.parseDateToString(summary.getDate())+"(新分值"+summary.getScore()+")");
+		log.setWho(user);
+		return log;
+	}
+
+	public static ScoreLog createScoreSheet(Account user, Scoresheets sheet) {
+		ScoreLog log = new ScoreLog();
+		log.setAction(ScoreLog.NEW_SCORE_SHEET);
+		log.setCreatetime(Calendar.getInstance().getTime());
+		log.setRecordid(sheet.getId()+"");
+		log.setRemark("创建了新的积分表单:"+sheet.getName());
+		log.setWho(user);
+		return log;
+	}
+
+	public static ScoreLog removeScoreSheet(Account user, Scoresheets sheet) {
+		ScoreLog log = new ScoreLog();
+		log.setAction(ScoreLog.RM_SCORE_SHEET);
+		log.setCreatetime(Calendar.getInstance().getTime());
+		log.setRecordid(sheet.getId()+"");
+		log.setRemark("删除了积分表单:"+sheet.getName());
+		log.setWho(user);
+		return log;
+	}
+
+	public static ScoreLog removeScoreTypeFromSheet(Account user,
+			Scoresheets sheet, Scoretype st) {
+		ScoreLog log = new ScoreLog();
+		log.setAction(ScoreLog.RM_SCORE_SHEET_ST);
+		log.setCreatetime(Calendar.getInstance().getTime());
+		log.setRecordid(sheet.getId()+"");
+		log.setRemark("从表单 "+sheet.getName()+" 移除了条例:"+st.getReference());
+		log.setWho(user);
+		return log;
+	}
+
+	public static Object assignScoreTypeToSheet(Account user, Scoretype st,
+			Scoresheets sheet) {
+		ScoreLog log = new ScoreLog();
+		log.setAction(ScoreLog.ADD_SCORE_SHEET_ST);
+		log.setCreatetime(Calendar.getInstance().getTime());
+		log.setRecordid(sheet.getId()+"");
+		log.setRemark("从表单 "+sheet.getName()+" 添加了条例:"+st.getReference());
 		log.setWho(user);
 		return log;
 	}

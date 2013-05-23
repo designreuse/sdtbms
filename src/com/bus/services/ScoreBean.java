@@ -54,9 +54,9 @@ public class ScoreBean {
 	public Map getAllScoreTypes(int pagenum, int lotsize) throws Exception{
 		List<Scoretype> list=null;
 		if(pagenum == -1 || lotsize == -1)
-			list = em.createQuery("SELECT q FROM Scoretype q").getResultList();
+			list = em.createQuery("SELECT q FROM Scoretype q ORDER BY reference").getResultList();
 		else
-			list = em.createQuery("SELECT q FROM Scoretype q")
+			list = em.createQuery("SELECT q FROM Scoretype q ORDER BY reference")
 				.setFirstResult(pagenum * lotsize - lotsize).setMaxResults(lotsize).getResultList();
 		Long count = (Long) em.createQuery("SELECT count(q) FROM Scoretype q").getSingleResult();
 		Map<String,Object> map = new HashMap<String,Object>();
@@ -367,12 +367,16 @@ public class ScoreBean {
 			return null;
 		}
 	}
-	
-	public Map getRecordsByStatement(int pagenum, int lotsize, String statement) {
-		return null;
-		
-	}
 
+	/**
+	 *  Get score rank directly, returns a virtual table ScoreMemberRank data.<br/>
+	 *   List<ScoreMemberRank>
+	 * @param pagenum
+	 * @param lotsize
+	 * @param statement
+	 * @return
+	 * @throws Exception
+	 */
 	public Map getSummaryByStatement(int pagenum, int lotsize, String statement) throws Exception{
 		Map ret = new HashMap<String,Object>();
 		List<ScoreMemberRank> list = null;
@@ -385,5 +389,126 @@ public class ScoreBean {
 		ret.put("list", list);
 		ret.put("count", list.get(0).getCount());
 		return ret;
+	}
+
+	/**
+	 * Get the selected sheet infomation by its sheet id
+	 * @param selectedSheet
+	 * @return
+	 */
+	public Scoresheets getScoreSheetById(Integer selectedSheet) {
+		try{
+			return em.find(Scoresheets.class, selectedSheet);
+		}catch(Exception e){
+			return null;
+		}
+	}
+
+	/**
+	 * Get all score sheets available in database
+	 * @return
+	 */
+	public List<Scoresheets> getAllScoreSheets() throws Exception{
+		return em.createQuery("SELECT q FROM Scoresheets q").getResultList();
+	}
+
+	/**
+	 * Create new score sheet and log, check sheet name existence first
+	 * @param user
+	 * @param sheet
+	 * @throws Exception
+	 */
+	@Transactional
+	public void createScoreSheet(Account user, Scoresheets sheet) throws Exception{
+		if(isScoreSheetNameExist(sheet.getName()))
+			return;
+		em.persist(sheet);
+		em.flush();
+		em.persist(LoggerAction.createScoreSheet(user, sheet));
+	}
+	
+	/**
+	 * CHeck whether a score sheet name exsit
+	 * @param name
+	 * @return
+	 */
+	public boolean isScoreSheetNameExist(String name){
+		try{
+			List<Scoresheets> s = (List<Scoresheets>) em.createQuery("SELECT q FROM Scoresheets q WHERE name=?")
+					.setParameter(1, name).getResultList();
+			if(s.size() > 0)
+				return true;
+			else
+				return false;
+		}catch(Exception e){
+			return false;
+		}
+	}
+
+	/**
+	 * Delete a score sheet and log
+	 * @param user
+	 * @param selectedSheet
+	 * @throws Exception
+	 */
+	@Transactional
+	public void removeScoreSheet(Account user, Integer selectedSheet) throws Exception{
+		Scoresheets s = em.find(Scoresheets.class, selectedSheet);
+		em.persist(LoggerAction.removeScoreSheet(user,s));
+		em.remove(s);
+	}
+
+	/**
+	 * remove score type from sheet, given both ids
+	 * @param user
+	 * @param parseInt
+	 * @param id
+	 */
+	@Transactional
+	public void removeScoreTypeFromSheet(Account user, Integer sheetId, Integer scoretypeId) throws Exception{
+		Scoresheets sheet = em.find(Scoresheets.class, sheetId);
+		Scoretype st = em.find(Scoretype.class, scoretypeId);
+		Scoresheetmapper mapper = (Scoresheetmapper) em.createQuery("SELECT q FROM Scoresheetmapper q WHERE sheetid =:sheet AND scoretypeid=:st")
+				.setParameter("sheet", sheet).setParameter("st", st).getSingleResult();
+		em.persist(LoggerAction.removeScoreTypeFromSheet(user,sheet,st));
+		em.remove(mapper);
+	}
+
+	/**
+	 * CHeck if the score type already assign to sheet provided
+	 * @param scoretypeId
+	 * @param sheetId
+	 * @return
+	 */
+	public boolean isScoretypeExistForSheet(Integer scoretypeId, int sheetId){
+		try{
+			Scoresheets sheet = em.find(Scoresheets.class, sheetId);
+			Scoretype st = em.find(Scoretype.class, scoretypeId);
+			Scoresheetmapper mapper = (Scoresheetmapper) em.createQuery("SELECT q FROM Scoresheetmapper q WHERE sheetid =:sheet AND scoretypeid=:st")
+					.setParameter("sheet", sheet).setParameter("st", st).getSingleResult();
+			if(mapper != null)
+				return true;
+			return false;
+		}catch(Exception e){
+			return false;
+		}
+	}
+
+	/**
+	 * Assign score type to a score sheet
+	 * @param user
+	 * @param id
+	 * @param itemlist
+	 */
+	@Transactional
+	public void assignScoreTypeToSheet(Account user, Integer scoretypeId, int sheetId) throws Exception{
+		Scoresheets sheet = em.find(Scoresheets.class, sheetId);
+		Scoretype st = em.find(Scoretype.class, scoretypeId);
+		Scoresheetmapper mapper = new Scoresheetmapper();
+		mapper.setSheet(sheet);
+		mapper.setType(st);
+		em.persist(mapper);
+		em.flush();
+		em.persist(LoggerAction.assignScoreTypeToSheet(user, st, sheet));
 	}
 }

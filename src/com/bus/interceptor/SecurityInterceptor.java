@@ -36,8 +36,9 @@ public class SecurityInterceptor implements Interceptor{
 		if(isLoggedIn(ctx.getActionBeanContext())){
 			return resolution;
 		}
-		
-		return new RedirectResolution("/actionbean/Login.action");
+//		System.out.println(((MyActionBeanContext)ctx.getActionBeanContext()).getFullURL() );
+		return new RedirectResolution("/actionbean/Login.action").addParameter("url"
+				,((MyActionBeanContext)ctx.getActionBeanContext()).getFullURL() );
 	}
 	
 	 /** Returns true if the user is logged in. */
