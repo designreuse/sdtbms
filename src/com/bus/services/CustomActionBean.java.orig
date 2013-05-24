@@ -63,5 +63,17 @@ public class CustomActionBean implements ActionBean,Permission{
 			return false;
 		}
 	}
+<<<<<<< HEAD
+=======
 	
+	@Override
+	public boolean getScoreSystemPermission(){
+		try{
+			StripesSecurityFilter m = new StripesSecurityFilter();
+			return true;
+		}catch(Exception e){
+			return false;
+		}
+	}
+>>>>>>> 73cb55b7c8518196fdd683098fd452c0ae459f34
 }
