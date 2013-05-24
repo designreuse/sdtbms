@@ -21,3 +21,8 @@
 .ui-datepicker>div>a>span.ui-icon{
 	display:inline !important;
 }
+
+
+#page-header, #page-header #page-header-wrapper, #page-header #page-header-wrapper #navigation {
+    z-index: 999 !important;
+}

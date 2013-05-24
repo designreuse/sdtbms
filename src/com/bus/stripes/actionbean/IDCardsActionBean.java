@@ -3,11 +3,14 @@ package com.bus.stripes.actionbean;
 import java.util.ArrayList;
 import java.util.List;
 
+import security.action.Secure;
+
 import com.bus.dto.Account;
 import com.bus.dto.Employee;
 import com.bus.dto.Idmanagement;
 import com.bus.services.CustomActionBean;
 import com.bus.services.HRBean;
+import com.bus.util.Roles;
 import com.bus.util.SelectBoxOption;
 import com.bus.util.SelectBoxOptions;
 
@@ -34,6 +37,7 @@ public class IDCardsActionBean extends CustomActionBean implements Permission{
 	}
 	
 	@DefaultHandler
+	@Secure(roles=Roles.EMPLOYEE_IDCARDS_VIEW)
 	public Resolution defaultAction(){
 		loadOptionList();
 		setTargetId(context.getRequest().getParameter("targetId"));
@@ -43,6 +47,7 @@ public class IDCardsActionBean extends CustomActionBean implements Permission{
 	}
 	
 	@HandlesEvent(value="create")
+	@Secure(roles=Roles.EMPLOYEE_IDCARDS_ADD)
 	public Resolution create(){
 		if(idcard == null)
 			return defaultAction();
@@ -55,6 +60,7 @@ public class IDCardsActionBean extends CustomActionBean implements Permission{
 	}
 	
 	@HandlesEvent(value="delete")
+	@Secure(roles=Roles.EMPLOYEE_IDCARDS_RM)
 	public Resolution delete(){
 		bean.deleteIdcard(idcard.getId()+"");
 		return defaultAction();

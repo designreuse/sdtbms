@@ -132,7 +132,7 @@ $(document).ready(function() {
     		url:getNameByIdUrl,
     		success:function(response){
 //    			alert(response);
-    			$('.employeenamefromid').val(response);
+    			$('.employeenamefromid').val(response.trim());
     		},
     		error:function(response){
     			alert("员工工号不存在或存在重复");
@@ -160,10 +160,10 @@ $(document).ready(function() {
     	$.ajax({
     		url:getGenerationUrl+"&workerid="+workerId,
     		success:function(response){
-    			if(response == "1")
-    				alert("工号已经存在");
+    			if(response.trim() == "1")
+    				alert(response.trim() + " 工号已经存在");
     			else
-    				alert("工号可用");
+    				alert(response.trim() + "工号可用");
     		},
     		error:function(response){
     			alert("工号检查失败,请手动检查");

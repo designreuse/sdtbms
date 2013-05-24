@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld" %>
+<%@ taglib prefix="ss" uri="/WEB-INF/StripesSecurityManager.tld" %>
 <div id="sidebar">
 			<div class="sidebar-content">
 				<a id="close_sidebar" class="btn ui-state-default full-link ui-corner-all" href="#drill">
@@ -13,27 +14,47 @@
 						<div class="portlet-header ui-widget-header">人事部专栏<span class="ui-icon ui-icon-circle-arrow-s"></span></div>
 						<div class="portlet-content">
 							<ul id="style-switcher" class="side-menu">
+							  <ss:secure roles="employee_view">
 								<li>
 									<a href="${pageContext.request.contextPath}/actionbean/Employee.action" title="档案查看">档案管理</a>
 								</li>
+								</ss:secure>
+								
+								<ss:secure roles="employee_dept_view">
 								<li>
 									<a href="${pageContext.request.contextPath}/actionbean/Department.action" title="部门查看">部门管理</a>
 								</li>
+								</ss:secure>
+								
+								<ss:secure roles="employee_pos_view">
 								<li>
 									<a href="${pageContext.request.contextPath}/actionbean/Position.action" title="职位查看">职位管理</a>
 								</li>
+								</ss:secure>
+								
+								<ss:secure roles="employee_view_contract">
 								<li>
 									<a href="${pageContext.request.contextPath}/actionbean/Contract.action" title="职位查看">合同管理</a>
 								</li>
+								</ss:secure>
+								
+								<ss:secure roles="employee_idcards_view">
 								<li>
 									<a href="${pageContext.request.contextPath}/actionbean/Idmanagement.action" title="职位查看">证件管理</a>
 								</li>
+								</ss:secure>
+								
+								<ss:secure roles="employee_coor_view">
 								<li>
-									<a href="${pageContext.request.contextPath}/actionbean/HRCoordinator.action" title="升迁/调度/离职">升迁/调动/离职</a>
+									<a href="${pageContext.request.contextPath}/actionbean/HRCoordinator.action" title="升迁/调动/离职">升迁/调动/离职</a>
 								</li>
+								</ss:secure>
+								
+								<ss:secure roles="employee_property_list_view">
 								<li>
 									<a href="${pageContext.request.contextPath}/actionbean/HRListEditor.action" title="属性设置">属性设置</a>
 								</li>
+								</ss:secure>
 							</ul>
 						</div>
 					</div>

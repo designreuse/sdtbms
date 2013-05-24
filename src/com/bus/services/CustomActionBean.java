@@ -43,25 +43,4 @@ public class CustomActionBean implements ActionBean,Permission{
 			return false;
 		}
 	}
-	@Override
-	public boolean getPermission(String action) {
-		try{
-			Account a = context.getUser();
-			if(a == null)
-				return false;
-			a = accBean.getAccountById(a.getId()+"");
-			for(Accountgroup ag:a.getGroups()){
-				if(ag.getGroups().getName().equals("administrator"))
-					return true;
-				for(Actiongroup actiong:ag.getGroups().getActions()){
-					if(actiong.getAction().getName().equals(action))
-						return true;
-				}
-			}
-			return false;
-		}catch(Exception e){
-			return false;
-		}
-	}
-	
 }

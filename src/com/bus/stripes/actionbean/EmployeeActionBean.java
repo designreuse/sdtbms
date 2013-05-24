@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import security.action.Secure;
+
 import com.bus.dto.Account;
 import com.bus.dto.Contract;
 import com.bus.dto.Department;
@@ -19,6 +21,7 @@ import com.bus.stripes.selector.EmployeeSelector;
 import com.bus.test.data.TestData;
 import com.bus.util.ExcelFileSaver;
 import com.bus.util.ExcelFileWriter;
+import com.bus.util.Roles;
 import com.bus.util.SelectBoxOption;
 import com.bus.util.SelectBoxOptions;
 
@@ -181,15 +184,18 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 		}
 		setTotalcount(getRecordsTotal()/lotsize +1);
 	}
+	
 	@DefaultHandler
+	@Secure(roles=Roles.EMPLOYEE_VIEW)
 	public Resolution defaultAction(){
 		loadOptionList();
 		initData();
 //		employee = TestData.getEmployeeTestData();
-		return new ForwardResolution("/index.jsp").addParameter("pagenum", pagenum);
+		return new ForwardResolution("/hr/employee.jsp").addParameter("pagenum", pagenum);
 	}
 	
 	@HandlesEvent(value = "create")
+	@Secure(roles=Roles.EMPLOYEE_EDIT)
 	public Resolution create() {
 		employee.setAccount(context.getUser());
 		bean.saveEmployee(employee);
@@ -197,6 +203,7 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
     }
 	
 	@HandlesEvent(value="delete")
+	@Secure(roles=Roles.EMPLOYEE_RM)
 	public Resolution delete(){
 		Employee d = new Employee();
 		String targetId = context.getRequest().getParameter("targetId");
@@ -211,6 +218,7 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 	}
 	
 	@HandlesEvent(value="detail")
+	@Secure(roles=Roles.EMPLOYEE_VIEW_DETAIL)
 	public Resolution detail(){
 		loadOptionList();
 		String id = context.getRequest().getParameter("targetId");
@@ -223,12 +231,14 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 	}
 	
 	@HandlesEvent(value="edit")
+	@Secure(roles=Roles.EMPLOYEE_EDIT)
 	public Resolution edit(){
 		bean.updateEmployee(employee);
 		return new StreamingResolution("text;charset=utf-8", "修改成功");
 	}
 	
 	@HandlesEvent(value="createcontract")
+	@Secure(roles=Roles.EMPLOYEE_ADD_CONTRACT)
 	public Resolution createcontract(){
 		String id = context.getRequest().getParameter("targetId");
 		Employee e = new Employee();
@@ -256,6 +266,7 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 	}
 	
 	@HandlesEvent(value="employeefileupload")
+	@Secure(roles=Roles.EMPLOYEE_DATAFILE_UPLOAD)
 	public Resolution employeefileupload(){
 //		String info = "";
 		try{
@@ -281,6 +292,7 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 	}
 	
 	@HandlesEvent(value="employeeresignfileupload")
+	@Secure(roles=Roles.EMPLOYEE_DATAFILE_UPLOAD)
 	public Resolution employeeresignfileupload(){
 		try{
 			if(employeeexcel != null){
@@ -302,6 +314,7 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 	}
 	
 	@HandlesEvent(value="resignemployeecoordination")
+	@Secure(roles=Roles.EMPLOYEE_DATAFILE_UPLOAD)
 	public Resolution resignemployeecoordination(){
 		try{
 			if(coordinatorfile != null){
@@ -319,6 +332,7 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 	}
 	
 	@HandlesEvent(value="checkids")
+	@Secure(roles=Roles.EMPLOYEE_IDCHECK_FILE_UPLOAD)
 	public Resolution checkids(){
 		try{
 			if(checkIds != null){
@@ -336,6 +350,7 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 	}
 	
 	@HandlesEvent(value="driverlisences")
+	@Secure(roles=Roles.EMPLOYEE_DATAFILE_UPLOAD)
 	public Resolution driverlisences(){
 		try{
 			if(drivers != null){
@@ -355,6 +370,7 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 	}
 	
 	@HandlesEvent(value = "coordinatorfileupload")
+	@Secure(roles=Roles.EMPLOYEE_COOR_FILE_UPLOAD)
 	public Resolution coordinatorfileupload(){
 		try{
 			if(coordinatorfile != null){
@@ -375,12 +391,14 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 	}
 	
 	@HandlesEvent(value="idcards")
+	@Secure(roles=Roles.EMPLOYEE_IDCARDS_VIEW)
 	public Resolution idcards(){
 		String targetId = context.getRequest().getParameter("targetId");
 		return new ForwardResolution("/actionbean/IDCards.action").addParameter("targetId", targetId);
 	}
 	
 	@HandlesEvent(value="resign")
+	@Secure(roles=Roles.EMPLOYEE_RESIGN)
 	public Resolution resign(){
 		String targetId = context.getRequest().getParameter("targetId");
 		String remark  = context.getRequest().getParameter("remark");
@@ -478,6 +496,7 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 	
 	
 	@HandlesEvent(value="downloadcurrentform")
+	@Secure(roles=Roles.EMPLOYEE_DATA_DOWNLOAD)
 	public Resolution downloadCurrentForm(){
 		ExcelFileWriter writer = new ExcelFileWriter();
 		String statement = "";
@@ -543,9 +562,9 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 //		System.out.println(workerId);
 		boolean exist = bean.isEmployeeWorkerIdExist(workerId);
 		if(exist)
-			return new StreamingResolution("text;charset=utf-8", "1");
+			return new StreamingResolution("text/html;charset=utf-8", "1");
 		else
-			return new StreamingResolution("text;charset=utf-8", "0");
+			return new StreamingResolution("text/html;charset=utf-8", "0");
 	}
 
 }

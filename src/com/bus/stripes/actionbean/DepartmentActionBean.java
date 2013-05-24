@@ -4,11 +4,14 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import security.action.Secure;
+
 import com.bus.dto.Account;
 import com.bus.dto.Department;
 import com.bus.services.CustomActionBean;
 import com.bus.services.HRBean;
 import com.bus.test.data.TestData;
+import com.bus.util.Roles;
 import com.bus.util.SelectBoxOptions;
 
 import net.sourceforge.stripes.action.ActionBean;
@@ -59,6 +62,7 @@ public class DepartmentActionBean extends CustomActionBean implements Permission
 	}
 	
 	@DefaultHandler
+	@Secure(roles = Roles.EMPLOYEE_DEPT_VIEW)
 	public Resolution defaultAction(){
 		initData();
 //		department = TestData.getDepartmentData();
@@ -66,6 +70,7 @@ public class DepartmentActionBean extends CustomActionBean implements Permission
 	}
 	
 	@HandlesEvent(value="create")
+	@Secure(roles = Roles.EMPLOYEE_DEPT_ADD)
 	public Resolution create(){
 		try{
 			bean.saveDepartment(department);
@@ -76,6 +81,7 @@ public class DepartmentActionBean extends CustomActionBean implements Permission
 	}
 	
 	@HandlesEvent(value="delete")
+	@Secure(roles = Roles.EMPLOYEE_DEPT_RM)
 	public Resolution delete(){
 		Department d = new Department();
 		String targetId = context.getRequest().getParameter("targetId");

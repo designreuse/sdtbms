@@ -3,11 +3,14 @@ package com.bus.stripes.actionbean;
 import java.util.ArrayList;
 import java.util.List;
 
+import security.action.Secure;
+
 import com.bus.dto.Account;
 import com.bus.dto.Fixoptions;
 import com.bus.dto.Workertype;
 import com.bus.services.CustomActionBean;
 import com.bus.services.HRBean;
+import com.bus.util.Roles;
 import com.bus.util.SelectBoxOption;
 import com.bus.util.SelectBoxOptions;
 
@@ -41,12 +44,14 @@ public class HRListEditorActionBean extends CustomActionBean implements Permissi
 	}
 	
 	@DefaultHandler
+	@Secure(roles=Roles.EMPLOYEE_PROPERTY_LIST_VIEW)
 	public Resolution defaultAction(){
 		loadOptionLists();
 		return new ForwardResolution("/hr/hrlist.jsp").addParameter("optionlistnewdata", getOptionlistnewdata());
 	}
 	
 	@HandlesEvent(value="createnewproperty")
+	@Secure(roles=Roles.EMPLOYEE_PROPERTY_LIST_ADD)
 	public Resolution createnewproperty(){
 		try{
 			setOptionlistid(Integer.parseInt(context.getRequest().getParameter("optionlistid")));
@@ -68,6 +73,7 @@ public class HRListEditorActionBean extends CustomActionBean implements Permissi
 	}
 	
 	@HandlesEvent(value="createnewworkertype")
+	@Secure(roles=Roles.EMPLOYEE_PROPERTY_LIST_ADD)
 	public Resolution createnewworkertype(){
 		try{
 			if(optionlistnewdata == null || optionlistnewdata.equals("") || optionlistnewdata.indexOf(",")!= -1)
@@ -84,6 +90,7 @@ public class HRListEditorActionBean extends CustomActionBean implements Permissi
 	}
 	
 	@HandlesEvent(value="deleteworkertype")
+	@Secure(roles=Roles.EMPLOYEE_PROPERTY_LIST_RM)
 	public Resolution deleteworkertype(){
 		try{
 			bean.deleteWorkerTypeByName(optionlistselectedvalue);
@@ -95,6 +102,7 @@ public class HRListEditorActionBean extends CustomActionBean implements Permissi
 	}
 	
 	@HandlesEvent(value="deletenewproperty")
+	@Secure(roles=Roles.EMPLOYEE_PROPERTY_LIST_RM)
 	public Resolution deletenewproperty(){
 		try{
 			setOptionlistid(Integer.parseInt(context.getRequest().getParameter("optionlistid")));

@@ -2,6 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ss" uri="/WEB-INF/StripesSecurityManager.tld" %>
 <stripes:layout-render name="../default.jsp">
 	
     <stripes:layout-component name="contents">
@@ -62,8 +63,13 @@
 							<td><stripes:select name="optionlistselectedvalue"><stripes:options-collection collection="${opt.optionList}" label="label" value="value"/></stripes:select></td>
 							<td><stripes:text name="optionlistnewdata"/></td>
 							<td>
+								<ss:secure roles="employee_property_list_rm">
 								<stripes:submit name="deletenewproperty" value="删除"/>
+								</ss:secure>
+								
+								<ss:secure roles="employee_property_list_add">
 								<stripes:submit name="createnewproperty" value="添加"/>
+								</ss:secure>
 							</td>
 						</tr>
 						</stripes:form>
@@ -75,8 +81,13 @@
 							<td><stripes:select name="optionlistselectedvalue"><stripes:options-collection collection="${actionBean.workertypes}" label="label" value="value"/></stripes:select></td>
 							<td><stripes:text name="optionlistnewdata"/></td>
 							<td>
+								<ss:secure roles="employee_property_list_rm">
 								<stripes:submit name="deleteworkertype" value="删除"/>
+								</ss:secure>
+								
+								<ss:secure roles="employee_property_list_add">
 								<stripes:submit name="createnewworkertype" value="添加"/>
+								</ss:secure>
 							</td>
 					</tr>
 					</stripes:form>

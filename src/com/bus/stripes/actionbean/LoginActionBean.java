@@ -96,9 +96,10 @@ public class LoginActionBean implements ActionBean{
 		
 		if(url != null){
 			String suburl = url.substring(url.lastIndexOf("bms")+3);
-			return new RedirectResolution(suburl);
+//			return new RedirectResolution(suburl);
+			return new RedirectResolution("/actionbean/Index.action");
 		}else
-			return new RedirectResolution("/actionbean/Employee.action");
+			return new RedirectResolution("/actionbean/Index.action");
 	}
 	
 	@HandlesEvent(value="logout")

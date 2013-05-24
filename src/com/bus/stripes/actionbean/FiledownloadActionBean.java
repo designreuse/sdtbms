@@ -11,11 +11,14 @@ import java.util.Date;
 
 import org.apache.commons.io.FileUtils;
 
+import security.action.Secure;
+
 import com.bus.dto.Account;
 import com.bus.services.CustomActionBean;
 import com.bus.services.HRBean;
 import com.bus.stripes.selector.EmployeeSelector;
 import com.bus.util.ExcelFileWriter;
+import com.bus.util.Roles;
 
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
@@ -51,6 +54,7 @@ public class FiledownloadActionBean extends CustomActionBean implements Permissi
 	}
 	
 	@HandlesEvent(value="employees")
+	@Secure(roles=Roles.EMPLOYEE_DATA_DOWNLOAD)
 	public Resolution downloadEmployee(){
 			ExcelFileWriter writer = new ExcelFileWriter();
 			String content = writer.writeEmployees(bean,"A");
@@ -63,6 +67,7 @@ public class FiledownloadActionBean extends CustomActionBean implements Permissi
 	}
 	
 	@HandlesEvent(value="drivers")
+	@Secure(roles=Roles.EMPLOYEE_DRIVER_DATA_DOWNLOAD)
 	public Resolution downloadDrivers(){
 			ExcelFileWriter writer = new ExcelFileWriter();
 			String content = writer.writeDrivers(bean);
@@ -74,6 +79,7 @@ public class FiledownloadActionBean extends CustomActionBean implements Permissi
 	}
 	
 	@HandlesEvent(value="monthreport")
+	@Secure(roles=Roles.EMPLOYEE_COOR_DATA_DOWNLOAD)
 	public Resolution monthreport(){
 		ExcelFileWriter writer = new ExcelFileWriter();
 		String content = writer.writeCoordination(bean,startdate, enddate, coortype);

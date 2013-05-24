@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import security.action.Secure;
+
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -20,6 +22,7 @@ import com.bus.dto.Promoandtransfer;
 import com.bus.services.CustomActionBean;
 import com.bus.services.HRBean;
 import com.bus.stripes.selector.CoordinationSelector;
+import com.bus.util.Roles;
 import com.bus.util.SelectBoxOption;
 import com.bus.util.SelectBoxOptions;
 
@@ -72,17 +75,62 @@ public class HRCoordinatorActionBean extends CustomActionBean implements Permiss
 		}
 		setTotalcount(getRecordsTotal()/lotsize +1);
 	}
+	
 	@DefaultHandler
+	@Secure(roles=Roles.EMPLOYEE_COOR_VIEW)
 	public Resolution defaultAction(){
 		initData();
 		return new ForwardResolution("/hr/coordinator.jsp").addParameter("pagenum", pagenum);
 	}
 	
 	@HandlesEvent(value="create")
+	@Secure(roles=Roles.EMPLOYEE_COOR_ADD)
 	public Resolution create(){
 		coordinate.setCreator(context.getUser());
 		String ret = bean.saveCoordination(coordinate);
 		return new StreamingResolution("text;charset=utf-8",ret);
+	}
+	
+	@HandlesEvent(value="delete")
+	@Secure(roles = Roles.EMPLOYEE_COOR_EDIT)
+	public Resolution delete(){
+		String targetId = context.getRequest().getParameter("targetId");
+		if(targetId == null)
+			return defaultAction();
+		try{
+			bean.removeCoordination(Integer.parseInt(targetId));
+			return defaultAction();
+		}catch(Exception e){
+			return context.errorResolution("删除失败", "请确认调动信息没被引用再试一次，或调动信息已经删除。错误："+e.getMessage());
+		}
+	}
+	
+	@HandlesEvent(value="editCoorPage")
+	@Secure(roles = Roles.EMPLOYEE_COOR_EDIT)
+	public Resolution editCoorPage(){
+		String targetId = context.getRequest().getParameter("targetId");
+		if(targetId == null)
+			return context.errorResolution("修改失败", "调动不存在");
+		try{
+			getSelectBoxOptions();
+			coordinate = bean.getCoordinationsById(Integer.parseInt(targetId));
+			return new ForwardResolution("/hr/editcoor.jsp");
+		}catch(Exception e){
+			return context.errorResolution("修改失败", "调动不存在");
+		}
+	}
+	
+	@HandlesEvent(value="edit")
+	@Secure(roles = Roles.EMPLOYEE_COOR_EDIT)
+	public Resolution edit(){
+		if(coordinate == null)
+			return context.errorResolutionAjax("修改失败", "请确认格式信息填写正确");
+		try{
+			bean.editCoordination(context.getUser(),coordinate);
+			return new StreamingResolution("text;charset=utf-8","修改成功.");
+		}catch(Exception e){
+			return context.errorResolutionAjax("修改失败", "请确认格式信息填写正确."+e.getMessage());
+		}
 	}
 	
 	@HandlesEvent(value="prevpage")

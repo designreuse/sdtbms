@@ -217,7 +217,7 @@ public class HRBean {
 					return true;
 			}
 		} catch (Exception e) {
-//			e.printStackTrace();
+			e.printStackTrace();
 			return false;
 		}
 	}
@@ -974,6 +974,30 @@ public class HRBean {
 		}catch(Exception e){
 			return false;
 		}
+	}
+
+	@Transactional
+	public void removeCoordination(int targetId) throws Exception{
+		Promoandtransfer pt = em.find(Promoandtransfer.class, targetId);
+		em.remove(pt);
+	}
+
+	public Promoandtransfer getCoordinationsById(int targetId) throws Exception{
+		return em.find(Promoandtransfer.class, targetId);
+	}
+
+	@Transactional
+	public void editCoordination(Account user, Promoandtransfer coordinate) {
+		Promoandtransfer pt = em.find(Promoandtransfer.class, coordinate.getId());
+		pt.setActivedate(coordinate.getActivedate());
+		pt.setMovedate(coordinate.getMovedate());
+		pt.setCurdepartment(coordinate.getCurdepartment());
+		pt.setPredepartment(coordinate.getPredepartment());
+		pt.setCurposition(coordinate.getCurposition());
+		pt.setPreposition(coordinate.getPreposition());
+		pt.setType(coordinate.getType());
+		pt.setRemark(coordinate.getRemark());
+		em.merge(pt);
 	}
 
 }

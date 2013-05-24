@@ -2,6 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ss" uri="/WEB-INF/StripesSecurityManager.tld" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
@@ -148,7 +149,9 @@ function disableAll(){
 									</c:when>
 									<c:otherwise>
 										<input type="hidden" name="targetId" value="${cont.employee.id}"/>
+										<ss:secure roles="employee_edit_contract">
 										<button name="edit" value="none" class="btneditcontract">修改</button>
+										</ss:secure>
 									</c:otherwise>
 								</c:choose>
 							</td>

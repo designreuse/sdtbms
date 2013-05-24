@@ -6,6 +6,35 @@ public interface Roles {
 	public static final String EMPLOYEE_SYSTEM = "employee_system";
 	public static final String EMPLOYEE_VIEW = "employee_view";
 	public static final String EMPLOYEE_EDIT = "employee_edit";
+	public static final String EMPLOYEE_RM = "employee_rm";
+	public static final String EMPLOYEE_VIEW_DETAIL= "employee_view_detail";
+	public static final String EMPLOYEE_DATA_MIGRATE= "employee_data_migrate";
+	public static final String EMPLOYEE_DATAFILE_UPLOAD= "employee_datafile_upload";
+	public static final String EMPLOYEE_IDCHECK_FILE_UPLOAD= "employee_idcheck_file_upload";
+	public static final String EMPLOYEE_COOR_FILE_UPLOAD = "employee_coordination_file_upload";
+	public static final String EMPLOYEE_RESIGN = "employee_resign";
+	public static final String EMPLOYEE_ADD_CONTRACT = "employee_add_contract";
+	public static final String EMPLOYEE_VIEW_CONTRACT = "employee_view_contract";
+	public static final String EMPLOYEE_EDIT_CONTRACT = "employee_edit_contract";
+	public static final String EMPLOYEE_RM_CONTRACT = "employee_rm_contract";
+	public static final String EMPLOYEE_DEPT_VIEW = "employee_dept_view";
+	public static final String EMPLOYEE_DEPT_ADD = "employee_dept_add";
+	public static final String EMPLOYEE_DEPT_RM = "employee_dept_rm";
+	public static final String EMPLOYEE_DATA_DOWNLOAD = "employee_data_download";
+	public static final String EMPLOYEE_DRIVER_DATA_DOWNLOAD = "employee_driver_data_download";
+	public static final String EMPLOYEE_COOR_DATA_DOWNLOAD = "employee_coor_data_download";
+	public static final String EMPLOYEE_COOR_VIEW = "employee_coor_view";
+	public static final String EMPLOYEE_COOR_ADD = "employee_coor_add";
+	public static final String EMPLOYEE_COOR_EDIT = "employee_coor_edit";
+	public static final String EMPLOYEE_PROPERTY_LIST_VIEW = "employee_property_list_view";
+	public static final String EMPLOYEE_PROPERTY_LIST_ADD = "employee_property_list_add";
+	public static final String EMPLOYEE_PROPERTY_LIST_RM = "employee_property_list_rm";
+	public static final String EMPLOYEE_IDCARDS_VIEW = "employee_idcards_view";
+	public static final String EMPLOYEE_IDCARDS_ADD = "employee_idcards_add";
+	public static final String EMPLOYEE_IDCARDS_RM = "employee_idcards_rm";
+	public static final String EMPLOYEE_POS_VIEW = "employee_pos_view";
+	public static final String EMPLOYEE_POS_ADD = "employee_pos_add";
+	public static final String EMPLOYEE_POS_RM = "employee_pos_rm";
 	
 	
 	//For Score System

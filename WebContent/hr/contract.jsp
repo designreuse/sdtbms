@@ -2,6 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ss" uri="/WEB-INF/StripesSecurityManager.tld" %>
 <stripes:layout-render name="../default.jsp">
 	
     <stripes:layout-component name="contents">
@@ -85,14 +86,19 @@
 						</c:choose>
 							<td>
 								<input type="hidden" name="targetId" value="${cont.id}"/>
+								<ss:secure roles="employee_view_detail">
 								<button name="btn_view"  class="btn_contract_view_employee" value="/bms/actionbean/Employee.action">查看员工</button>
+								</ss:secure>
 								<button name="btn_view_contract" class="btn_contract_view_all" value="/bms/actionbean/Contract.action">所有合同</button>
+								
 								<c:choose>
 									<c:when test="${cont.status == status}">
 										<label>已删除合同</label>
 									</c:when>
 									<c:otherwise>
+										<ss:secure roles="employee_rm_contract">
 										<button name="btn_delete_contract" class="btn_contract_delete" value="/bms/actionbean/Contract.action">删除合同</button>
+										</ss:secure>
 									</c:otherwise>
 								</c:choose>
 								

@@ -2,6 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ss" uri="/WEB-INF/StripesSecurityManager.tld" %>
 
 <html>
 <head>
@@ -82,7 +83,9 @@ text-align:center;
 									<div>
 										<stripes:hidden name="idcard.id" value="${card.id}"/>
 										<stripes:hidden name="targetId"/>
+										<ss:secure roles="employee_idcards_rm">
 										<stripes:submit name="delete" value="删除"/>
+										</ss:secure>
 									</div>
 								</stripes:form>
 							</td>
@@ -119,7 +122,9 @@ text-align:center;
 						<tr>
 							<td>
 								<stripes:hidden name="targetId"/>
+								<ss:secure roles="employee_idcards_add">
 								<stripes:submit name="create" value="增加"/>
+								</ss:secure>
 							</td>
 							<td>
 								<stripes:select name="idcard.type"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.typeoptions}" label="label" value="value"/></stripes:select>

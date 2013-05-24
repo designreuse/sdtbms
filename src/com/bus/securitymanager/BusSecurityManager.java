@@ -60,7 +60,11 @@ public class BusSecurityManager implements StripesSecurityManager{
 			return false;
 		}
 		boolean roleok = false;
-		
+
+//		for(String r:userroles){
+//			System.out.println("user has role:"+r);
+//		}
+//		
 		for (String role : roles){
 			roleok = false;
 			for(String userrole : userroles){

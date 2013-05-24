@@ -6,7 +6,7 @@ $(document).ready(function() {
     	$.ajax({
     		url:getGenerationUrl+"&workerid="+workerId,
     		success:function(response){
-    			if(response == "1")
+    			if(response.trim() == "1")
     				alert("员工存在");
     			else
     				alert("员工不存在");

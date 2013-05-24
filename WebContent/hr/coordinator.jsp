@@ -2,6 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ss" uri="/WEB-INF/StripesSecurityManager.tld" %>
 <stripes:layout-render name="../default.jsp">
 	
     <stripes:layout-component name="contents">
@@ -28,13 +29,16 @@
 				
 				<!-- 新建档案  Dialog-->
 				<div id="hr_top_button_bar" style="height:40px;">&nbsp;  
+				
+				<a class="btn ui-state-default ui-corner-all" href="javascript:location.reload();">
+					刷新
+				</a>
+				<ss:secure roles="employee_coor_add">
 				<a id="btn_new_coordinate_link" class="btn ui-state-default ui-corner-all" href="#">
 						<span class="ui-icon ui-icon-person"></span>
 						新调动
 				</a>
-				<a class="btn ui-state-default ui-corner-all" href="javascript:location.reload();">
-					刷新
-				</a>
+				
 				<div id="btn_new_coordinate_dialog" title="新调动">
 <!-- 				The Form to submit new coordinate data -->
 				<stripes:form id="form_new_coordinate" beanclass="com.bus.stripes.actionbean.HRCoordinatorActionBean" focus="">
@@ -67,39 +71,12 @@
 					</table>
 				</stripes:form>
 				</div>
-				
+				</ss:secure>
 				</div>
 				<hr/>
 				
 				<!--  File Upload -->
 				<div class="clear"></div>
-				<div>
-				文件上传
-				<stripes:form id="file_submit_form" beanclass="com.bus.stripes.actionbean.HRCoordinatorActionBean">
-					<Label>调动csv :</Label><stripes:file name="coordinatebean" id="file_coordinate" /><stripes:submit name="coordinate" value="提交"/>
-					<br/>
-					<script type="text/javascript">
-					$("#file_submit_form").submit(function(){
-						var coor_csv =$('#file_coordinate').val().trim();
-						if(coor_csv == ""){
-							alert("请选择文件");
-							return false;
-						}
-						if(coor_csv != ""){
-							var ext = coor_csv.split('.').pop().toLowerCase();
-							if($.inArray(ext, ['csv']) == -1) {
-						    	alert('驾驶员资料不是合法的csv文件');
-						    	return false;
-							}
-						}
-						return true;
-					});
-					</script>
-				</stripes:form>
-				<br/>
-				<br/>
-				<hr/>
-				</div>
 				
 				<!--  Display Employee   -->
 				<div>
@@ -166,8 +143,10 @@
 								<stripes:form beanclass="com.bus.stripes.actionbean.HRCoordinatorActionBean">
 									<div>
 										<input type="hidden" name="targetId" value="${coor.id}"/>
+										<ss:secure roles="employee_coor_edit">
 										<stripes:submit name="delete" value="删除"/>
-										<stripes:submit name="edit" value="修改"/>
+										<a target="_blank" href="${pageContext.request.contextPath}/actionbean/HRCoordinator.action?targetId=${coor.id}&editCoorPage=">修改</a>
+										</ss:secure>
 									</div>
 								</stripes:form>
 							</td>

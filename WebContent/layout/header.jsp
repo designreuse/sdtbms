@@ -30,10 +30,12 @@
 				</div>
 				<ul id="navigation">
 					
+					<ss:secure roles="employee_system">
 					<li>
 						<a href="${pageContext.request.contextPath}/actionbean/Employee.action" class="sf-with-ul">人事系统</a>
 						
 					</li>
+					</ss:secure>
 					
 					<ss:secure roles="score_system">
 					<li>

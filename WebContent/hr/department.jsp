@@ -2,6 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ss" uri="/WEB-INF/StripesSecurityManager.tld" %>
 <stripes:layout-render name="../default.jsp">
 	
     <stripes:layout-component name="contents">
@@ -24,12 +25,14 @@
 				
 				<!-- 新建档案  Dialog-->
 				<div id="hr_top_button_bar" style="height:40px;">&nbsp;  
+				
+				<a class="btn ui-state-default ui-corner-all" href="javascript:location.reload();">
+					刷新
+				</a>
+				<ss:secure roles="employee_dept_add">
 				<a id="btn_new_department_link" class="btn ui-state-default ui-corner-all" href="javascript:void">
 						<span class="ui-icon ui-icon-suitcase"></span>
 						新建部门
-				</a>
-				<a class="btn ui-state-default ui-corner-all" href="javascript:location.reload();">
-					刷新
 				</a>
 				<div id="btn_new_department_dialog" title="新建部门">
 				<!-- The Form to submit new employee data -->
@@ -43,6 +46,7 @@
 					</table>
 				</stripes:form>
 				</div>
+				</ss:secure>
 				</div>
 				<hr/>
 				
@@ -81,7 +85,9 @@
 								<stripes:form beanclass="com.bus.stripes.actionbean.DepartmentActionBean">
 									<div>
 										<input type="hidden" name="targetId" value="${dpment.id}"/>
+										<ss:secure roles="employee_dept_rm">
 										<stripes:submit name="delete" value="删除"/>
+										</ss:secure>
 									</div>
 								</stripes:form>
 							</td>

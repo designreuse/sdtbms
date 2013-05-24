@@ -4,6 +4,8 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
+import security.action.Secure;
+
 import com.bus.dto.Account;
 import com.bus.dto.Contract;
 import com.bus.dto.Employee;
@@ -11,6 +13,7 @@ import com.bus.services.CustomActionBean;
 import com.bus.services.HRBean;
 import com.bus.stripes.selector.ContractSelector;
 import com.bus.stripes.selector.EmployeeSelector;
+import com.bus.util.Roles;
 import com.bus.util.SelectBoxOption;
 import com.bus.util.SelectBoxOptions;
 
@@ -92,13 +95,16 @@ public class ContractActionBean extends CustomActionBean implements Permission{
 			}
 		}
 	}
+	
 	@DefaultHandler
+	@Secure(roles=Roles.EMPLOYEE_VIEW_CONTRACT)
 	public Resolution defaultAction(){
 		initData();
 		return new ForwardResolution("/hr/contract.jsp").addParameter("pagenum", pagenum);
 	}
 	
 	@HandlesEvent(value="viewall")
+	@Secure(roles=Roles.EMPLOYEE_VIEW_CONTRACT)
 	public Resolution viewall(){
 		String id = context.getRequest().getParameter("targetId");
 		setContracts(bean.getContractsByEmployeeId(Integer.parseInt(id)));
@@ -106,12 +112,14 @@ public class ContractActionBean extends CustomActionBean implements Permission{
 	}
 	
 	@HandlesEvent(value="edit")
+	@Secure(roles=Roles.EMPLOYEE_EDIT_CONTRACT)
 	public Resolution edit(){
 		bean.updateContract(contract);
 		return new StreamingResolution("text;charset=utf-8","合同修改成功");
 	}
 	
 	@HandlesEvent(value="delete")
+	@Secure(roles=Roles.EMPLOYEE_RM_CONTRACT)
 	public Resolution delete(){
 		String id = context.getRequest().getParameter("targetId");
 		bean.removeContract(Integer.parseInt(id));

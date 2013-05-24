@@ -3,11 +3,14 @@ package com.bus.stripes.actionbean;
 import java.util.List;
 import java.util.Map;
 
+import security.action.Secure;
+
 import com.bus.dto.Account;
 import com.bus.dto.Idmanagement;
 import com.bus.services.CustomActionBean;
 import com.bus.services.HRBean;
 import com.bus.stripes.selector.IdmanagementSelector;
+import com.bus.util.Roles;
 import com.bus.util.SelectBoxOption;
 import com.bus.util.SelectBoxOptions;
 
@@ -77,6 +80,7 @@ public class IdmanagementActionBean extends CustomActionBean implements Permissi
 	}
 	
 	@DefaultHandler
+	@Secure(roles=Roles.EMPLOYEE_IDCARDS_VIEW)
 	public Resolution defaultAction(){
 		initData();
 		return new ForwardResolution("/hr/idmanagement.jsp").addParameter("pagenum", pagenum);
