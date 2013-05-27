@@ -85,7 +85,8 @@ public class ExcelFileSaver {
 				e = bean.createEmployeeAndContract(e, c);
 				
 			}catch(Exception e){
-				str += "N-" + cols[1]+ " Err:" + e.getMessage() + "<br/>\n";
+				String firstline = e.getStackTrace()[0].toString();
+				str += "N-" + cols[1]+ " Err:" + e.getMessage() + "<br/>\n"+firstline+"<br/>\n";
 				continue;
 			}
 		}
@@ -134,7 +135,8 @@ public class ExcelFileSaver {
 					str += "NLEAVE- Info: 离职调动没创建成功。<br/>\n";
 				}
 			}catch(Exception e){
-				str += "N-" + cols[1]+ " Err:" + e.getMessage() + "<br/>\n";
+				String firstline = e.getStackTrace()[0].toString();
+				str += "N-" + cols[1]+ " Err:" + e.getMessage() + ".Trace:"+firstline+"<br/>\n";
 				continue;
 			}
 		}

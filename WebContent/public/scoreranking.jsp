@@ -91,7 +91,8 @@ $(document).ready(function(){
 				分值类型:<stripes:select name="scoreSelector.scoretype">
 					<stripes:option value="0">临时分</stripes:option>
 					<stripes:option value="1">固定分</stripes:option>
-					<stripes:option value="2">总分</stripes:option>
+					<stripes:option value="2">绩效分</stripes:option>
+					<stripes:option value="3">总分</stripes:option>
 				</stripes:select>
 			</div>
 			<div class="searchdiv">
@@ -122,6 +123,7 @@ $(document).ready(function(){
 											<th>职位</th>
 											<th>固定分总分</th>
 											<th>临时分总分</th>
+											<th>绩效分总分</th>
 											<th>总分</th>
 										</tr>
 									</thead>
@@ -145,22 +147,26 @@ $(document).ready(function(){
 													<c:when test="${actionBean.scoretype == 1}">
 														<td class="highlight">${summary.fixscore }</td>
 														<td>${summary.tempscore }</td>
+														<td>${summary.performancescore }</td>
 														<td>${summary.totalscore }</td>
 													</c:when>
 													<c:when test="${actionBean.scoretype == 0}">
 														<td>${summary.fixscore }</td>
 														<td class="highlight">${summary.tempscore }</td>
+														<td>${summary.performancescore }</td>
 														<td>${summary.totalscore }</td>
 													</c:when>
 													<c:when test="${actionBean.scoretype == 2}">
 														<td>${summary.fixscore }</td>
 														<td>${summary.tempscore }</td>
-														<td class="highlight">${summary.totalscore }</td>
+														<td class="highlight">${summary.performancescore }</td>
+														<td>${summary.totalscore }</td>
 													</c:when>
 													<c:otherwise>
 														<td>${summary.fixscore }</td>
 														<td>${summary.tempscore }</td>
-														<td>${summary.totalscore }</td>
+														<td>${summary.performancescore }</td>
+														<td class="highlight">${summary.totalscore }</td>
 													</c:otherwise>
 												</c:choose>
 												

@@ -13,7 +13,8 @@ public class ScoreViewPublicSelector implements BMSSelector{
 	
 	private final static int TYPE_BY_FIX_SCORE = 1;
 	private final static int TYPE_BY_TEMP_SCORE = 0;
-	private final static int TYPE_BY_TOTAL_SCORE = 2;
+	private final static int TYPE_BY_TOTAL_SCORE = 3;
+	private final static int TYPE_BY_PERFORMANCESCORE =2;
 	
 	private Date recordDate;
 	
@@ -34,7 +35,7 @@ public class ScoreViewPublicSelector implements BMSSelector{
 		Calendar c = Calendar.getInstance();
 		c.setTime(recordDate);
 		String scoretypeselection = getScoreTypeQuery();
-		String query = "SELECT scoresummary.workerid AS workercode,SUM(fixscore) AS fixscore, SUM(score) AS tempscore, SUM(fixscore+score) AS totalscore, RANK() OVER ("+scoretypeselection+") AS rank, COUNT(scoresummary.workerid) AS count," +
+		String query = "SELECT scoresummary.workerid AS workercode,SUM(fixscore) AS fixscore, SUM(score) AS tempscore, SUM(performancescore) AS performancescore, SUM(fixscore+score+performancescore) AS totalscore, RANK() OVER ("+scoretypeselection+") AS rank, COUNT(scoresummary.workerid) AS count," +
 				" employee.fullname AS name, employee.firstworktime AS firstworktime," +
 				" position.name AS positionname " +
 				" FROM scoresummary JOIN employee ON scoresummary.workerid=employee.workerid" +
@@ -63,8 +64,10 @@ public class ScoreViewPublicSelector implements BMSSelector{
 			scoretypeselection = "ORDER BY SUM(fixscore) "+getOrderString();
 		}else if(scoretype == TYPE_BY_TEMP_SCORE){
 			scoretypeselection = "ORDER BY SUM(score) "+getOrderString();
+		}else if (scoretype == TYPE_BY_PERFORMANCESCORE){
+			scoretypeselection = "ORDER BY SUM(performancescore) "+getOrderString();
 		}else if(scoretype == TYPE_BY_TOTAL_SCORE){
-			scoretypeselection = "ORDER BY SUM(fixscore+score) " +getOrderString();
+			scoretypeselection = "ORDER BY SUM(fixscore+score+performancescore) " +getOrderString();
 		}else{
 			scoretypeselection = "ORDER BY SUM(score) "+getOrderString();
 		}
@@ -78,7 +81,7 @@ public class ScoreViewPublicSelector implements BMSSelector{
 		Calendar c = Calendar.getInstance();
 		c.setTime(recordDate);
 		String scoretypeselection = getScoreTypeQuery();
-		String query = "SELECT scoresummary.workerid AS workercode,SUM(fixscore) AS fixscore, SUM(score) AS tempscore, SUM(fixscore+score) AS totalscore, RANK() OVER ("+scoretypeselection+") AS rank, COUNT(scoresummary.workerid) AS count," +
+		String query = "SELECT scoresummary.workerid AS workercode,SUM(fixscore) AS fixscore, SUM(score) AS tempscore, SUM(fixscore+score+performancescore) AS totalscore, SUM(performancescore) AS performancescore, RANK() OVER ("+scoretypeselection+") AS rank, COUNT(scoresummary.workerid) AS count," +
 				" employee.fullname AS name, employee.firstworktime AS firstworktime," +
 				" position.name AS positionname " +
 				" FROM scoresummary JOIN employee ON scoresummary.workerid=employee.workerid"+
@@ -112,7 +115,7 @@ public class ScoreViewPublicSelector implements BMSSelector{
 			start.setTime(recordStartDate);
 			Calendar end = Calendar.getInstance();
 			end.setTime(recordEndDate);
-			String query = "SELECT scoresummary.workerid AS workercode,SUM(fixscore) AS fixscore, SUM(score) AS tempscore, SUM(fixscore+score) AS totalscore, RANK() OVER ("+getScoreTypeQuery()+") AS rank, COUNT(scoresummary.workerid) AS count," +
+			String query = "SELECT scoresummary.workerid AS workercode,SUM(fixscore) AS fixscore, SUM(score) AS tempscore, SUM(performancescore) AS performancescore, SUM(fixscore+score+performancescore) AS totalscore, RANK() OVER ("+getScoreTypeQuery()+") AS rank, COUNT(scoresummary.workerid) AS count," +
 					" employee.fullname AS name, employee.firstworktime AS firstworktime," +
 					" position.name AS positionname " +
 					" FROM scoresummary JOIN employee ON scoresummary.workerid=employee.workerid" +

@@ -27,6 +27,8 @@ public class Scoretype  implements Serializable{
 	@Transient
 	public final static int SCORE_TYPE_TEMP = 0;
 	public final static String SCORE_TYPE_TEMP_STR = "临时";
+	public final static int SCORE_TYPE_PERFORMENCE  = 2;
+	public final static String SCORE_TYPE_PERFORMENCE_STR = "绩效";
 	
 	private Integer id;
 	private Date createdate;
@@ -97,6 +99,8 @@ public class Scoretype  implements Serializable{
 			return Scoretype.SCORE_TYPE_FIX_STR;
 		}else if(Scoretype.SCORE_TYPE_TEMP == type){
 			return  Scoretype.SCORE_TYPE_TEMP_STR;
+		}else if(Scoretype.SCORE_TYPE_PERFORMENCE == type){
+			return Scoretype.SCORE_TYPE_PERFORMENCE_STR;
 		}else
 			return type.toString();
 	}

@@ -45,7 +45,7 @@
 									<td>编号:</td><td><stripes:text name="scoretype.reference" class="required"/></td>
 								</tr>
 								<tr>
-									<td>类型:</td><td><stripes:select name="scoretype.type"  class="required"><stripes:option value="0">临时分</stripes:option><stripes:option value="1">固定分</stripes:option></stripes:select></td>
+									<td>类型:</td><td><stripes:select name="scoretype.type"  class="required"><stripes:option value="0">临时分</stripes:option><stripes:option value="1">固定分</stripes:option><stripes:option value="2">绩效分</stripes:option></stripes:select></td>
 								</tr>
 								<tr>
 									<td>注释:</td><td><stripes:textarea name="scoretype.description"  class="required"/></td>

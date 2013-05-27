@@ -1,0 +1,14 @@
+package com.bus.stripes.actionbean;
+
+import com.bus.dto.Account;
+
+public interface Permission {
+
+	public boolean allowToAccess(Account user,String beanstr);
+	public boolean getPermission(String action);
+	
+<<<<<<< HEAD
+=======
+	public boolean getScoreSystemPermission();
+>>>>>>> 73cb55b7c8518196fdd683098fd452c0ae459f34
+}

@@ -115,7 +115,6 @@ public class HRBean {
 	@Transactional
 	public Employee createEmployeeAndContract(Employee e, Contract c)
 			throws Exception {
-		try {
 			Department d = getDepartmentByName(e.getDepartment().getName());
 			e.setDepartment(d);
 			Position p = getPositionByName(e.getPosition().getName());
@@ -137,10 +136,6 @@ public class HRBean {
 				em.persist(c);
 			}
 			return e;
-		} catch (Exception err) {
-			throw new Exception("Create employee and contract error."
-					+ err.getMessage());
-		}
 	}
 
 	public List<Employee> getAllEmployee(String type) {

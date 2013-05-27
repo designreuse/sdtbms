@@ -71,7 +71,6 @@
 					</stripes:form>
 				</div>
 				</ss:secure>
-				
 				<ss:secure roles="employee_edit">
 				<a id="btn_new_document_link" class="btn ui-state-default ui-corner-all" href="#">
 						<span class="ui-icon ui-icon-person"></span>

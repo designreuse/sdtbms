@@ -255,6 +255,8 @@ public class ScoreBean {
 				summary.setFixscore(new Long(score));
 			else if(st.getType() == Scoretype.SCORE_TYPE_TEMP)
 				summary.setScore(new Long(score));
+			else if(st.getType() == Scoretype.SCORE_TYPE_PERFORMENCE)
+				summary.setPerformancescore(new Long(score));
 			em.persist(summary);
 			em.flush();
 			em.persist(LoggerAction.createNewScoreSummary(user,summary));
@@ -264,6 +266,8 @@ public class ScoreBean {
 				summary.setFixscore(summary.getFixscore() + new Long(score));
 			else if(st.getType() == Scoretype.SCORE_TYPE_TEMP)
 				summary.setScore(summary.getScore() + new Long(score));
+			else if(st.getType() == Scoretype.SCORE_TYPE_PERFORMENCE)
+				summary.setPerformancescore(new Long(score));
 			em.merge(summary);
 			em.persist(LoggerAction.updateScoreSummary(user,summary));
 		}

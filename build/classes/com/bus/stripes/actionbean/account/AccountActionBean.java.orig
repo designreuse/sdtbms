@@ -1,0 +1,436 @@
+package com.bus.stripes.actionbean.account;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import security.action.Secure;
+
+import net.sourceforge.stripes.action.ActionBean;
+import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.HandlesEvent;
+import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.integration.spring.SpringBean;
+import net.sourceforge.stripes.validation.Validate;
+
+import com.bus.dto.Account;
+import com.bus.dto.Action;
+import com.bus.dto.Groups;
+import com.bus.services.AccountBean;
+import com.bus.services.CustomActionBean;
+import com.bus.services.HRBean;
+import com.bus.stripes.actionbean.MyActionBeanContext;
+import com.bus.stripes.actionbean.Permission;
+import com.bus.stripes.typeconverter.PasswordTypeConverter;
+import com.bus.util.Roles;
+import com.bus.util.SelectBoxOption;
+import com.bus.util.SelectBoxOptions;
+
+@UrlBinding(value="/actionbean/account/Account.action")
+@Secure(roles = Roles.ACCOUNT_SYSTEM)
+public class AccountActionBean extends CustomActionBean implements Permission{
+
+	private HRBean hrBean;
+	public HRBean getHrBean(){return hrBean;}
+	@SpringBean
+	public void setHrBean(HRBean bean){this.hrBean = bean;}
+	
+	private String empworkerid;
+	private String username;
+	private String groupname;
+	private Account account;
+	private Groups group;
+	private List<String> userids;
+	private List<String> groupids;
+	private List<Action> allactions;
+	private List<SelectBoxOption> usergroups;
+	private List<Action> groupactions;
+	private List<SelectBoxOption> users;
+	private List<SelectBoxOption> groups;
+	
+	@Validate(converter=PasswordTypeConverter.class)
+	private String password;
+	
+	private void loadOptionsList(){
+		try{
+			users = SelectBoxOptions.getUsers(accBean.getAccounts());
+			groups = SelectBoxOptions.getGroups(accBean.getGroups());
+		}catch(Exception e){
+			System.out.println(e);
+		}
+	}
+	
+	@DefaultHandler
+	public Resolution defaultAction(){
+		loadOptionsList();
+		return new ForwardResolution("/acc/accmanagement.jsp");
+	}
+	
+	@HandlesEvent(value="createaccount")
+	@Secure(roles = Roles.ACCOUNT_ACCOUNT_CREATE)
+	public Resolution createaccount(){
+<<<<<<< HEAD
+=======
+		if(!getPermission("account_createaccount")){
+			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
+		}
+>>>>>>> 73cb55b7c8518196fdd683098fd452c0ae459f34
+		try{
+			if(empworkerid != null && !hrBean.isEmployeeWorkerIdExist(empworkerid)){
+				return defaultAction();
+			}
+			if(username == null || username.trim().equals(""))
+				return defaultAction();
+			Account a = new Account();
+			a.setUsername(username);
+			a.setPassword(password);
+			a.setEmployee(empworkerid);
+			accBean.saveAccount(a, context.getUser());
+			return defaultAction();
+		}catch(Exception e){
+			e.printStackTrace();
+			return defaultAction();
+		}
+	}
+	
+	@HandlesEvent(value="creategroup")
+	@Secure(roles = Roles.ACCOUNT_GROUP_CREATE)
+	public Resolution creategroup(){
+<<<<<<< HEAD
+=======
+		if(!getPermission("account_creategroup")){
+			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
+		}
+>>>>>>> 73cb55b7c8518196fdd683098fd452c0ae459f34
+		try{
+			if(groupname == null || groupname.trim().equals(""))
+				return defaultAction();
+			Groups g = new Groups();
+			g.setName(groupname);
+			accBean.saveGroup(g, context.getUser());
+			return defaultAction();
+		}catch(Exception e){
+			e.printStackTrace();
+			return defaultAction();
+		}
+	}
+	
+	@HandlesEvent(value="assigngroups")
+	@Secure(roles = Roles.ACCOUNT_ASSIGN_ACC_TO_GP)
+	public Resolution assigngroups(){
+<<<<<<< HEAD
+=======
+		if(!getPermission("account_assigngroup")){
+			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
+		}
+>>>>>>> 73cb55b7c8518196fdd683098fd452c0ae459f34
+		try{
+			if(userids == null || groupids == null)
+				return defaultAction();
+			for(int i=0;i<userids.size();i++){
+				for(int j=0;j<groupids.size();j++){
+					if(!accBean.isGroupAssigned(groupids.get(j),userids.get(i)))
+						accBean.assignToGroup(userids.get(i),groupids.get(j), context.getUser());
+				}
+			}
+			return defaultAction();
+		}catch(Exception e){
+			System.out.println(e.getMessage());
+			return defaultAction();
+		}
+	}
+	
+	@HandlesEvent(value="removeusers")
+	@Secure(roles = Roles.ACCOUNT_REMOVE_ACC)
+	public Resolution removeusers(){
+<<<<<<< HEAD
+=======
+		if(!getPermission("account_removeaccount")){
+			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
+		}
+>>>>>>> 73cb55b7c8518196fdd683098fd452c0ae459f34
+		try{
+			if(userids == null)
+				return defaultAction();
+			for(int i=0;i<userids.size();i++){
+				accBean.removeUser(userids.get(i), context.getUser());
+			}
+			return defaultAction();
+		}catch(Exception e){
+			System.out.println(e.getMessage());
+			return defaultAction();
+		}
+	}
+	
+	@HandlesEvent(value="resignusers")
+	@Secure(roles = Roles.ACCOUNT_RESIGN_ACC)
+	public Resolution resignusers(){
+<<<<<<< HEAD
+=======
+		if(!getPermission("account_resignaccount")){
+			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
+		}
+>>>>>>> 73cb55b7c8518196fdd683098fd452c0ae459f34
+		try{
+			if(userids == null)
+				return defaultAction();
+			for(int i=0;i<userids.size();i++){
+				accBean.resignUser(userids.get(i), context.getUser());
+			}
+			return defaultAction();
+		}catch(Exception e){
+			System.out.println(e.getMessage());
+			return defaultAction();
+		}
+	}
+	
+	@HandlesEvent(value="removegroups")
+	@Secure(roles = Roles.ACCOUNT_REMOVE_GP)
+	public Resolution removegroups(){
+<<<<<<< HEAD
+=======
+		if(!getPermission("account_removegroup")){
+			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
+		}
+>>>>>>> 73cb55b7c8518196fdd683098fd452c0ae459f34
+		try{
+			if(groupids == null)
+				return defaultAction();
+			for(int i=0;i<groupids.size();i++){
+				accBean.removeGroup(groupids.get(i), context.getUser());
+			}
+			return defaultAction();
+		}catch(Exception e){
+			System.out.println(e.getMessage());
+			return defaultAction();
+		}
+
+	}
+	
+	@HandlesEvent(value="accountgroups")
+	@Secure(roles = Roles.ACCOUNT_VIEW_ACC_GPS)
+	public Resolution accountgroups(){
+<<<<<<< HEAD
+=======
+		if(!getPermission("account_viewaccountgroups")){
+			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
+		}
+>>>>>>> 73cb55b7c8518196fdd683098fd452c0ae459f34
+		String targetId = context.getRequest().getParameter("targetId");
+		try{
+			account = accBean.getAccountById(targetId);
+			usergroups = SelectBoxOptions.getGroups(accBean.getUserGroups(targetId));
+			return new ForwardResolution("/acc/usergroups.jsp");
+		}catch(Exception e){
+			return new ForwardResolution("/actionbean/Error.action").addParameter("error", "获取账号信息失败")
+					.addParameter("description", "无法获取账号ID:"+targetId+"的信息，请联系管理员。");
+		}
+	}
+	
+	@HandlesEvent(value="groupactions")
+	@Secure(roles = Roles.ACCOUNT_VIEW_GP_ACTIONS)
+	public Resolution groupactions(){
+<<<<<<< HEAD
+=======
+		if(!getPermission("account_viewgroupactions")){
+			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
+		}
+>>>>>>> 73cb55b7c8518196fdd683098fd452c0ae459f34
+		String targetId = context.getRequest().getParameter("targetId");
+		try{
+			group = accBean.getGroupById(targetId);
+			groupactions = accBean.getGroupActions(targetId);
+			allactions = accBean.getAllActions();
+			for(int i=0;i<groupactions.size();i++){
+				for(int j=0;j<allactions.size();j++){
+					if(groupactions.get(i).getId() == allactions.get(j).getId())
+						allactions.get(j).setChecked(true);
+				}
+			}
+			groupactions = null;
+			allactions = sortActions(allactions);
+			return new ForwardResolution("/acc/groupactions.jsp");
+		}catch(Exception e){
+			return new ForwardResolution("/actionbean/Error.action").addParameter("error", "获取用户组信息失败")
+					.addParameter("description", "无法用户组ID:"+targetId+"的信息，请联系管理员。");
+		}
+	}
+	
+	
+	@HandlesEvent("removeusergroup")
+	@Secure(roles = Roles.ACCOUNT_REMOVE_GP_FROM_USER)
+	public Resolution removeusergroup(){
+<<<<<<< HEAD
+=======
+		if(!getPermission("account_removegroupfromuser")){
+			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
+		}
+>>>>>>> 73cb55b7c8518196fdd683098fd452c0ae459f34
+		String usergroupid = context.getRequest().getParameter("usergroupid");
+		String targetId = context.getRequest().getParameter("targetId");
+		try{
+			accBean.removeUsergroupMapper(targetId,usergroupid,context.getUser());
+			return accountgroups();
+		}catch(Exception e){
+			return new ForwardResolution("/actionbean/Error.action").addParameter("error", "移除组失败")
+					.addParameter("description", "无法移除账号ID:"+targetId+"的组信息，请联系管理员。"+e.getMessage());
+		}
+	}
+	
+	@HandlesEvent("assignactionstogroup")
+	@Secure(roles = Roles.ACCOUNT_ASSIGN_ACTION_TO_GP)
+	public Resolution assignactionstogroup(){
+<<<<<<< HEAD
+=======
+		if(!getPermission("account_assignactiontogroup")){
+			return context.errorResolution("权限错误","你没有权限进行该操作,请联系管理员");
+		}
+>>>>>>> 73cb55b7c8518196fdd683098fd452c0ae459f34
+		if(groupactions == null)
+			groupactions = new ArrayList<Action>();
+		String groupid = context.getRequest().getParameter("targetId");
+		try{
+			allactions = accBean.getGroupActions(groupid);
+			for(int j=0;j<allactions.size();j++){
+				boolean exist = false;
+				for(int i=0;i<groupactions.size();i++){
+					if(groupactions.get(i) != null && allactions.get(j).getId() == groupactions.get(i).getId()){
+						exist = true;
+						break;
+					}
+				}
+				if(!exist && accBean.isGroupActionExist(allactions.get(j),groupid)){
+					accBean.removeActionFromGroup(allactions.get(j),groupid, context.getUser());
+				}
+			}
+			for(int i=0;i<groupactions.size();i++){
+				if(groupactions.get(i) != null && !accBean.isGroupActionExist(groupactions.get(i),groupid)){
+					accBean.assignActionToGroup(groupactions.get(i),groupid,context.getUser());
+				}
+			}
+			return groupactions();
+		}catch(Exception e){
+			e.printStackTrace();
+			return new ForwardResolution("/actionbean/Error.action").addParameter("error", "更新组失败")
+					.addParameter("description", "无法更新组ID:"+groupid+"的组信息，请联系管理员。"+e.getMessage());
+		}
+	}
+	
+	/**
+	 * Sort the actions so that can display nicely in UI
+	 * @param allactions2
+	 * @return
+	 */
+	private List<Action> sortActions(List<Action> actions) {
+		List<String> systems = new ArrayList<String>();
+		HashMap<String, List<Action>> mappedActions = new HashMap<String, List<Action>>();
+		
+		for(Action action:actions){
+			if(action.getName().indexOf("system") != -1){
+				systems.add(action.getName());
+				List<Action> actionsarr = new ArrayList<Action>();
+				actionsarr.add(action);
+				mappedActions.put(action.getName(),actionsarr);
+			}
+		}
+		
+		for(Action action:actions){
+			String name = action.getName().substring(0,action.getName().indexOf("_"));
+			for(String sys:systems){
+				String sysname = sys.substring(0,sys.indexOf("_"));
+				if(sysname.equals(name) && action.getName().indexOf("system") == -1){
+						mappedActions.get(sys).add(action);
+				}
+			}
+		}
+		
+		List<Action> ret = new ArrayList<Action>();
+		for(String system:systems){
+			ret.addAll(mappedActions.get(system));
+		}
+		return ret;
+	}
+	
+	public String getEmpworkerid() {
+		return empworkerid;
+	}
+	public void setEmpworkerid(String empworkerid) {
+		this.empworkerid = empworkerid;
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	public String getGroupname() {
+		return groupname;
+	}
+	public void setGroupname(String groupname) {
+		this.groupname = groupname;
+	}
+	public List<SelectBoxOption> getUsers() {
+		return users;
+	}
+	public void setUsers(List<SelectBoxOption> users) {
+		this.users = users;
+	}
+	public List<SelectBoxOption> getGroups() {
+		return groups;
+	}
+	public void setGroups(List<SelectBoxOption> groups) {
+		this.groups = groups;
+	}
+	public List<String> getUserids() {
+		return userids;
+	}
+	public void setUserids(List<String> userids) {
+		this.userids = userids;
+	}
+	public List<String> getGroupids() {
+		return groupids;
+	}
+	public void setGroupids(List<String> groupids) {
+		this.groupids = groupids;
+	}
+	public List<SelectBoxOption> getUsergroups() {
+		return usergroups;
+	}
+	public void setUsergroups(List<SelectBoxOption> usergroups) {
+		this.usergroups = usergroups;
+	}
+	public List<Action> getGroupactions() {
+		return groupactions;
+	}
+	public void setGroupactions(List<Action> groupactions) {
+		this.groupactions = groupactions;
+	}
+	public Account getAccount() {
+		return account;
+	}
+	public void setAccount(Account account) {
+		this.account = account;
+	}
+	public Groups getGroup() {
+		return group;
+	}
+	public void setGroup(Groups group) {
+		this.group = group;
+	}
+	public List<Action> getAllactions() {
+		return allactions;
+	}
+	public void setAllactions(List<Action> allactions) {
+		this.allactions = allactions;
+	}
+
+}

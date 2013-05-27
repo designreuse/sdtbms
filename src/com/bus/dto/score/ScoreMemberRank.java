@@ -23,6 +23,7 @@ public class ScoreMemberRank implements Serializable{
 	private String workerid;
 	private Long fixscore;
 	private Long tempscore;
+	private Long performancescore;
 	private Long totalscore;
 	private Integer rank;
 	private Long count;
@@ -125,5 +126,13 @@ public class ScoreMemberRank implements Serializable{
 	}
 	public void setPositionName(String positionName) {
 		this.positionName = positionName;
+	}
+	
+	@Column(name="performancescore")
+	public Long getPerformancescore() {
+		return performancescore;
+	}
+	public void setPerformancescore(Long performancescore) {
+		this.performancescore = performancescore;
 	}
 }
