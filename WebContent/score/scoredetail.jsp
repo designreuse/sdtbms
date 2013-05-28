@@ -61,7 +61,7 @@
 								日期:<stripes:text name="recordDate" formatPattern="yyyy-MM-dd" class="datepickerClass"/>
 								<stripes:submit name="memberDetail" value="查询"/>
 								
-								<ss:secure roles="scoredetail_remove_record">
+								<ss:secure roles="score_detail_remove_record">
 								  <stripes:submit name="deleteRecords" value="删除选择"/>
 								</ss:secure>
 							<div class="hastable">

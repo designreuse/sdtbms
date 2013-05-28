@@ -393,7 +393,7 @@ public class HRBean {
 	}
 
 	public List<Position> getAllPosition() {
-		List<Position> positions = em.createQuery("SELECT p FROM Position p")
+		List<Position> positions = em.createQuery("SELECT p FROM Position p ORDER BY p.name")
 				.getResultList();
 		return positions;
 	}

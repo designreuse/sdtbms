@@ -176,14 +176,14 @@ $(document).ready(function() {
 $(document).ready(function(){
     $(".btn_contract_view_employee").click(function(){
     	var url = $(this).val();
-    	var targetId = $(this).prev().val();
+    	var targetId = $(this).prev().prev().val();
     	url += "?targetId="+targetId +"&detail=";
     	window.open(url, "Contract Employee Detail ID:"+targetId, ["width=650,height=400,scrollbars=yes"]);
     });
 	$(".btn_contract_view_all").click(function(){
 		var url = $(this).val();
-    	var targetId = $(this).prev().prev().val();
-    	url += "?targetId="+targetId +"&viewall=";
+    	var targetId = $(this).prev().prev().prev().val();
+    	url += "?employeeId="+targetId +"&viewall=";
     	window.open(url, "Contracts For Employee Detail ID:"+targetId, ["width=1200,height=400,scrollbars=yes"]);
 	});
 	$(".btn_contract_delete").click(function(){

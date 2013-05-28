@@ -85,6 +85,7 @@
 							</c:otherwise>
 						</c:choose>
 							<td>
+								<input type="hidden" name="employeeId" value="${cont.employee.id}"/>
 								<input type="hidden" name="targetId" value="${cont.id}"/>
 								<ss:secure roles="employee_view_detail">
 								<button name="btn_view"  class="btn_contract_view_employee" value="/bms/actionbean/Employee.action">查看员工</button>

@@ -457,8 +457,8 @@ public class ExcelFileSaver {
 			if(cols.length < 13){
 				continue;
 			}
-			String department = cols[11];
-			String position = cols[12];
+			String department = cols[11].trim();
+			String position = cols[12].trim();
 			
 			Department d = null;
 			try{
@@ -484,7 +484,7 @@ public class ExcelFileSaver {
 			if(cols.length < 14 || cols[0].trim().equals("") || !Character.isDigit(cols[1].charAt(0))){
 				continue;
 			}
-			String department = cols[2];
+			String department = cols[2].trim();
 			
 			Department d = bean.getDepartmentByName(department);
 			if(d == null){

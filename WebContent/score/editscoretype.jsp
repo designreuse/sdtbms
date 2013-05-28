@@ -57,7 +57,7 @@ function editScoretype(){
 								</tr>
 						</table>
 						</div>
-						<ss:secure roles="scoreitems_edit">
+						<ss:secure roles="score_items_edit">
 						<a href="javascript:editScoretype();">修改</a>
 						</ss:secure>
 					</stripes:form>

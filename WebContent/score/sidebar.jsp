@@ -15,31 +15,31 @@
 						<div class="portlet-content">
 							<ul id="style-switcher" class="side-menu">
 							
-								<ss:secure roles="scorehome_view">
+								<ss:secure roles="score_home_view">
 								<li>
 									<a href="${pageContext.request.contextPath}/actionbean/Scorehome.action" title="积分主页">积分主页</a>
 								</li>
 								</ss:secure>
 								
-								<ss:secure roles="scoreitems_view">
+								<ss:secure roles="score_items_view">
 								<li>
 									<a href="${pageContext.request.contextPath}/actionbean/Scoreitems.action" title="积分主页">条例管理</a>
 								</li>
 								</ss:secure>
 								
-								<ss:secure roles="scoreitems_create,scoreitems_givescore">
+								<ss:secure roles="score_items_create,score_items_givescore">
 								<li>
 									<a href="${pageContext.request.contextPath}/actionbean/Scorefile.action" title="积分主页">批量积分添加/删除</a>
 								</li>
 								</ss:secure>
 								
-								<ss:secure roles="scoresheet_view">
+								<ss:secure roles="score_sheet_view">
 								<li>
 									<a href="${pageContext.request.contextPath}/actionbean/Scoresheet.action" title="积分主页">积分单管理</a>
 								</li>
 								</ss:secure>
 								
-								<ss:secure roles="scoredetail_view">
+								<ss:secure roles="score_detail_view">
 								<li>
 									<a href="${pageContext.request.contextPath}/actionbean/Scoredetail.action" title="积分主页">积分详细信息</a>
 								</li>

@@ -2,6 +2,7 @@ package com.bus.stripes.actionbean.score;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +58,7 @@ public class ScoreitemsActionBean extends CustomActionBean{
 	private Employee employee;
 	private Employee scorer;
 	private Integer score=0;
+	private Date scoredate;
 
 	private int pagenum;
 	private int lotsize;
@@ -165,7 +167,7 @@ public class ScoreitemsActionBean extends CustomActionBean{
 	@HandlesEvent(value="givescores")
 	@Secure(roles=Roles.SCORE_GIVE_SCORE)
 	public Resolution givescores(){
-		if(employee == null || selectedScoreTypes == null){
+		if(employee == null || scorer == null || selectedScoreTypes == null){
 			return defaultAction();
 		}
 		try{
@@ -177,9 +179,12 @@ public class ScoreitemsActionBean extends CustomActionBean{
 				if(hrBean.isWorkerExist(scorer))
 					scoreBean.createScoreMember(context.getUser(),scorer);
 			}
+			if(scoredate == null){
+				scoredate = Calendar.getInstance().getTime();
+			}
 			for(Scoretype st:selectedScoreTypes){
 				if(st != null && st.getId() != null)
-					scoreBean.assignScoreTypeToScoreMember(context.getUser(),employee.getWorkerid(),scorer.getWorkerid(),st, Calendar.getInstance().getTime(),score);
+					scoreBean.assignScoreTypeToScoreMember(context.getUser(),employee.getWorkerid(),scorer.getWorkerid(),st, scoredate,score);
 			}
 		}catch(Exception e){
 			e.printStackTrace();
@@ -302,5 +307,11 @@ public class ScoreitemsActionBean extends CustomActionBean{
 	}
 	public void setSheetList(List<Scoresheets> sheetList) {
 		this.sheetList = sheetList;
+	}
+	public Date getScoredate() {
+		return scoredate;
+	}
+	public void setScoredate(Date scoredate) {
+		this.scoredate = scoredate;
 	}
 }

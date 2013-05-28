@@ -126,7 +126,7 @@
 							<td>职位:</td><td><stripes:select class="required" name="employee.position.id"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.position}" label="label" value="value"/></stripes:select></td>
 						</tr>
 						<tr>
-							<td>所属镇街:</td><td><stripes:text class="required" name="employee.placebelong"/></td>
+							<td>所属镇街:</td><td><stripes:text name="employee.placebelong"/></td>
 							<td>户籍类型:</td><td><stripes:select class="required" name="employee.domiciletype"><stripes:option value="">请选择...</stripes:option><stripes:options-collection collection="${actionBean.domiciletypes}" label="label" value="value"/></stripes:select></td>
 							<td>军人:</td><td><stripes:radio name="employee.army" value="是"/>是<stripes:radio name="employee.army" value="否"/>否</td>
 						</tr>

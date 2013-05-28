@@ -106,7 +106,7 @@ public class ContractActionBean extends CustomActionBean implements Permission{
 	@HandlesEvent(value="viewall")
 	@Secure(roles=Roles.EMPLOYEE_VIEW_CONTRACT)
 	public Resolution viewall(){
-		String id = context.getRequest().getParameter("targetId");
+		String id = context.getRequest().getParameter("employeeId");
 		setContracts(bean.getContractsByEmployeeId(Integer.parseInt(id)));
 		return new ForwardResolution("/hr/viewcontracts.jsp");
 	}

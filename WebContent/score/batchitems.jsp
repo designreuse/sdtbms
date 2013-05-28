@@ -34,12 +34,12 @@
 				文件上传
 				<stripes:form id="file_submit_form" beanclass="com.bus.stripes.actionbean.score.ScoreFileUploadActionBean">
 					<Label>条例 文件(csv):</Label><stripes:file name="itemsfile" id="file_scoreitem" />
-									<ss:secure roles="scorefileupload_uploaditems">
+									<ss:secure roles="score_fileupload_uploaditems">
 											<stripes:submit name="itemsupload" value="提交"/>
 									</ss:secure>
 					<br/>
 					<Label>给分文件(csv):</Label><stripes:file name="scorefile"  id="file_score" />
-									<ss:secure roles="scorefileupload_uploadscores">
+									<ss:secure roles="score_fileupload_uploadscores">
 											<stripes:submit name="scoreupload" value="提交"/>
 									</ss:secure>
 					<br/>
