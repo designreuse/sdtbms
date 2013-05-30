@@ -15,6 +15,7 @@ import net.sourceforge.stripes.integration.spring.SpringBean;
 
 import com.bus.dto.Employee;
 import com.bus.dto.score.ScoreMemberRank;
+import com.bus.dto.score.Scoregroup;
 import com.bus.dto.score.Scoremember;
 import com.bus.dto.score.Scorerecord;
 import com.bus.dto.score.Scoresummary;
@@ -45,6 +46,7 @@ public class ScoreViewPublicActionBean extends CustomActionBean{
 	private List<Employee> founds;
 	private List<Scorerecord> records;
 	private List<ScoreMemberRank> summarys;
+	private List<Scoregroup> scoregroups;
 	private Date recordDate;
 	
 	private ScoreViewPublicSelector scoreSelector;
@@ -105,6 +107,11 @@ public class ScoreViewPublicActionBean extends CustomActionBean{
 	}
 	
 	private void loadOptionList(){
+		try{
+			scoregroups = scoreBean.getAllScoreGroup();
+		}catch(Exception e){
+			scoregroups = new ArrayList<Scoregroup>();
+		}
 		departments = SelectBoxOptions.getDepartment(hrBean.getAllDepartment());
 		positions = SelectBoxOptions.getPosition(hrBean.getAllPosition());
 	}
@@ -258,5 +265,11 @@ public class ScoreViewPublicActionBean extends CustomActionBean{
 	}
 	public void setScoretype(Integer scoretype) {
 		this.scoretype = scoretype;
+	}
+	public List<Scoregroup> getScoregroups() {
+		return scoregroups;
+	}
+	public void setScoregroups(List<Scoregroup> scoregroups) {
+		this.scoregroups = scoregroups;
 	}
 }

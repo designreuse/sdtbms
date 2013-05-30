@@ -45,7 +45,7 @@
 									<td>编号:</td><td><stripes:text name="scoretype.reference" class="required"/></td>
 								</tr>
 								<tr>
-									<td>类型:</td><td><stripes:select name="scoretype.type"  class="required"><stripes:option value="0">临时分</stripes:option><stripes:option value="1">固定分</stripes:option><stripes:option value="2">绩效分</stripes:option></stripes:select></td>
+									<td>类型:</td><td><stripes:select name="scoretype.type"  class="required"><stripes:option value="0">临时分</stripes:option><stripes:option value="1">固定分</stripes:option><stripes:option value="2">绩效分</stripes:option><stripes:option value="3">项目分</stripes:option></stripes:select></td>
 								</tr>
 								<tr>
 									<td>注释:</td><td><stripes:textarea name="scoretype.description"  class="required"/></td>
@@ -97,7 +97,7 @@
 						<tr>
 							<td colspan=6 style="text-align:left">
 								<Label class='selector'>编号:</Label><stripes:text name="selector.reference"/>
-								<Label class='selector'>类型:</Label><stripes:select name="selector.type"><stripes:option value="">不限</stripes:option><stripes:option value="0">临时分</stripes:option><stripes:option value="1">固定分</stripes:option><stripes:option value="2">绩效分</stripes:option></stripes:select>
+								<Label class='selector'>类型:</Label><stripes:select name="selector.type"><stripes:option value="">不限</stripes:option><stripes:option value="0">临时分</stripes:option><stripes:option value="1">固定分</stripes:option><stripes:option value="2">绩效分</stripes:option><stripes:option value="3">项目分</stripes:option></stripes:select>
 								<Label class='selector'>条例单:</Label><stripes:select name="itemlist"><stripes:option value=""></stripes:option>不限<stripes:options-collection collection="${actionBean.sheetList}" label="name" value="id"/></stripes:select>
 								<br/>
 								<ss:secure roles="score_items_edit">

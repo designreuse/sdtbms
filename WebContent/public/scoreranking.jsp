@@ -102,6 +102,7 @@ $(document).ready(function(){
 			<div class="searchdiv">
 				部门:<stripes:select name="scoreSelector.department"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.departments}" label="label" value="value"/></stripes:select>
 				职位:<stripes:text name="scoreSelector.position"/>
+				分组:<stripes:select name="scoreSelector.selectedGroup"><stripes:option value="">不限....</stripes:option><stripes:options-collection collection="${actionBean.scoregroups}" label="name" value="id"/></stripes:select>
 			</div>
 			<div class="searchdiv">
 				顺序:<stripes:radio value="0" name="scoreSelector.order"/>高到底

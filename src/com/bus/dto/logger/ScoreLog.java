@@ -36,6 +36,11 @@ public class ScoreLog {
 	public static final int RM_SCORE_SHEET = 19;
 	public static final int RM_SCORE_SHEET_ST = 20;
 	public static final int ADD_SCORE_SHEET_ST = 21;
+	public static final Integer ADD_POS_GRP = 22;
+	public static final Integer ASSIGN_POS_GRP = 23;
+	public static final Integer QUIT_POS_GRP = 24;
+	public static final Integer EDIT_POS_GRP_DETAIL = 25;
+	public static final Integer RM_POS_GRP = 26;
 	
 	private Integer id;
 	private Account who;

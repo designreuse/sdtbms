@@ -15,8 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bus.dto.Account;
 import com.bus.dto.Employee;
+import com.bus.dto.Position;
 import com.bus.dto.logger.ScoreLog;
+import com.bus.dto.score.Positiongroup;
 import com.bus.dto.score.ScoreMemberRank;
+import com.bus.dto.score.Scoregroup;
 import com.bus.dto.score.Scoremember;
 import com.bus.dto.score.Scorerecord;
 import com.bus.dto.score.Scoresheetmapper;
@@ -257,6 +260,8 @@ public class ScoreBean {
 				summary.setScore(new Long(score));
 			else if(st.getType() == Scoretype.SCORE_TYPE_PERFORMENCE)
 				summary.setPerformancescore(new Long(score));
+			else if(st.getType() == Scoretype.SCORE_TYPE_PROJECT)
+				summary.setProjectscore(new Long(score));
 			em.persist(summary);
 			em.flush();
 			em.persist(LoggerAction.createNewScoreSummary(user,summary));
@@ -267,7 +272,9 @@ public class ScoreBean {
 			else if(st.getType() == Scoretype.SCORE_TYPE_TEMP)
 				summary.setScore(summary.getScore() + new Long(score));
 			else if(st.getType() == Scoretype.SCORE_TYPE_PERFORMENCE)
-				summary.setPerformancescore(new Long(score));
+				summary.setPerformancescore(summary.getPerformancescore() + new Long(score));
+			else if(st.getType() == Scoretype.SCORE_TYPE_PROJECT)
+				summary.setProjectscore(summary.getProjectscore() + new Long(score));
 			em.merge(summary);
 			em.persist(LoggerAction.updateScoreSummary(user,summary));
 		}
@@ -514,5 +521,125 @@ public class ScoreBean {
 		em.persist(mapper);
 		em.flush();
 		em.persist(LoggerAction.assignScoreTypeToSheet(user, st, sheet));
+	}
+
+	/**
+	 * Get positions belongs to given group
+	 * @return
+	 */
+	public List<Position> getGroupedPositions(Integer groupid) throws Exception {
+		List<Positiongroup> posg = em.createQuery("SELECT q FROM Positiongroup q WHERE" +
+				" scoregroupid=? ORDER BY q.position.name").setParameter(1, groupid).getResultList();
+		List<Position> pos = new ArrayList<Position>();
+		for(Positiongroup g:posg){
+			pos.add(g.getPosition());
+		}
+		return pos;
+	}
+
+	/**
+	 * Create score group
+	 * @param group
+	 * @throws Exception
+	 */
+	@Transactional
+	public void saveGroup(Account user, Scoregroup group) throws Exception{
+		em.persist(group);
+		em.flush();
+		em.persist(LoggerAction.createScoreGroup(user, group));
+	}
+
+	/**
+	 * 
+	 * @param positionid
+	 * @param groupSelected
+	 * @return
+	 */
+	public boolean isGroupedPositionExist(Integer positionid, Integer groupSelected) throws Exception {
+		try{
+			Positiongroup pg = (Positiongroup) em.createQuery("SELECT q FROM Positiongroup q WHERE " +
+					" scoregroupid=? AND positionid=?").setParameter(1, groupSelected).setParameter(2, positionid).getSingleResult();
+			if(pg != null)
+				return true;
+			else
+				return false;
+		}catch(Exception e){
+			return false;
+		}
+	}
+
+	/**
+	 * 
+	 * @param i
+	 * @param groupSelected
+	 */
+	@Transactional
+	public void assignPosToGroup(Account user, Integer posid, Integer groupSelected) throws Exception{
+			Position p = em.find(Position.class, posid);
+			Scoregroup sg = em.find(Scoregroup.class, groupSelected);
+			Positiongroup pg = new Positiongroup();
+			pg.setPosition(p);
+			pg.setScoreGroup(sg);
+			em.persist(pg);
+			em.flush();
+			em.persist(LoggerAction.assginToScoreGroup(user, pg));
+	}
+
+	/**
+	 * 
+	 * @param user
+	 * @param posid
+	 * @param groupSelected
+	 * @throws Exception
+	 */
+	@Transactional
+	public void quitPosFromGroup(Account user, Integer posid, Integer groupSelected) throws Exception{
+		Position p = em.find(Position.class, posid);
+		Scoregroup sg = em.find(Scoregroup.class, groupSelected);
+		Positiongroup pg = (Positiongroup) em.createQuery("SELECT q FROM Positiongroup q WHERE " +
+				" q.position=:p AND q.scoreGroup=:sg").setParameter("p", p).setParameter("sg",sg).getSingleResult();
+		em.persist(LoggerAction.quitScoreGroup(user, pg));
+		em.remove(pg);
+	}
+
+	/**
+	 * Get all scoring positions' group
+	 * @return
+	 */
+	public List<Scoregroup> getAllScoreGroup() throws Exception{
+		List<Scoregroup> list = em.createQuery("SELECT q FROM Scoregroup q ORDER BY q.id").getResultList();
+		return list;
+	}
+
+	/**
+	 * Edit the group information for created group
+	 * @param user
+	 * @param groupSelected
+	 * @param editGroup
+	 */
+	@Transactional
+	public void editGroup(Account user, Integer groupSelected,
+			Scoregroup editGroup) throws Exception{
+		Scoregroup sg = em.find(Scoregroup.class, groupSelected);
+		if(editGroup.getName() != null && editGroup.getName().trim() != ""){
+			sg.setName(editGroup.getName());
+		}
+		if(editGroup.getRemark() != null && editGroup.getRemark().trim() != ""){
+			sg.setRemark(editGroup.getRemark());
+		}
+		em.merge(sg);
+		em.persist(LoggerAction.editScoreGroupDetail(user, sg));
+	}
+
+	/**
+	 * Remove the score group, only if no positions are assigned
+	 * @param user
+	 * @param groupSelected
+	 */
+	@Transactional
+	public void removeScoreGroup(Account user, Integer groupSelected) throws Exception{
+		Scoregroup sg = em.find(Scoregroup.class, groupSelected);
+		em.persist(LoggerAction.removeScoreGroup(user,sg));
+		em.remove(sg);
 	}
 }

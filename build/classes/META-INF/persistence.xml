@@ -37,6 +37,8 @@
  <class>com.bus.dto.score.Scoretype</class>
  <class>com.bus.dto.score.Scoresummary</class>
  <class>com.bus.dto.score.ScoreMemberRank</class>
+ <class>com.bus.dto.score.Scoregroup</class>
+ <class>com.bus.dto.score.Positiongroup</class>
  
  <class>com.bus.dto.logger.ScoreLog</class>
  <class>com.bus.dto.logger.AccountLog</class>

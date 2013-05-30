@@ -23,30 +23,36 @@
 								
 								<ss:secure roles="score_items_view">
 								<li>
-									<a href="${pageContext.request.contextPath}/actionbean/Scoreitems.action" title="积分主页">条例管理</a>
+									<a href="${pageContext.request.contextPath}/actionbean/Scoreitems.action" title="条例管理">条例管理</a>
 								</li>
 								</ss:secure>
 								
 								<ss:secure roles="score_items_create,score_items_givescore">
 								<li>
-									<a href="${pageContext.request.contextPath}/actionbean/Scorefile.action" title="积分主页">批量积分添加/删除</a>
+									<a href="${pageContext.request.contextPath}/actionbean/Scorefile.action" title="批量积分添加/删除">批量积分添加/删除</a>
 								</li>
 								</ss:secure>
 								
 								<ss:secure roles="score_sheet_view">
 								<li>
-									<a href="${pageContext.request.contextPath}/actionbean/Scoresheet.action" title="积分主页">积分单管理</a>
+									<a href="${pageContext.request.contextPath}/actionbean/Scoresheet.action" title="积分单管理">积分单管理</a>
+								</li>
+								</ss:secure>
+								
+								<ss:secure roles="score_rank_group_view">
+								<li>
+									<a href="${pageContext.request.contextPath}/actionbean/Rankgroup.action" title="排位组管理">排位组管理</a>
 								</li>
 								</ss:secure>
 								
 								<ss:secure roles="score_detail_view">
 								<li>
-									<a href="${pageContext.request.contextPath}/actionbean/Scoredetail.action" title="积分主页">积分详细信息</a>
+									<a href="${pageContext.request.contextPath}/actionbean/Scoredetail.action" title="积分详细信息">积分详细信息</a>
 								</li>
 								</ss:secure>
 
 								<li>
-									<a href="${pageContext.request.contextPath}/actionbean/Empscore.action?ranking=" title="积分主页">积分排名查看</a>
+									<a href="${pageContext.request.contextPath}/actionbean/Empscore.action?ranking=" title="积分排名查看">积分排名查看</a>
 								</li>
 							</ul>
 						</div>

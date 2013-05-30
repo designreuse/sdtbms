@@ -26,6 +26,7 @@ public class Scoresummary {
 	private Long score = 0L;
 	private Long fixscore = 0L;
 	private Long performancescore = 0L;
+	private Long projectscore = 0L;
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -76,5 +77,13 @@ public class Scoresummary {
 	}
 	public void setPerformancescore(Long performancescore) {
 		this.performancescore = performancescore;
+	}
+	
+	@Column(name="projectscore")
+	public Long getProjectscore() {
+		return projectscore;
+	}
+	public void setProjectscore(Long projectscore) {
+		this.projectscore = projectscore;
 	}
 }

@@ -7,6 +7,8 @@ import com.bus.dto.Account;
 import com.bus.dto.Employee;
 import com.bus.dto.logger.AccountLog;
 import com.bus.dto.logger.ScoreLog;
+import com.bus.dto.score.Positiongroup;
+import com.bus.dto.score.Scoregroup;
 import com.bus.dto.score.Scoremember;
 import com.bus.dto.score.Scorerecord;
 import com.bus.dto.score.Scoresheets;
@@ -229,13 +231,63 @@ public class LoggerAction {
 		return log;
 	}
 
-	public static Object assignScoreTypeToSheet(Account user, Scoretype st,
+	public static ScoreLog assignScoreTypeToSheet(Account user, Scoretype st,
 			Scoresheets sheet) {
 		ScoreLog log = new ScoreLog();
 		log.setAction(ScoreLog.ADD_SCORE_SHEET_ST);
 		log.setCreatetime(Calendar.getInstance().getTime());
 		log.setRecordid(sheet.getId()+"");
 		log.setRemark("从表单 "+sheet.getName()+" 添加了条例:"+st.getReference());
+		log.setWho(user);
+		return log;
+	}
+
+	public static ScoreLog createScoreGroup(Account user, Scoregroup group) {
+		ScoreLog log = new ScoreLog();
+		log.setAction(ScoreLog.ADD_POS_GRP);
+		log.setCreatetime(Calendar.getInstance().getTime());
+		log.setRecordid(group.getId()+"");
+		log.setRemark("新建了积分组"+group.getName());
+		log.setWho(user);
+		return log;
+	}
+
+	public static ScoreLog assginToScoreGroup(Account user, Positiongroup pg) {
+		ScoreLog log = new ScoreLog();
+		log.setAction(ScoreLog.ASSIGN_POS_GRP);
+		log.setCreatetime(Calendar.getInstance().getTime());
+		log.setRecordid(pg.getId()+"");
+		log.setRemark("积分组 "+ pg.getScoreGroup().getName() +" 添加了职位 "+pg.getPosition().getName());
+		log.setWho(user);
+		return log;
+	}
+
+	public static ScoreLog quitScoreGroup(Account user, Positiongroup pg) {
+		ScoreLog log = new ScoreLog();
+		log.setAction(ScoreLog.QUIT_POS_GRP);
+		log.setCreatetime(Calendar.getInstance().getTime());
+		log.setRecordid(pg.getId()+"");
+		log.setRemark("积分组 "+ pg.getScoreGroup().getName() +" 移除了职位 "+pg.getPosition().getName());
+		log.setWho(user);
+		return log;
+	}
+
+	public static ScoreLog editScoreGroupDetail(Account user, Scoregroup sg) {
+		ScoreLog log = new ScoreLog();
+		log.setAction(ScoreLog.EDIT_POS_GRP_DETAIL);
+		log.setCreatetime(Calendar.getInstance().getTime());
+		log.setRecordid(sg.getId()+"");
+		log.setRemark("积分组 "+ sg.getName() +" 的资料更新了。 ");
+		log.setWho(user);
+		return log;
+	}
+
+	public static ScoreLog removeScoreGroup(Account user, Scoregroup sg) {
+		ScoreLog log = new ScoreLog();
+		log.setAction(ScoreLog.RM_POS_GRP);
+		log.setCreatetime(Calendar.getInstance().getTime());
+		log.setRecordid(sg.getId()+"");
+		log.setRemark("积分组 "+ sg.getName() +" 被删除了。 ");
 		log.setWho(user);
 		return log;
 	}

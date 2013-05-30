@@ -57,6 +57,8 @@ public class ScoreExcelFileProcessor extends ExcelFileProcessor {
 					st.setType(Scoretype.SCORE_TYPE_TEMP);
 				else if (cols[1].equals(Scoretype.SCORE_TYPE_PERFORMENCE_STR))
 					st.setType(Scoretype.SCORE_TYPE_PERFORMENCE);
+				else if (cols[1].equals(Scoretype.SCORE_TYPE_PROJECT_STR))
+					st.setType(Scoretype.SCORE_TYPE_PROJECT);
 				else {
 					str += "不知名的类型." + "第" + index + "行" + "录入失败,编号"+ cols[0]  + "\n<br/>";
 					continue;

@@ -24,6 +24,8 @@ public class ScoreViewPublicSelector implements BMSSelector{
 	private Integer scoretype;
 	private Integer order;
 	
+	private Integer selectedGroup;
+	
 	private Integer department;
 	private String position;
 	
@@ -35,7 +37,7 @@ public class ScoreViewPublicSelector implements BMSSelector{
 		Calendar c = Calendar.getInstance();
 		c.setTime(recordDate);
 		String scoretypeselection = getScoreTypeQuery();
-		String query = "SELECT scoresummary.workerid AS workercode,SUM(fixscore) AS fixscore, SUM(score) AS tempscore, SUM(performancescore) AS performancescore, SUM(fixscore+score+performancescore) AS totalscore, RANK() OVER ("+scoretypeselection+") AS rank, COUNT(scoresummary.workerid) AS count," +
+		String query = "SELECT scoresummary.workerid AS workercode,SUM(fixscore) AS fixscore, SUM(score+projectscore) AS tempscore, SUM(performancescore) AS performancescore, SUM(fixscore+score+performancescore+projectscore) AS totalscore, RANK() OVER ("+scoretypeselection+") AS rank, COUNT(scoresummary.workerid) AS count," +
 				" employee.fullname AS name, employee.firstworktime AS firstworktime," +
 				" position.name AS positionname " +
 				" FROM scoresummary JOIN employee ON scoresummary.workerid=employee.workerid" +
@@ -63,11 +65,11 @@ public class ScoreViewPublicSelector implements BMSSelector{
 		if(scoretype == TYPE_BY_FIX_SCORE){
 			scoretypeselection = "ORDER BY SUM(fixscore) "+getOrderString();
 		}else if(scoretype == TYPE_BY_TEMP_SCORE){
-			scoretypeselection = "ORDER BY SUM(score) "+getOrderString();
+			scoretypeselection = "ORDER BY SUM(score+projectscore) "+getOrderString();
 		}else if (scoretype == TYPE_BY_PERFORMANCESCORE){
 			scoretypeselection = "ORDER BY SUM(performancescore) "+getOrderString();
 		}else if(scoretype == TYPE_BY_TOTAL_SCORE){
-			scoretypeselection = "ORDER BY SUM(fixscore+score+performancescore) " +getOrderString();
+			scoretypeselection = "ORDER BY SUM(fixscore+score+performancescore+projectscore) " +getOrderString();
 		}else{
 			scoretypeselection = "ORDER BY SUM(score) "+getOrderString();
 		}
@@ -81,11 +83,15 @@ public class ScoreViewPublicSelector implements BMSSelector{
 		Calendar c = Calendar.getInstance();
 		c.setTime(recordDate);
 		String scoretypeselection = getScoreTypeQuery();
-		String query = "SELECT scoresummary.workerid AS workercode,SUM(fixscore) AS fixscore, SUM(score) AS tempscore, SUM(fixscore+score+performancescore) AS totalscore, SUM(performancescore) AS performancescore, RANK() OVER ("+scoretypeselection+") AS rank, COUNT(scoresummary.workerid) AS count," +
+		String query = "SELECT scoresummary.workerid AS workercode,SUM(fixscore) AS fixscore, SUM(score+projectscore) AS tempscore, SUM(fixscore+score+performancescore+projectscore) AS totalscore, SUM(performancescore) AS performancescore, RANK() OVER ("+scoretypeselection+") AS rank, COUNT(scoresummary.workerid) AS count," +
 				" employee.fullname AS name, employee.firstworktime AS firstworktime," +
 				" position.name AS positionname " +
 				" FROM scoresummary JOIN employee ON scoresummary.workerid=employee.workerid"+
 				" JOIN position ON employee.positionid = position.id";
+		if(selectedGroup != null){
+			query += 	" JOIN positiongroup ON positiongroup.scoregroupid=" +selectedGroup+ " AND positiongroup.positionid = employee.positionid";
+		}
+			
 		if(selecttype == null)
 			selecttype = 2;
 		if(selecttype == 0){
@@ -97,10 +103,10 @@ public class ScoreViewPublicSelector implements BMSSelector{
 			//order in month
 			query += "  WHERE EXTRACT(month FROM date)="+(c.get(Calendar.MONTH)+1);
 		}
-		if(department != null){
+		if(selectedGroup == null && department != null){
 			query += " AND employee.departmentid="+department;
 		}
-		if(position != null){
+		if(selectedGroup == null && position != null){
 			query += " AND position.name LIKE '%"+position+"%'";
 		}
 		query += " GROUP BY scoresummary.workerid, employee.fullname, employee.firstworktime, position.name";
@@ -115,19 +121,22 @@ public class ScoreViewPublicSelector implements BMSSelector{
 			start.setTime(recordStartDate);
 			Calendar end = Calendar.getInstance();
 			end.setTime(recordEndDate);
-			String query = "SELECT scoresummary.workerid AS workercode,SUM(fixscore) AS fixscore, SUM(score) AS tempscore, SUM(performancescore) AS performancescore, SUM(fixscore+score+performancescore) AS totalscore, RANK() OVER ("+getScoreTypeQuery()+") AS rank, COUNT(scoresummary.workerid) AS count," +
+			String query = "SELECT scoresummary.workerid AS workercode,SUM(fixscore) AS fixscore, SUM(score+projectscore) AS tempscore, SUM(performancescore) AS performancescore, SUM(fixscore+score+performancescore+projectscore) AS totalscore, RANK() OVER ("+getScoreTypeQuery()+") AS rank, COUNT(scoresummary.workerid) AS count," +
 					" employee.fullname AS name, employee.firstworktime AS firstworktime," +
 					" position.name AS positionname " +
 					" FROM scoresummary JOIN employee ON scoresummary.workerid=employee.workerid" +
-					" JOIN position ON employee.positionid = position.id" +
-					" WHERE EXTRACT(month FROM date)>="+(start.get(Calendar.MONTH)+1)+
+					" JOIN position ON employee.positionid = position.id";
+			if(selectedGroup != null){
+				query += 	" JOIN positiongroup ON positiongroup.scoregroupid=" +selectedGroup+ " AND positiongroup.positionid = employee.positionid";
+			}
+			query +=" WHERE EXTRACT(month FROM date)>="+(start.get(Calendar.MONTH)+1)+
 					" AND EXTRACT(month FROM date)<="+(end.get(Calendar.MONTH)+1)+
 					" AND EXTRACT(year FROM date)>="+start.get(Calendar.YEAR)+
 					" AND EXTRACT(year FROM date)<="+end.get(Calendar.YEAR);
-			if(department != null){
+			if(selectedGroup == null && department != null){
 				query += " AND employee.departmentid="+department;
 			}
-			if(position != null){
+			if(selectedGroup == null && position != null){
 				query += " AND position.name LIKE '%"+position+"%'";
 			}
 			query += " GROUP BY scoresummary.workerid, employee.fullname, employee.firstworktime, position.name";
@@ -214,5 +223,13 @@ public class ScoreViewPublicSelector implements BMSSelector{
 
 	public void setScoretype(Integer scoretype) {
 		this.scoretype = scoretype;
+	}
+
+	public Integer getSelectedGroup() {
+		return selectedGroup;
+	}
+
+	public void setSelectedGroup(Integer selectedGroup) {
+		this.selectedGroup = selectedGroup;
 	}
 }
