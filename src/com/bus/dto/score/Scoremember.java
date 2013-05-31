@@ -23,10 +23,11 @@ public class Scoremember implements Serializable{
 
 	private Integer id;
 	private Employee employee;
-	private Integer monthlytotal;
-	private Integer monthlyremain;
-	private Long historytotal;
-	private Integer monthlyscore;
+	private Integer monthlytotal = 0;
+	private Integer monthlyremain = 0;
+	private Long historytotal = 0L;
+	private Integer monthlyscore = 0;
+	private Long voucherscore = 0L;
 	
 	@Column(name="monthlytotal")
 	public Integer getMonthlytotal() {
@@ -85,6 +86,14 @@ public class Scoremember implements Serializable{
 	}
 	public void setId(Integer id) {
 		this.id = id;
+	}
+	
+	@Column(name="voucherscore")
+	public Long getVoucherscore() {
+		return voucherscore;
+	}
+	public void setVoucherscore(Long voucherscore) {
+		this.voucherscore = voucherscore;
 	}
 	
 	

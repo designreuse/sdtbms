@@ -26,6 +26,7 @@ import com.bus.dto.score.Scoresheetmapper;
 import com.bus.dto.score.Scoresheets;
 import com.bus.dto.score.Scoresummary;
 import com.bus.dto.score.Scoretype;
+import com.bus.dto.score.Voucherlist;
 import com.bus.util.LoggerAction;
 
 
@@ -321,6 +322,7 @@ public class ScoreBean {
 		member.setMonthlyremain(0);
 		member.setMonthlyscore(0);
 		member.setMonthlytotal(0);
+		member.setVoucherscore(0L);
 		em.persist(member);
 		em.flush();
 		em.persist(LoggerAction.createScoreMember(user, member));
@@ -641,5 +643,56 @@ public class ScoreBean {
 		Scoregroup sg = em.find(Scoregroup.class, groupSelected);
 		em.persist(LoggerAction.removeScoreGroup(user,sg));
 		em.remove(sg);
+	}
+
+	/**
+	 * Get vouchers from company and make records
+	 * @param user
+	 * @param workerid
+	 * @param vl
+	 */
+	@Transactional
+	public void giveVouchers(Account user, Voucherlist vl) throws Exception{
+		Scoremember sm = vl.getScoremember();
+		sm.setVoucherscore(sm.getVoucherscore() + new Long(vl.getScore()));
+		em.merge(sm);
+		em.persist(vl);
+		em.flush();
+		em.persist(LoggerAction.giveVoucher(user,vl));
+	}
+
+	/**
+	 * Get voucher records by worker's workerId
+	 * @param filterworkerid
+	 * @return
+	 */
+	public List<Voucherlist> getVouchersByWorkerId(String filterworkerid) throws Exception {
+		return em.createQuery("SELECT q FROM Voucherlist q WHERE workerid=? ORDER BY date DESC")
+				.setParameter(1, filterworkerid).getResultList();
+	}
+
+	/**
+	 * Get voucher records by worker's name
+	 * @param filtername
+	 * @return
+	 */
+	public List<Voucherlist> getVouchersByName(String filtername) throws Exception{
+		return em.createQuery("SELECT q FROM Voucherlist q WHERE q.scoremember.employee.fullname LIKE '%"+filtername+"%' ORDER BY date DESC")
+				.getResultList();
+	}
+
+	/**
+	 * Delete voucher record given the voucher record id
+	 * @param targetId
+	 * @throws Exception
+	 */
+	@Transactional
+	public void deleteVoucherRecord(Account user, Integer targetId) throws Exception{
+		Voucherlist vl = em.find(Voucherlist.class, targetId);
+		Scoremember sm = vl.getScoremember();
+		sm.setVoucherscore(sm.getVoucherscore() - new Long(vl.getScore()));
+		em.merge(sm);
+		em.persist(LoggerAction.deleteVoucherRecord(user, vl));
+		em.remove(vl);
 	}
 }

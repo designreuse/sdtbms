@@ -14,6 +14,7 @@ import com.bus.dto.score.Scorerecord;
 import com.bus.dto.score.Scoresheets;
 import com.bus.dto.score.Scoresummary;
 import com.bus.dto.score.Scoretype;
+import com.bus.dto.score.Voucherlist;
 
 public class LoggerAction {
 
@@ -288,6 +289,26 @@ public class LoggerAction {
 		log.setCreatetime(Calendar.getInstance().getTime());
 		log.setRecordid(sg.getId()+"");
 		log.setRemark("积分组 "+ sg.getName() +" 被删除了。 ");
+		log.setWho(user);
+		return log;
+	}
+
+	public static ScoreLog giveVoucher(Account user, Voucherlist vl) {
+		ScoreLog log = new ScoreLog();
+		log.setAction(ScoreLog.GIVE_VOUCHER);
+		log.setCreatetime(Calendar.getInstance().getTime());
+		log.setRecordid(vl.getId()+"");
+		log.setRemark("员工"+vl.getScoremember().getEmployee().getFullname() + "获取了"+vl.getQuantity()+"张奖券.");
+		log.setWho(user);
+		return log;
+	}
+
+	public static ScoreLog deleteVoucherRecord(Account user, Voucherlist vl) {
+		ScoreLog log = new ScoreLog();
+		log.setAction(ScoreLog.DELETE_VOUCHER);
+		log.setCreatetime(Calendar.getInstance().getTime());
+		log.setRecordid(vl.getId()+"");
+		log.setRemark("删除了员工"+vl.getScoremember().getEmployee().getFullname() + "在"+vl.getQuantity()+"张奖券记录.");
 		log.setWho(user);
 		return log;
 	}

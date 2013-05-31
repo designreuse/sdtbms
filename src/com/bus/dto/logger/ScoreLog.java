@@ -41,6 +41,8 @@ public class ScoreLog {
 	public static final Integer QUIT_POS_GRP = 24;
 	public static final Integer EDIT_POS_GRP_DETAIL = 25;
 	public static final Integer RM_POS_GRP = 26;
+	public static final Integer GIVE_VOUCHER = 27;
+	public static final Integer DELETE_VOUCHER = 28;
 	
 	private Integer id;
 	private Account who;
@@ -139,7 +141,7 @@ public class ScoreLog {
 		case ADD_SCORE_SHEET_ST:
 			return "从表单添加条例";
 			default:
-				return "未知";
+				return "";
 		}
 	}
 	

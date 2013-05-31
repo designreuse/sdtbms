@@ -58,6 +58,22 @@ $(document).ready(function(){
     		}
     	});
     });
+    
+
+    $("#getNameById3").click(function(){
+    	var getNameByIdUrl = $(this).next().val();
+        var workerId = $(this).prev().val();
+        getNameByIdUrl += "&workerid="+workerId;
+        $.ajax({
+    		url:getNameByIdUrl,
+    		success:function(response){
+    			$('#employeenamefromid1').val(response);
+    		},
+    		error:function(response){
+    			alert("员工工号不存在或存在重复");
+    		}
+    	});
+    });
 });
 
 
@@ -128,4 +144,19 @@ function scoreNewItemValidation(formId){
 	if(text != "")
 		alert("请输入 " + text);
 	return valid;
+}
+
+function deleteVoucher(vlurl){
+	$.ajax({
+		url:vlurl,
+		type:"post",
+		dataType:'text',
+		success:function(response){
+			alert(response);
+			location.reload();
+		},
+		error:function(response){
+			alert("删除失败");
+		}
+	});
 }

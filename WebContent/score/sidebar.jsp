@@ -51,6 +51,12 @@
 								</li>
 								</ss:secure>
 
+								<ss:secure roles="score_voucher_view">
+								<li>
+									<a href="${pageContext.request.contextPath}/actionbean/Voucher.action" title="奖券管理">奖券管理</a>
+								</li>
+								</ss:secure>
+
 								<li>
 									<a href="${pageContext.request.contextPath}/actionbean/Empscore.action?ranking=" title="积分排名查看">积分排名查看</a>
 								</li>
