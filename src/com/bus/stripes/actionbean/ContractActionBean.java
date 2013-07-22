@@ -85,7 +85,7 @@ public class ContractActionBean extends CustomActionBean implements Permission{
 				try{
 //					statement = URLDecoder.decode(statement, "UTF-8");
 					setContracts(bean.getContractsBySelector(pagenum,lotsize,statement));
-//					System.out.println("Using statement:"+statement);
+					System.out.println("Using statement:"+statement);
 				}catch(Exception e){
 					e.printStackTrace();
 					setContracts(bean.getContracts(pagenum, lotsize));
@@ -124,6 +124,18 @@ public class ContractActionBean extends CustomActionBean implements Permission{
 		String id = context.getRequest().getParameter("targetId");
 		bean.removeContract(Integer.parseInt(id));
 		return new StreamingResolution("text;charset=utf-8","合同已经删除");
+	}
+	
+	@HandlesEvent(value="resignContract")
+	@Secure(roles=Roles.EMPLOYEE_RM_CONTRACT)
+	public Resolution resignContract(){
+		try{
+			String id = context.getRequest().getParameter("targetId");
+			bean.resignContract(Integer.parseInt(id));
+			return new StreamingResolution("text;charset=utf-8","合同结束成功");
+		}catch(Exception e){
+			return new StreamingResolution("text;charset=utf-8","合同未结束."+e.getMessage());
+		}
 	}
 	
 	@HandlesEvent(value="prevpage")

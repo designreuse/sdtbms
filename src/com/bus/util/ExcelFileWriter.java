@@ -3,6 +3,7 @@ package com.bus.util;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,16 @@ public class ExcelFileWriter {
 		return str;
 	}
 	
+	private List<Contract> getPassContracts(Set<Contract> contracts){
+		List<Contract> c = new ArrayList<Contract>();
+		for(Contract tc: contracts){
+				if(tc != null && tc.getStatus().equals("E")){
+					c.add(tc);
+				}
+		}
+		return c;
+	}
+	
 	private Contract getLastContract(Set<Contract> contracts) {
 		Contract c = null;
 		for(Contract tc: contracts){
@@ -35,6 +46,8 @@ public class ExcelFileWriter {
 				c = tc;
 			else{
 				if(tc.getStatus().equals("A")){
+					if(tc.getEnddate() == null || c.getEnddate() == null)
+						continue;
 					if(tc.getEnddate().getTime() > c.getEnddate().getTime()){
 						c = tc;
 					}
@@ -67,6 +80,7 @@ public class ExcelFileWriter {
 		str += "有效日期（驾）"+ ",";
 		str += "从业资格证"+ ",";
 		str += "从业资格类别"+ ",";
+		str += "领证日期"+",";
 		str += "有效日期（从）"+ ",";
 		str += "服务资格证"+ "\n";
 		
@@ -96,6 +110,10 @@ public class ExcelFileWriter {
 			if(forworkservice != null){
 				str += toStr(forworkservice.getNumber()) + ",";
 				str += toStr(forworkservice.getRemark()) + ",";
+				if(forworkservice.getValidfrom() != null)
+					str += HRUtil.parseDateToString(forworkservice.getValidfrom()) +",";
+				else
+					str += ",";
 				str += HRUtil.parseDateToString(forworkservice.getExpiredate()) + ",";
 			}else{
 				str += ",";str += ",";str += ",";
@@ -268,7 +286,7 @@ public class ExcelFileWriter {
 		str += "政治面貌"+ ",";
 		str += "入党时间"+ ",";
 		str += "职称"+ ",";
-		str += "军人"+ ",";
+		str += "特殊身份"+ ",";
 		str += "职级"+ ",";
 		str += "合同始期"+ ",";
 		str += "终结日期"+ ",";
@@ -314,7 +332,12 @@ public class ExcelFileWriter {
 				Contract c = getLastContract(e.getContracts());
 				str += HRUtil.parseDateToString(c.getStartdate())+",";
 				str += HRUtil.parseDateToString(c.getEnddate())+",";
-				str += e.getContracts().size()+ "次,";
+				
+				String contractStr = "";
+				for(Contract cp : getPassContracts(e.getContracts())){
+					contractStr += "("+cp.getStartdatestr()+":"+cp.getEnddatestr()+"|"+cp.getRemark()+").";
+				}
+				str += contractStr+",";
 			}else{
 				str += ",";
 				str += ",";
@@ -324,7 +347,30 @@ public class ExcelFileWriter {
 			
 			str += HRUtil.parseDateToString(e.getTransfertime()) + ",";
 //			str += toStr(e.getRemark());
-			str += ",";
+			String tranfStr = "";
+			if(e.getTransfers() != null){
+				for(Promoandtransfer p:e.getTransfers()){
+					tranfStr += "(";
+					if(p.getMovedatestr() != null)
+						tranfStr += p.getMovedatestr();
+					
+					tranfStr += ":"+p.getType()+":";
+					
+					if(p.getPredepartment() != null)
+						tranfStr += p.getPredepartment().getName()+" ";
+					if(p.getPreposition()!= null)
+						tranfStr += p.getPreposition().getName();
+					if(p.getCurdepartment()!= null)
+						tranfStr += "--"+p.getCurdepartment().getName()+" ";
+					if(p.getCurposition() != null)
+						tranfStr += p.getCurposition().getName()+":";
+					if(p.getRemark() != null)
+						tranfStr += p.getRemark();
+					tranfStr +=").";
+				}
+				str += tranfStr+",";
+			}else
+				str += ",";
 			str +="\n";
 		}
 		return str;

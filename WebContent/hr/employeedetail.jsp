@@ -87,9 +87,9 @@ function editEmployee(){
 							<td>职位:</td><td><stripes:select name="employee.position.id"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.position}" label="label" value="value"/></stripes:select></td>
 						</tr>
 						<tr>
-							<td>所属镇街:</td><td><stripes:text name="employee.placebelong"/></td>
+							<td>所属镇街:</td><td><stripes:select name="employee.placebelong"><stripes:option value=""></stripes:option><stripes:options-collection collection="${actionBean.placebelongs}" label="label" value="label"/></stripes:select></td>
 							<td>户籍类型:</td><td><stripes:select name="employee.domiciletype"><stripes:option value="">请选择...</stripes:option><stripes:options-collection collection="${actionBean.domiciletypes}" label="label" value="value"/></stripes:select></td>
-							<td>军人:</td><td><stripes:radio name="employee.army" value="是"/>是<stripes:radio name="employee.army" value="否"/>否</td>
+							<td>特殊身份:</td><td><stripes:select name="employee.army"><stripes:options-collection collection="${actionBean.specialPeople}" label="label" value="value"/></stripes:select></td>
 						</tr>
 						<tr>
 							<td>最后毕业学校:</td><td><stripes:text name="employee.colleage"></stripes:text></td>

@@ -126,9 +126,9 @@
 							<td>职位:</td><td><stripes:select class="required" name="employee.position.id"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.position}" label="label" value="value"/></stripes:select></td>
 						</tr>
 						<tr>
-							<td>所属镇街:</td><td><stripes:text name="employee.placebelong"/></td>
+							<td>所属镇街:</td><td><stripes:select name="employee.placebelong"><stripes:option value=""></stripes:option><stripes:options-collection collection="${actionBean.placebelongs}" label="label" value="label"/></stripes:select></td>
 							<td>户籍类型:</td><td><stripes:select class="required" name="employee.domiciletype"><stripes:option value="">请选择...</stripes:option><stripes:options-collection collection="${actionBean.domiciletypes}" label="label" value="value"/></stripes:select></td>
-							<td>军人:</td><td><stripes:radio name="employee.army" value="是"/>是<stripes:radio name="employee.army" value="否"/>否</td>
+							<td>特殊身份:</td><td><stripes:select name="employee.army"><stripes:options-collection collection="${actionBean.specialPeople}" label="label" value="value"/></stripes:select></td>
 						</tr>
 						<tr>
 							<td>最后毕业学校:</td><td><stripes:text name="employee.colleage"></stripes:text></td>
@@ -200,44 +200,6 @@
 					<Label>调动文件csv:</Label><stripes:file name="coordinatorfile" id="file_coordinator"/><stripes:submit name="coordinatorfileupload" value="提交"/>
 					</ss:secure>					
 <%-- 					<stripes:submit name="resignemployeecoordination" value="离职"/> --%>
-					<script type="text/javascript">
-// 					$("#file_submit_form").submit(function(){ 
-// 						try{
-// 						var employee_csv =$('#file_employee').val().trim();
-// 						var employee_check = $('#file_employee_check').val().trim();
-// 						var drivers  = $('#file_drivers').val().trim();
-// 						var coordinator = $('#file_coordinator').val().trim();
-// 						if(employee_csv != ""){
-// 							var ext = employee_csv.split('.').pop().toLowerCase();
-// 							if($.inArray(ext, ['csv']) == -1) {
-// 						    	alert('员工资料不是合法的csv文件');
-// 						    	return false;
-// 							}
-// 						}else if(employee_check != ""){
-// 							var ext = employee_check.split('.').pop().toLowerCase();
-// 							if($.inArray(ext, ['txt']) == -1) {
-// 						    	alert('员工资料检查不是合法的txt文件');
-// 						    	return false;
-// 							}
-// 						}else if(drivers != ""){
-// 							var ext = drivers.split('.').pop().toLowerCase();
-// 							if($.inArray(ext, ['csv']) == -1) {
-// 						    	alert('驾驶员资料不是合法的csv文件');
-// 						    	return false;
-// 							}
-// 						}else if(coordinator != ""){
-// 							var ext = coordinator.split('.').pop().toLowerCase();
-// 							if($.inArray(ext,['csv'])==-1){ 
-// 								alert('调动文件不是合法的csv文件');
-// 								return false;
-// 							}
-// 						}
-// 						return true;
-// 						}catch (err) {
-// 							return ture;
-// 						}
-// 					});
-					</script>
 				</stripes:form>
 				<br/>
 				<br/>
@@ -280,7 +242,7 @@
 								<br/>
 								<Label class='selector'>籍贯:</Label><stripes:text name="employeeselector.pob"/>
 								<Label class='selector'>驾驶员:</Label><stripes:text name="employeeselector.driver"/>
-								<Label class='selector'>所属镇街:</Label><stripes:text name="employeeselector.placebelong"/>
+								<Label class='selector'>所属镇街:</Label><stripes:select name="employeeselector.placebelong"><stripes:option value=""></stripes:option><stripes:options-collection collection="${actionBean.placebelongs}" label="label" value="label"/></stripes:select>
 <%-- 								年龄:<stripes:text name="employeeselector.age"/> --%>
 							</td>
 							<td rowspan=3><stripes:select name="employeeselector.ds"  multiple="multiple" style="height:200px;"><stripes:option value="">不限</stripes:option><stripes:options-collection collection="${actionBean.department}" label="label" value="value"/></stripes:select></td>
@@ -315,7 +277,7 @@
 						</tr>
 						<tr>
 							<td colspan=11 style="text-align:left">
-								<Label class='selector'>军人:</Label><stripes:radio name="employeeselector.army" value="是"/>是<stripes:radio name="employeeselector.army" value="否"/>否<stripes:radio name="employeeselector.army" value=""/>不限
+								<Label class='selector'>特殊身份(例:军人):</Label><stripes:text name="employeeselector.army"/>
 								<br/>
 								<Label class='selector'>日期:</Label><stripes:radio name="employeeselector.date" value="0"/>不限 <stripes:radio name="employeeselector.date" value="1"/>入职时间<stripes:radio name="employeeselector.date" value="2"/>按年龄排
 								<br/>
@@ -391,7 +353,15 @@
 										</ss:secure>
 										
 										<ss:secure roles="employee_resign">
-										<stripes:submit class="resign" name="getresign" value="辞"/>
+											<c:if test="${emp.status == 'A'}">
+												<stripes:submit class="resign" name="getresign" value="辞"/>
+											</c:if>
+										</ss:secure>
+										
+										<ss:secure roles="employee_edit">
+											<c:if test="${emp.status == 'E'}">
+												<stripes:submit class="rejoin" name="getrejoin" value="复"/>
+											</c:if>
 										</ss:secure>
 									</div>
 								</stripes:form>
@@ -427,6 +397,16 @@
 						<br/>
 						<textarea name="remark"></textarea>
 						<stripes:submit name="resign" value="辞"/>
+					</stripes:form>
+				</div>
+				</ss:secure>
+				<ss:secure roles="employee_edit">
+				<div id="btn_rejoin_date_dialog" title="复职日期">
+					<stripes:form beanclass="com.bus.stripes.actionbean.EmployeeActionBean">
+						复职日期:<stripes:text name="resigndate"  formatPattern="yyyy-MM-dd" class="datepickerClass"/>
+						<input id="rejoinemployeeId" type="hidden" name="targetId" value=""/>
+						<br/>
+						<stripes:submit name="rejoin" value="复职"/>
 					</stripes:form>
 				</div>
 				</ss:secure>

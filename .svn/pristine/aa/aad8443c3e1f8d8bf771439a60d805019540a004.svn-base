@@ -1,0 +1,93 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ss" uri="/WEB-INF/StripesSecurityManager.tld" %>
+
+<stripes:layout-render name="../default.jsp">
+	
+    <stripes:layout-component name="contents">
+    <script type="text/javascript" src="${pageContext.request.contextPath}/js/employment.js"></script>
+   
+		<div id="sub-nav"><div class="page-title">
+			<h1>驾驶员考试记录</h1>
+		</div></div>
+		
+		<div id="page-layout"><div id="page-content">
+			<div id="page-content-wrapper">
+			
+			
+			
+			<!-- Side bar ****************************************************************** -->
+			<jsp:include page="/employment/empsidebar.jsp" />
+			
+		<!-- Side bar ****************************************************************** -->
+		
+				<!-- Start of main content -->
+				<div id="rightcontent">
+				
+				<div id="items_top_button_bar" style="height:40px;">&nbsp;  
+				<a class="btn ui-state-default ui-corner-all" href="javascript:location.reload();">
+					刷新
+				</a>
+				
+				</div>
+				<hr/>
+					
+					
+					<div class="hastable">
+						<table>
+							<thead>
+								<stripes:form beanclass="com.bus.stripes.actionbean.application.EmpDriverExamActionBean">
+								<tr>
+										<td colspan=8 style="text-align:left !important">
+											<stripes:submit name="prevpage" value="上页"/> 页码: <stripes:text name="pagenum"/> / ${actionBean.pagecount}<stripes:hidden name="totalcount"/>  <stripes:submit name="nextpage" value="下页"/>
+											显示数量:<stripes:text name="lotsize"/>${actionBean.totalcount}行记录
+											<stripes:submit name="filter" value="提交"/>
+										</td>
+								</tr>
+								</stripes:form>
+								<tr>
+								<th>报考日期</th>
+								<th>姓名</th>
+								<th>电话</th>
+								<th>次数</th>
+								<th>合格</th>
+								<th>桩考</th>
+								<th>路考</th>
+								<th>注释</th>
+								</tr>
+							</thead>
+							<tbody>
+								<c:set var="color" value="0" scope="page"/>
+								<c:forEach items="${actionBean.drivingexams}" var="driver" varStatus="loop">
+								<c:choose>
+									<c:when test="${color%2 == 0}">
+										<tr>
+									</c:when>
+									<c:otherwise>
+										<tr class="alt">
+									</c:otherwise>
+								</c:choose>
+								<td>${driver.examdateStr}</td>
+								<td>${driver.applicant.name}</td>
+								<td>${driver.applicant.mobile}</td>
+								<td>${driver.examtimes}</td>
+								<td>${driver.exampassStr}</td>
+								<td>${driver.zhuangPassStr}</td>
+								<td>${driver.roadPassStr}</td>
+								<td>${driver.remark}</td>
+							</tr>
+						<c:set var="color" value="${color + 1}" scope="page"/>
+					</c:forEach>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<!-- End of main content -->
+			</div>
+			<div class="clear"></div>
+		</div>
+	</div>
+    </stripes:layout-component>
+</stripes:layout-render>

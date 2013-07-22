@@ -1,5 +1,9 @@
 package com.bus.stripes.selector;
 
+import java.util.Date;
+
+import com.bus.util.HRUtil;
+
 public class IdmanagementSelector implements BMSSelector{
 
 	private int date = -1; //0 不限，1 证件到期

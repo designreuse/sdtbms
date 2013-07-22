@@ -36,9 +36,10 @@ import com.bus.dto.Position;
 import com.bus.dto.Promoandtransfer;
 import com.bus.dto.Qualification;
 import com.bus.dto.Workertype;
+import com.bus.util.EmployeeStatus;
 import com.bus.util.HRUtil;
 
-public class HRBean {
+public class HRBean{
 
 	@PersistenceContext
 	protected EntityManager em;
@@ -534,14 +535,10 @@ public class HRBean {
 	}
 
 	@Transactional
-	public void deleteIdcard(String cardId) {
-		try {
+	public void deleteIdcard(String cardId) throws Exception{
 			Idmanagement idcard = em.find(Idmanagement.class,
 					Integer.parseInt(cardId));
 			em.remove(idcard);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
 	}
 
 	public Long countIdcards() {
@@ -634,9 +631,16 @@ public class HRBean {
 			coordinate.setEmployee(e);
 			coordinate.setCreatedate(new Date());
 
-			if (isCoordinatorExist(coordinate) == null)
+			if (isCoordinatorExist(coordinate) == null){
+				e.setDepartment(curd);
+				e.setPosition(curp);
+				em.merge(e);
+				em.flush();
 				em.persist(coordinate);
+			}
+			
 			str = "创建成功";
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			str = "创建失败，可能员工不存在." + e.getMessage();
@@ -819,12 +823,13 @@ public class HRBean {
 	public List<Promoandtransfer> getResignEmployeeByCoordinationDate(
 			Date startdate, Date enddate) {
 		try {
+			//不用检查q.employee.status因为直接由记录在promoandtransfer里
 			List<Promoandtransfer> list = (List<Promoandtransfer>) em
 					.createQuery(
-							"SELECT q FROM Promoandtransfer q WHERE q.employee.status=? AND type=? AND"
+							"SELECT q FROM Promoandtransfer q WHERE type=? AND"
 									+ " activedate BETWEEN ? AND ?")
-					.setParameter(1, "E").setParameter(2, "离职")
-					.setParameter(3, startdate).setParameter(4, enddate)
+					.setParameter(1, "离职")
+					.setParameter(2, startdate).setParameter(3, enddate)
 					.getResultList();
 			return list;
 		} catch (Exception e) {
@@ -879,10 +884,10 @@ public class HRBean {
 			coor.setCreatedate(new Date());
 			coor.setRemark(remark);
 			em.persist(coor);
-			e.setStatus("E");
+			e.setStatus(EmployeeStatus.RESIGN);
 			for (Contract c : e.getContracts()) {
-				if (c.getStatus().equals("A")) {
-					c.setStatus("E");
+				if (c.getStatus().equals(EmployeeStatus.ACTIVE)) {
+					c.setStatus(EmployeeStatus.RESIGN);
 					em.merge(c);
 				}
 			}
@@ -892,6 +897,23 @@ public class HRBean {
 			return;
 		}
 
+	}
+	
+	@Transactional
+	public void reJoinEmployee(String targetId, Date resigndate) {
+		try {
+			Employee e = em.find(Employee.class, Integer.parseInt(targetId));
+			if (e == null)
+				throw new Exception("Employee not exist with target id:"
+						+ targetId);
+			e.setStatus(EmployeeStatus.ACTIVE);
+			e.setTransfertime(resigndate);
+			e.setFirstworktime(resigndate);
+			em.merge(e);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return;
+		}
 	}
 
 	public boolean confirmDuplicated(Employee e) {
@@ -974,6 +996,15 @@ public class HRBean {
 	@Transactional
 	public void removeCoordination(int targetId) throws Exception{
 		Promoandtransfer pt = em.find(Promoandtransfer.class, targetId);
+		Employee e  = pt.getEmployee();
+		if(e.getDepartment().getId() == pt.getCurdepartment().getId()){
+			if(e.getPosition().getId() == pt.getCurposition().getId()){
+				e.setDepartment(pt.getPredepartment());
+				e.setPosition(pt.getPreposition());
+				em.merge(e);
+				em.flush();
+			}
+		}
 		em.remove(pt);
 	}
 
@@ -982,7 +1013,7 @@ public class HRBean {
 	}
 
 	@Transactional
-	public void editCoordination(Account user, Promoandtransfer coordinate) {
+	public void editCoordination(Account user, Promoandtransfer coordinate) throws Exception{
 		Promoandtransfer pt = em.find(Promoandtransfer.class, coordinate.getId());
 		pt.setActivedate(coordinate.getActivedate());
 		pt.setMovedate(coordinate.getMovedate());
@@ -992,7 +1023,39 @@ public class HRBean {
 		pt.setPreposition(coordinate.getPreposition());
 		pt.setType(coordinate.getType());
 		pt.setRemark(coordinate.getRemark());
+		
+		Employee e  = pt.getEmployee();
+		e.setDepartment(coordinate.getCurdepartment());
+		e.setPosition(coordinate.getCurposition());
+		em.merge(e);
+		em.flush();
 		em.merge(pt);
+	}
+
+	/**
+	 * Update id card information, only validfrom, expire, remark, number can be update
+	 * @param idcard
+	 */
+	@Transactional
+	public void updateIdCatd(Idmanagement idcard) throws Exception{
+		Idmanagement card = em.find(Idmanagement.class, idcard.getId());
+		card.setExpiredate(idcard.getExpiredate());
+		card.setValidfrom(idcard.getValidfrom());
+		card.setNumber(idcard.getNumber());
+		card.setRemark(idcard.getRemark());
+		em.merge(card);
+	}
+
+	/**
+	 * Resign a contract
+	 * @param id
+	 * @throws Exception
+	 */
+	@Transactional
+	public void resignContract(int id) throws Exception{
+		Contract c = em.find(Contract.class, id);
+		c.setStatus("E");
+		em.merge(c);
 	}
 
 }

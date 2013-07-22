@@ -7,6 +7,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HRUtil {
 
@@ -67,5 +69,18 @@ public class HRUtil {
 		Long amount = Long.parseLong(num);
 		NumberFormat formatter = NumberFormat.getInstance();
 		return formatter.format(amount);
+	}
+	
+	public static Map<String,String> parseRequestToMap(String queryString){
+		String[] split1 = queryString.split("&");
+		Map<String,String> map = new HashMap<String,String>();
+		for(int i=0;i<split1.length;i++){
+			String[] split2 = split1[i].split("=");
+			if(split2.length>1)
+				map.put(split2[0], split2[1]);
+			else
+				map.put(split2[0], null);
+		}
+		return map;
 	}
 }

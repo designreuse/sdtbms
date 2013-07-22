@@ -1,0 +1,203 @@
+package com.bus.stripes.actionbean.application;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
+import security.action.Secure;
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.HandlesEvent;
+import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.StreamingResolution;
+import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.integration.spring.SpringBean;
+
+import com.bus.dto.Department;
+import com.bus.dto.Position;
+import com.bus.dto.application.EmployeeRequest;
+import com.bus.dto.application.HRApplication;
+import com.bus.services.CustomActionBean;
+import com.bus.services.EmpApplicationBean;
+import com.bus.services.HRBean;
+import com.bus.stripes.selector.EmploymentSelector;
+import com.bus.util.Roles;
+
+@UrlBinding(value="/actionbean/Employment.action")
+public class EmploymentActionBean extends CustomActionBean{
+	
+	private EmpApplicationBean empBean;
+	public EmpApplicationBean getEmpApplicationBean(){return this.empBean;}
+	@SpringBean
+	public void setEmpApplicationBean(EmpApplicationBean bean){this.empBean = bean;}
+	
+	private HRBean hrBean;
+	public HRBean getBean() {return hrBean;}
+	@SpringBean
+	public void setBean(HRBean bean) {this.hrBean = bean;}
+	
+	//Preload list
+	private List<Department> departments;
+	private List<Position> positions;
+		
+	private List<HRApplication> applications;
+	private HRApplication applicant;
+	private EmploymentSelector selector;
+	private String eRR;
+
+	//For driver exam only
+	private Date examdate;
+	
+	private int pagenum;
+	private int lotsize;
+	private Long totalcount;
+	private int pagecount;
+	
+	private void initData(){
+		this.setDepartments(hrBean.getAllDepartment());
+		this.setPositions(hrBean.getAllPosition());
+		
+		if(pagenum <= 0 || lotsize <= 0){
+			pagenum = 1;
+			lotsize = 20;
+		}
+		setTotalcount(0L);
+		getRequestsFromSelector();
+		setPagecount((int) (totalcount/lotsize + 1));
+		if(pagenum > totalcount)
+			pagenum = Integer.parseInt(totalcount.toString());
+	}
+	
+	private void getRequestsFromSelector() {
+		try{
+			if(selector == null){
+				HashMap<String,Object> map = (HashMap<String, Object>) empBean.getApplications(pagenum, lotsize);
+				setApplications((List<HRApplication>) map.get("list"));
+				setTotalcount((Long) map.get("count"));
+			}else if(selector != null){
+				String statement = selector.getSelectorStatement();
+				System.out.println(statement);
+				HashMap<String,Object> map = (HashMap<String, Object>) empBean.getApplications(pagenum, lotsize,statement);
+				setApplications((List<HRApplication>) map.get("list"));
+				setTotalcount((Long) map.get("count"));
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+			eRR = e.getMessage();
+			setApplications(new ArrayList<HRApplication>());
+			setTotalcount(0L);
+			setPagecount(0);
+		}
+	}
+	
+	@DefaultHandler
+	@Secure(roles=Roles.EMPLOYMENT_HOME_VIEW)
+	public Resolution defaultAction(){
+		initData();
+		return new ForwardResolution("/employment/employment.jsp");
+	}
+	
+	@HandlesEvent(value="createApplicant")
+	@Secure(roles=Roles.EMPLOYMENT_APPLICATION_CREATE)
+	public Resolution createApplicant(){
+		try{
+			empBean.createApplicant(applicant);
+			return new StreamingResolution("text/utf8","报名成功");
+		}catch(Exception e){
+			return new StreamingResolution("text/utf8","报名失败."+e.getMessage());
+		}
+	}
+	
+	@HandlesEvent(value="applyExam")
+	@Secure(roles = Roles.EMPLOYMENT_APPLY_EXAM)
+	public Resolution applyExam(){
+		try{
+			String appId = getContext().getRequest().getParameter("appId");
+			String remark = getContext().getRequest().getParameter("remark");
+			return new StreamingResolution("text/utf8","报名成功 "+examdate+" | "+appId +" | "+ remark);
+		}catch(Exception e){
+			return new StreamingResolution("text/utf8","报名失败."+e.getMessage());
+		}
+	}
+	
+	@HandlesEvent(value="prevpage")
+	public Resolution prevpage(){
+		setPagenum(getPagenum() - 1);
+		return defaultAction();
+	}
+	
+	@HandlesEvent(value="nextpage")
+	public Resolution nextpage(){
+		setPagenum(getPagenum() + 1);
+		return defaultAction();
+	}
+	
+	@HandlesEvent(value="filter")
+	public Resolution filter(){
+		return defaultAction();
+	}
+	
+	
+	public EmploymentSelector getSelector() {
+		return selector;
+	}
+	public void setSelector(EmploymentSelector selector) {
+		this.selector = selector;
+	}
+
+	public int getPagenum() {
+		return pagenum;
+	}
+	public void setPagenum(int pagenum) {
+		this.pagenum = pagenum;
+	}
+	public int getLotsize() {
+		return lotsize;
+	}
+	public void setLotsize(int lotsize) {
+		this.lotsize = lotsize;
+	}
+	public Long getTotalcount() {
+		return totalcount;
+	}
+	public void setTotalcount(Long totalcount) {
+		this.totalcount = totalcount;
+	}
+	public int getPagecount() {
+		return pagecount;
+	}
+	public void setPagecount(int pagecount) {
+		this.pagecount = pagecount;
+	}
+	public List<Department> getDepartments() {
+		return departments;
+	}
+	public void setDepartments(List<Department> departments) {
+		this.departments = departments;
+	}
+	public List<Position> getPositions() {
+		return positions;
+	}
+	public void setPositions(List<Position> positions) {
+		this.positions = positions;
+	}
+	public String geteRR() {
+		return eRR;
+	}
+	public void seteRR(String eRR) {
+		this.eRR = eRR;
+	}
+	public List<HRApplication> getApplications() {
+		return applications;
+	}
+	public void setApplications(List<HRApplication> applications) {
+		this.applications = applications;
+	}
+	public HRApplication getApplicant() {
+		return applicant;
+	}
+	public void setApplicant(HRApplication applicant) {
+		this.applicant = applicant;
+	}
+}

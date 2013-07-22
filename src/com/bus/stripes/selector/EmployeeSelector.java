@@ -147,7 +147,7 @@ public class EmployeeSelector implements BMSSelector{
 		if(army != null){
 			if(set >0)
 				query += " AND";
-			query += " army='"+army+"'";
+			query += " army LIKE '%"+army+"%'";
 			set++;
 		}
 		if(placebelong != null){

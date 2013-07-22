@@ -43,7 +43,7 @@ $(document).ready(function(){
 	$("form[name=form_all_contract]").each(function(){
 		$(this).submit(function(){
 			return false;
-		})
+		});
 	});
     $(".btneditcontract").click(function(){
     	var value = $(this).attr('value');

@@ -1,0 +1,20 @@
+package com.bus.stripes.selector;
+
+import java.util.Date;
+
+import com.bus.util.HRUtil;
+
+public class EmpRequestSelector implements BMSSelector {
+
+	
+	
+	
+	@Override
+	public String getSelectorStatement() {
+		return null;
+			
+	}
+
+	
+	
+}

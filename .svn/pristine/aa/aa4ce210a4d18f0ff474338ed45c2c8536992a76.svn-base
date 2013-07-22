@@ -1,0 +1,98 @@
+/**
+ * This JS FILE is specifically for employment system pages
+ */
+
+$(document).ready(function(){
+	//New Item button and dialog
+	$("#btn_new_applicant_link").click(function() {
+		$('#btn_new_applicant_dialog').dialog('open');
+			return true;
+		});
+	buildNewItemDialog('form_applicant_req','btn_new_applicant_dialog',540,430,'&createApplicant=');
+	
+	$("#btn_new_emp_req_link").click(function() {
+		$('#btn_new_emp_req_dialog').dialog('open');
+			return true;
+		});
+	buildNewItemDialog('form_new_emp_req','btn_new_emp_req_dialog',450,410,'&createRequest=');
+	
+	$(".driver_exam_app").each(function(){
+		$(this).submit(function(){
+			$("#exam_app_id").val($(this).find("input[type=hidden]").val());
+			$('#btn_new_driverexam_dialog').dialog('open');
+			return false;
+		});
+	});
+	buildNewItemDialog("form_driverexam","btn_new_driverexam_dialog",250,200,"&applyExam=");
+});
+  
+
+
+function buildNewItemDialog(formId, dialogId, width, height, extra){
+	$("#"+dialogId).dialog({
+		autoOpen: false,
+		bgiframe: true,
+		resizable: true,
+		height:height,
+		width:width,
+		modal: true,
+		overlay: {
+			backgroundColor: '#000',
+			opacity: 0.5
+		},
+		buttons: {
+			'新建':function(){
+					if(!requireItemValidation(formId)){
+						return;
+					}
+					var form = $('#'+formId);
+					var params = $('#'+formId).serialize() + extra;
+					$.ajax({
+						url:form.action,
+						type:"post",
+						dataType:'text',
+						data:params,
+						success:function(response){
+							$("#"+dialogId).dialog('close');
+							alert(response);
+							location.reload();
+						},
+						error:function(response){
+							alert("errors");
+						}
+					});
+			},
+			'取消': function() {
+				$(this).dialog('close');
+			}
+		}
+	});
+}
+
+function requireItemValidation(formId){
+	var text = "";
+	var valid = true;
+	$('#'+formId).find('input').each(function(){
+		if($(this).hasClass('required')){
+			var value = $(this).val();
+			if(value.trim() == ""){
+				valid = false;
+				var name = $(this).parent().prev().html();
+				text += name + ",";
+			}
+		}
+	});
+	$('#'+formId).find('select').each(function(){
+		if($(this).hasClass('required')){
+			var value = $(this).val();
+			if(value.trim() == ""){
+				valid = false;
+				var name = $(this).parent().prev().html();
+				text += name + ",";
+			}
+		}
+	});
+	if(text != "")
+		alert("请输入 " + text);
+	return valid;
+}

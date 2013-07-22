@@ -3,8 +3,13 @@
 	color:rgb(153, 23, 23);
 }
 
+
 .ui-datepicker{
 	z-index : 99999 !important;	
+}
+
+.ui-datepicker-calendar{
+	width:200px !important;	
 }
 
 .ui-datepicker-calendar td{
@@ -12,6 +17,7 @@
 	height:15px;
 	padding:2px;
 }
+
 .ui-datepicker-calendar th{
 	width:25px;
 	height:20px;

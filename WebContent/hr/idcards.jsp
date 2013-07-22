@@ -25,7 +25,7 @@
 <link href="${pageContext.request.contextPath}/css/themes/black_rose/ui.css" rel="stylesheet" title="style"
 	media="all" />
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/ui/ui.datepicker.js"></script>   
-
+<link href="${pageContext.request.contextPath}/css/custom_general.css" rel="stylesheet" media="all" />
 
 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -37,6 +37,78 @@ $(document).ready(function(){
 		dateFormat: 'yy-mm-dd' 
     });
 
+//     disableAll();
+    $("form[class=form_all_idcards]").each(function(){
+		$(this).submit(function(){
+			return false;
+		});
+	});
+
+	$(".btndeleteidcard").click(function(){
+		var value = $(this).attr('value');
+		var href =  window.location.href;
+		var targetId = $(this).prev().val();
+		$.ajax({
+			url:value,
+			type:"post",
+			dataType:'text',
+			success:function(response){
+				alert(response);
+				if(href.indexOf("targetId") != -1)
+					window.location.href = href;
+				else
+					window.location.href = href+"?targetId="+targetId;
+			},
+			error:function(response){
+				alert(response);
+			}
+		});
+	});
+    
+    $(".btneditidcards").click(function(){
+//     	var value = $(this).attr('value');
+//     	if(value == "none"){
+//     		$(this).attr("value","editting");
+//     		$(this).parent().parent().children("td").each(function(){
+//     			$(this).children("input").each(function(){
+//     				$(this).prop("disabled",false);
+    				
+//     			});
+//     			$(this).children("select").each(function(){
+//     				$(this).prop("disabled",false);
+//     			});
+//     		});
+//         }else{
+    		//submitting
+    		var params = $(this).parent().parent().prev().serialize();
+    		var url = $(this).parent().parent().prev().attr("action") + "?edit=";
+    		$.ajax({
+    			url:url,
+    			type:"post",
+    			dataType:'text',
+    			data:params,
+    			success:function(response){
+    				console.log("ajax response = "+response);
+    				alert(response);
+    			},
+    			error:function(response){
+    				alert("errors");
+    			}
+    		});
+    		
+    		$(this).attr('value',"none");
+    		$(this).parent().parent().children("td").each(function(){
+    				$(this).children("input").each(function(){
+    					$(this).prop("disabled",true);
+    				});
+    				$(this).children("select").each(function(){
+    					$(this).prop("disabled",true);
+    				});
+    		});
+    		
+//         }
+    });
+//     disableAll();
 });
 
 </script>
@@ -60,8 +132,8 @@ text-align:center;
 						<th>Id</th>
 						<th>类型</th>
 						<th>号码</th>
-						<th>有效期</th>
-						<th>失效日期</th>
+						<th>初次获得证件日期</th>
+						<th>有效日期</th>
 						<th>图片</th>
 						<th>注释</th>
 						</tr>
@@ -70,6 +142,7 @@ text-align:center;
 					
 					<c:set var="color" value="0" scope="page"/>
 					<c:forEach items="${actionBean.idcards}" var="card" varStatus="loop">
+						<stripes:form class="form_all_idcards" beanclass="com.bus.stripes.actionbean.IDCardsActionBean">
 						<c:choose>
 							<c:when test="${color%2 == 0}">
 								<tr>
@@ -79,47 +152,53 @@ text-align:center;
 							</c:otherwise>
 						</c:choose>
 							<td>
-								<stripes:form beanclass="com.bus.stripes.actionbean.IDCardsActionBean">
-									<div>
+								
 										<stripes:hidden name="idcard.id" value="${card.id}"/>
 										<stripes:hidden name="targetId"/>
 										<ss:secure roles="employee_idcards_rm">
-										<stripes:submit name="delete" value="删除"/>
+											<button value="${pageContext.request.contextPath}/actionbean/IDCards.action?delete=&idcard.id=${card.id}" class="btndeleteidcard">删除</button>
 										</ss:secure>
-									</div>
-								</stripes:form>
+										<ss:secure roles="employee_idcards_add">
+											<button name="edit" value="none" class="btneditidcards">修改</button>
+										</ss:secure>
+								
 							</td>
 							<td>
-								${card.id}
+								${card.id}<stripes:hidden name="idcard.id" value="${cont.id}"/>
 							</td>
 							<td>${card.type}</td>
-							<td>${card.number}</td>
-							<td>${card.validfromstr}</td>
-							<td>${card.expiredatestr}</td>
+							<td><stripes:text name="idcard.number" value="${card.number}"/></td>
+							<td><stripes:text name="idcard.validfrom" value="${card.validfromstr}"  formatPattern="yyyy-MM-dd" class="datepickerClass"/></td>
+							<td><stripes:text name="idcard.expiredate" value="${card.expiredatestr}"  formatPattern="yyyy-MM-dd" class="datepickerClass"/></td>
 							<td>${card.image}</td>
-							<td>${card.remark}</td>
+							<td><stripes:text name="idcard.remark" value="${card.remark}"/></td>
 						</tr>
+						</stripes:form>
 						<c:set var="color" value="${color + 1}" scope="page"/>
 					</c:forEach>
 					</tbody>
 				</table>
-	</div>
-	<div>
-		<stripes:form beanclass="com.bus.stripes.actionbean.IDCardsActionBean">
-		<table>
-			<thead style="color:red;">
+				
+				<br/>
+				<br/>
+				<br/>
+				
+				<div class="hastable">
+				<table>
+					<thead>
 						<tr>
-						<th class="centertext"></th>
-						<th class="centertext">类型</th>
-						<th class="centertext">号码</th>
-						<th class="centertext">有效期</th>
-						<th class="centertext">失效日期</th>
-						<th class="centertext">图片</th>
-						<th class="centertext">注释</th>
+						<th></th>
+						<th>类型</th>
+						<th>号码</th>
+						<th>初次获得证件日期</th>
+						<th>有效日期</th>
+						<th>图片</th>
+						<th>注释</th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr>
+					<tr>
+						<stripes:form beanclass="com.bus.stripes.actionbean.IDCardsActionBean">
 							<td>
 								<stripes:hidden name="targetId"/>
 								<ss:secure roles="employee_idcards_add">
@@ -127,17 +206,19 @@ text-align:center;
 								</ss:secure>
 							</td>
 							<td>
-								<stripes:select name="idcard.type"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.typeoptions}" label="label" value="value"/></stripes:select>
+								<stripes:select name="newidcard.type"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.typeoptions}" label="label" value="value"/></stripes:select>
 							</td>
-							<td><stripes:text name="idcard.number" /></td>
-							<td><stripes:text name="idcard.validfrom"  formatPattern="yyyy-MM-dd" class="datepickerClass"/></td>
-							<td><stripes:text name="idcard.expiredate"  formatPattern="yyyy-MM-dd" class="datepickerClass"/></td>
+							<td><stripes:text name="newidcard.number" /></td>
+							<td><stripes:text name="newidcard.validfrom"  formatPattern="yyyy-MM-dd" class="datepickerClass"/></td>
+							<td><stripes:text name="newidcard.expiredate"  formatPattern="yyyy-MM-dd" class="datepickerClass"/></td>
 							<td></td>
-							<td><stripes:text name="idcard.remark" /></td>
+							<td><stripes:text name="newidcard.remark" /></td>
+						</stripes:form>
 						</tr>
-					</tbody>
+						</tbody>
 				</table>
-				</stripes:form>
+				</div>
 	</div>
+	
 </body>
 </html>

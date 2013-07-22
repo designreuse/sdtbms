@@ -191,7 +191,7 @@ public class ExcelFileSaver {
 				driverLicense.setType("驾驶证");
 				driverLicense.setNumber(cols[7]);
 				if(cols.length > 8)
-					driverLicense.setRemark("准驾车型:"+cols[8]+";");
+					driverLicense.setRemark(cols[8]+";");
 				if(cols.length > 9 && !cols[9].trim().equals(""))
 					driverLicense.setValidfrom(HRUtil.parseDate(cols[9], "yyyy.MM.dd"));
 				if(cols.length > 10 && !cols[10].trim().equals(""))
@@ -206,7 +206,7 @@ public class ExcelFileSaver {
 				if(cols.length > 12)
 					serviceLicense.setRemark(cols[12]);
 				if(cols.length > 13 && !cols[13].equals("")){
-					serviceLicense.setValidfrom(HRUtil.parseDate(cols[13], "yyyy.MM.dd"));
+					serviceLicense.setExpiredate(HRUtil.parseDate(cols[13], "yyyy.MM.dd"));
 				}
 			}
 				
@@ -405,10 +405,15 @@ public class ExcelFileSaver {
 		if(cols.length > 23)
 			e.setWorkertype(cols[23].trim());
 		
-		if(cols.length > 24 && !cols[24].trim().equals(""))
-			e.setArmy("是");
-		else
-			e.setArmy("否");
+		//特殊身份
+		if(cols.length > 24 && !cols[24].trim().equals("")){
+			if(cols[24].trim().equals("干部"))
+				e.setArmy("国家干部");
+			else
+				e.setArmy(cols[24].trim());
+		}else{
+			e.setArmy("无");
+		}
 		
 		if(cols.length > 25){
 			if(cols[25].trim().equals(""))

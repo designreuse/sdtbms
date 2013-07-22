@@ -20,6 +20,7 @@ import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.HandlesEvent;
 import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 
 public class IDCardsActionBean extends CustomActionBean implements Permission{
@@ -29,6 +30,7 @@ public class IDCardsActionBean extends CustomActionBean implements Permission{
 	private List<Idmanagement> idcards = new ArrayList<Idmanagement>();
 	private List<SelectBoxOption> typeoptions;
 	private Idmanagement idcard;
+	private Idmanagement newidcard;
 	
 	private String targetId;
 	
@@ -49,21 +51,36 @@ public class IDCardsActionBean extends CustomActionBean implements Permission{
 	@HandlesEvent(value="create")
 	@Secure(roles=Roles.EMPLOYEE_IDCARDS_ADD)
 	public Resolution create(){
-		if(idcard == null)
+		if(newidcard == null)
 			return defaultAction();
 		Employee e = new Employee();
 		e.setId(Integer.parseInt(targetId));
-		idcard.setEmployee(e);
-		bean.saveIdcard(idcard);
-		idcard = new Idmanagement();
+		newidcard.setEmployee(e);
+		bean.saveIdcard(newidcard);
+		newidcard = new Idmanagement();
 		return defaultAction();
 	}
 	
 	@HandlesEvent(value="delete")
 	@Secure(roles=Roles.EMPLOYEE_IDCARDS_RM)
 	public Resolution delete(){
-		bean.deleteIdcard(idcard.getId()+"");
-		return defaultAction();
+		try{
+			bean.deleteIdcard(idcard.getId()+"");
+			return new StreamingResolution("text/utf8","修改成功");
+		}catch(Exception e){
+			return new StreamingResolution("text/utf8","修改失败."+e.getMessage());
+		}
+	}
+	
+	@HandlesEvent(value="edit")
+	@Secure(roles=Roles.EMPLOYEE_IDCARDS_ADD)
+	public Resolution edit(){
+		try{
+			bean.updateIdCatd(idcard);
+			return new StreamingResolution("text/utf8","修改成功");
+		}catch(Exception e){
+			return new StreamingResolution("text/utf8","修改失败."+e.getMessage());
+		}
 	}
 	
 	public Idmanagement getIdcard() {
@@ -99,6 +116,14 @@ public class IDCardsActionBean extends CustomActionBean implements Permission{
 	@SpringBean
 	public void setBean(HRBean bean) {
 		this.bean = bean;
+	}
+
+	public Idmanagement getNewidcard() {
+		return newidcard;
+	}
+
+	public void setNewidcard(Idmanagement newidcard) {
+		this.newidcard = newidcard;
 	}
 
 }

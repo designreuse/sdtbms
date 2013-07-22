@@ -53,9 +53,9 @@
 								<Label class='selector'>合同类型:</Label><stripes:select name="contractselector.type"><stripes:option value="">不限</stripes:option><stripes:options-collection collection="${actionBean.contracttype}" label="label" value="value"/></stripes:select>
 								<Label class='selector'>日期:</Label>
 								<stripes:radio name="contractselector.dateselector" value="0"/>不限日期 
-								<stripes:radio name="contractselector.dateselector" value="1"/>结束日期 
 								<stripes:radio name="contractselector.dateselector" value="2"/>生效日期
 								<stripes:radio name="contractselector.dateselector" value="3"/>试用期
+								<stripes:radio name="contractselector.dateselector" value="1"/>结束日期 <stripes:text name="contractselector.expireDate" formatPattern="yyyy-MM-dd" class="datepickerClass"/>
 						</tr>
 						
 					</stripes:form>
@@ -75,6 +75,7 @@
 					<tbody>
 					<c:set var="color" value="0" scope="page"/>
 					<c:set var="status" value="D" scope="page"/>
+					<c:set var="statusE" value="E" scope="page"/>
 					<c:forEach items="${actionBean.contracts}" var="cont" varStatus="loop">
 						<c:choose>
 							<c:when test="${color%2 == 0}">
@@ -96,9 +97,15 @@
 									<c:when test="${cont.status == status}">
 										<label>已删除合同</label>
 									</c:when>
+									<c:when test="${cont.status == statusE}">
+										<label>已结束合同</label>
+									</c:when>
 									<c:otherwise>
 										<ss:secure roles="employee_rm_contract">
-										<button name="btn_delete_contract" class="btn_contract_delete" value="/bms/actionbean/Contract.action">删除合同</button>
+											<button name="btn_delete_contract" class="btn_contract_delete" value="/bms/actionbean/Contract.action">删除合同</button>
+										</ss:secure>
+										<ss:secure roles="employee_rm_contract">
+											<button name="btn_resign_contract" class="btn_contract_resign" value="/bms/actionbean/Contract.action">结束合同</button>
 										</ss:secure>
 									</c:otherwise>
 								</c:choose>

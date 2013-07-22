@@ -62,7 +62,9 @@ $(document).ready(function() {
             	else if(name == "idcards"){
             		name = $(this).prev().prev().prev().prev().attr("name");
             		value = $(this).prev().prev().prev().prev().attr("value");
-            		url = window.location.pathname + "?"+name+"="+value+"&idcards=";
+            		var pathname = window.location.pathname;
+            		var newpath = pathname.substring(0, pathname.indexOf("Employee.action", 0));
+            		url = newpath +"IDCards.action" + "?"+name+"="+value;
             		window.open(url, "Employee identity cards:"+value, ["width=800,height=400,scrollbars=yes"]);
             		submit =false;
             	}
@@ -70,6 +72,12 @@ $(document).ready(function() {
             		value = $(this).prev().prev().prev().prev().prev().attr("value");
             		$('#resignemployeeId').val(value);
             		$('#btn_resign_date_dialog').dialog("open");
+            		submit = false;
+            	}
+            	else if(name == "getrejoin"){
+            		value = $(this).prev().prev().prev().prev().prev().attr("value");
+            		$('#rejoinemployeeId').val(value);
+            		$('#btn_rejoin_date_dialog').dialog("open");
             		submit = false;
             	}
     		});
@@ -107,6 +115,24 @@ $(document).ready(function() {
     });
 
     $('#btn_resign_date_dialog').dialog({
+    	autoOpen: false,
+		bgiframe: true,
+		resizable: true,
+		height:125,
+		width:400,
+		modal: true,
+		overlay: {
+			backgroundColor: '#000',
+			opacity: 0.5
+		},
+		buttons: {
+			'取消': function() {
+				$(this).dialog('close');
+			}
+		}
+    });
+    
+    $('#btn_rejoin_date_dialog').dialog({
     	autoOpen: false,
 		bgiframe: true,
 		resizable: true,
@@ -204,7 +230,26 @@ $(document).ready(function(){
 				alert("删除合同失败");
 			}
 		});
-	})
+	});
+	$(".btn_contract_resign").click(function(){
+		var url = $(this).val();
+		var targetId = $(this).prev().prev().prev().prev().val();
+		var params = "targetId=" + targetId + "&resignContract=";
+		$.ajax({
+			url:url,
+			type:"post",
+			dataType:'text',
+			data:params,
+			success:function(response){
+				console.log("ajax response = "+response);
+				alert(response);
+				location.reload();
+			},
+			error:function(response){
+				alert("结束合同失败");
+			}
+		});
+	});
 });
 
 $(document).ready(function() {

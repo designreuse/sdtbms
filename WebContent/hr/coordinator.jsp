@@ -7,7 +7,40 @@
 	
     <stripes:layout-component name="contents">
     <script type="text/javascript" src="${pageContext.request.contextPath}/js/hr.js"></script>
-
+		
+	<script type="text/javascript">
+	$(document).ready(function(){
+	   $("#getNameByIdCoor").click(function(){
+	    	var getNameByIdUrl = $('#getNameByIdCoor').next().val();
+	    	var newurl = getNameByIdUrl.substring(0,getNameByIdUrl.indexOf("?"));
+	        var workerId = $('#getNameByIdCoor').prev().val();
+	        getNameByIdUrl += "&workerid="+workerId;
+	        newurl +="?getDepPosById="+"&workerid="+workerId;
+	        $.ajax({
+	    		url:getNameByIdUrl,
+	    		success:function(response){
+//	    			alert(response);
+	    			$('.employeenamefromid').val(response.trim());
+	    			$.ajax({
+	    	    		url:newurl,
+	    	    		success:function(response){
+// 	    	    			alert(response);
+	    	    			var jsonObj = JSON.parse($.trim(response));
+	    	    			$('.depOption option[value="'+jsonObj.department.id+'"]').prop("selected",true);
+	    	    			$('.posOption option[value="'+jsonObj.position.id+'"]').prop("selected",true);
+	    	    		},
+	    	    		error:function(response){
+	    	    			alert("员工工号不存在或存在重复");
+	    	    		}
+	    	    	});
+	    		},
+	    		error:function(response){
+	    			alert("员工工号不存在或存在重复");
+	    		}
+	    	});
+	    });
+	});
+	</script>
 		<div id="sub-nav"><div class="page-title">
 			<h1>人事管理</h1>
 			<span><a href="#" title="Layout Options">人事</a> > <a href="#" title="Two column layout">调动管理</a> > 查看</span>
@@ -51,11 +84,11 @@
 						</tr>
 						<tr>
 							<td>姓名:</td><td><stripes:text name="coordinate.employee.fullname" class="required employeenamefromid"/></td>
-							<td>工号:</td><td><stripes:text name="coordinate.employee.workerid" class="required"/><a href="javascript:void;" id="getNameById">获取</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?getnamebyid="/></td>
+							<td>工号:</td><td><stripes:text name="coordinate.employee.workerid" class="required"/><a href="javascript:void;" id="getNameByIdCoor">获取</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?getnamebyid="/></td>
 						</tr>
 						<tr>
-							<td>原部门:</td><td><stripes:select name="coordinate.predepartment.id"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.departments}" label="label" value="value"/></stripes:select></td>
-							<td>原岗位:</td><td><stripes:select name="coordinate.preposition.id"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.positions}" label="label" value="value"/></stripes:select></td>
+							<td>原部门:</td><td><stripes:select class="depOption" name="coordinate.predepartment.id"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.departments}" label="label" value="value"/></stripes:select></td>
+							<td>原岗位:</td><td><stripes:select class="posOption" name="coordinate.preposition.id"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.positions}" label="label" value="value"/></stripes:select></td>
 						</tr>
 						<tr>
 							<td>新部门:</td><td><stripes:select name="coordinate.curdepartment.id"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.departments}" label="label" value="value"/></stripes:select></td>

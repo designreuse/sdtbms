@@ -66,6 +66,8 @@ public class Employee implements Serializable{
 	private Date transfertime;
 	private Set<Idmanagement> idcards;
 	
+	private Set<Promoandtransfer> transfers;
+	
 	public Employee(){
 		status = "A";
 	}
@@ -82,20 +84,25 @@ public class Employee implements Serializable{
 		this.pob = e.getPob();
 		this.timeofjoinprc = e.getTimeofjoinrpc();
 		this.homenumber = e.getHomenumber();
-		this.homeaddress = e.getHomeaddress();
+		this.mobilenumber = e.getMobilenumber();
 		this.email = e.getEmail();
 		this.othercontact = e.getOthercontact();
-		this.mobilenumber = e.getMobilenumber();
+		this.homeaddress = e.getHomeaddress();
 		this.postcode = e.getPostcode();
 		this.marriage = e.getMarriage();
 		this.qualification = e.getQualification();
 		this.firstworktime = e.getFirstworktime();
 		this.workertype = e.getWorkertype();
+		this.joblevel = e.getJoblevel();
 		this.placebelong = e.getPlacebelong();
 		this.domiciletype = e.getDomiciletype();
 		this.army = e.getArmy();
-		this.joblevel = e.getJoblevel();
 		this.remark = e.getRemark();
+		this.department = e.getDepartment();
+		this.position = e.getPosition();
+		this.colleage = e.getColleage();
+		this.major = e.getMajor();
+		this.transfertime = e.getTransfertime();
 	}
 	
 	@ManyToOne
@@ -403,7 +410,7 @@ public class Employee implements Serializable{
 		this.domiciletype = domiciletype;
 	}
 
-	@Column(name="army",length=1)
+	@Column(name="army",length=64)
 	public String getArmy() {
 		return army;
 	}
@@ -491,5 +498,14 @@ public class Employee implements Serializable{
 			return HRUtil.parseDateToString(this.dob);
 		else
 			return "";
+	}
+
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "employee")
+	public Set<Promoandtransfer> getTransfers() {
+		return transfers;
+	}
+
+	public void setTransfers(Set<Promoandtransfer> transfers) {
+		this.transfers = transfers;
 	}
 }

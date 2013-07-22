@@ -64,6 +64,8 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 	private List<SelectBoxOption> joblevel;
 	private List<SelectBoxOption> workertype;
 	private List<SelectBoxOption> position;
+	private List<SelectBoxOption> specialPeople;
+	private List<SelectBoxOption> placebelongs;
 	
 	
 	private List<Employee> employees = new ArrayList<Employee>();
@@ -157,6 +159,8 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 		this.joblevel= SelectBoxOptions.getSelectBoxFromFixOptions(bean.getOptionListById(3));
 		this.workertype= SelectBoxOptions.getWorkerType(bean.getWorkertypeList());
 		this.contracttype = SelectBoxOptions.getSelectBoxFromFixOptions(bean.getOptionListById(5));
+		this.specialPeople = SelectBoxOptions.getSelectBoxFromFixOptions(bean.getOptionListById(8));
+		this.placebelongs = SelectBoxOptions.getSelectBoxFromFixOptions(bean.getOptionListById(9));
 	}
 	
 	
@@ -410,6 +414,19 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 		}
 	}
 	
+	@HandlesEvent(value="rejoin")
+	@Secure(roles=Roles.EMPLOYEE_EDIT)
+	public Resolution rejoin(){
+		String targetId = context.getRequest().getParameter("targetId");
+		//use resigndate as rejoindate to reduce variables
+		if(resigndate == null)
+			return defaultAction();
+		else{
+			bean.reJoinEmployee(targetId, resigndate);
+			return defaultAction();
+		}
+	}
+	
 	@ValidationMethod(on="create")
 	public void avoidCreateNullEmployee(ValidationErrors errors){
 		if(this.employee.getIdentitycode() == null || this.employee.getIdentitycode().equals("")){
@@ -521,6 +538,21 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 		return new StreamingResolution("text;charset=utf-8", e.getFullname());
 	}
 	
+	@HandlesEvent(value="getDepPosById")
+	public Resolution getDepPosById(){
+		try{
+			String workerId = context.getRequest().getParameter("workerid");
+			Employee e = bean.getEmployeeByWorkerId(workerId);
+			String ret ="{\"department\":{\"id\":\""+e.getDepartment().getId()+"\",\"name\":\""+e.getDepartment().getName()+"\"}," +
+					"\"position\":{\"id\":\""+e.getPosition().getId()+"\",\"name\":\""+e.getPosition().getName()+"\"}," +
+							"\"result\":\"1\"}";
+			return new StreamingResolution("text;charset=utf-8", ret);
+		}catch(Exception e){
+			e.printStackTrace();
+			return new StreamingResolution("text;charset=utf-8", "{\"result\":0,\"msg\":\""+e.getMessage()+"\"}");
+		}
+	}
+	
 	@HandlesEvent(value="getnewworkerid")
 	public Resolution getnewworkerid(){
 		List<String> workerids = bean.getCurrentDocumentIds();
@@ -565,6 +597,18 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 			return new StreamingResolution("text/html;charset=utf-8", "1");
 		else
 			return new StreamingResolution("text/html;charset=utf-8", "0");
+	}
+	public List<SelectBoxOption> getSpecialPeople() {
+		return specialPeople;
+	}
+	public void setSpecialPeople(List<SelectBoxOption> specialPeople) {
+		this.specialPeople = specialPeople;
+	}
+	public List<SelectBoxOption> getPlacebelongs() {
+		return placebelongs;
+	}
+	public void setPlacebelongs(List<SelectBoxOption> placebelongs) {
+		this.placebelongs = placebelongs;
 	}
 
 }

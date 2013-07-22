@@ -1,0 +1,159 @@
+package com.bus.dto.application;
+
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import com.bus.dto.Department;
+import com.bus.dto.Position;
+import com.bus.util.HRUtil;
+
+@Entity
+@XmlRootElement
+@Table(name="employee_request")
+public class EmployeeRequest {
+
+	private Integer id;
+	private Department department;
+	private Position position;
+	private Integer requireNumber;
+	private Integer commitNumber;
+	private Date receiveFormDate;
+	private Date sendApproveDate;
+	private Date approveDate;
+	private Integer approveResult;
+	private String remark;
+	
+	
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Column(name="id")
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	
+	@ManyToOne
+	@JoinColumn(name="department")
+	public Department getDepartment() {
+		return department;
+	}
+	public void setDepartment(Department department) {
+		this.department = department;
+	}
+	
+	@ManyToOne
+	@JoinColumn(name="position")
+	public Position getPosition() {
+		return position;
+	}
+	public void setPosition(Position position) {
+		this.position = position;
+	}
+	
+	@Column(name="requirenum")
+	public Integer getRequireNumber() {
+		return requireNumber;
+	}
+	public void setRequireNumber(Integer requireNumber) {
+		this.requireNumber = requireNumber;
+	}
+	
+	@Column(name="commitnum")
+	public Integer getCommitNumber() {
+		return commitNumber;
+	}
+	public void setCommitNumber(Integer commitNumber) {
+		this.commitNumber = commitNumber;
+	}
+	
+	@Column(name="receiveform")
+	public Date getReceiveFormDate() {
+		return receiveFormDate;
+	}
+	public void setReceiveFormDate(Date receiveFormDate) {
+		this.receiveFormDate = receiveFormDate;
+	}
+	
+	@Column(name="sendapprove")
+	public Date getSendApproveDate() {
+		return sendApproveDate;
+	}
+	public void setSendApproveDate(Date sendApproveDate) {
+		this.sendApproveDate = sendApproveDate;
+	}
+	
+	@Column(name="approveddate")
+	public Date getApproveDate() {
+		return approveDate;
+	}
+	public void setApproveDate(Date approveDate) {
+		this.approveDate = approveDate;
+	}
+	
+	@Column(name="approveresult")
+	public Integer getApproveResult() {
+		return approveResult;
+	}
+	public void setApproveResult(Integer approveResult) {
+		this.approveResult = approveResult;
+	}
+	
+	@Column(name="remark")
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+	
+	@Transient
+	public String getReceiveFormDateStr(){
+		if(receiveFormDate == null)
+			return "";
+		else{
+			return HRUtil.parseDateToString(receiveFormDate);
+		}
+	}
+	
+	@Transient
+	public String getSendApproveDateStr(){
+		if(sendApproveDate == null)
+			return "";
+		else{
+			return HRUtil.parseDateToString(sendApproveDate);
+		}
+	}
+	
+	@Transient
+	public String getApproveDateStr(){
+		if(approveDate == null)
+			return "";
+		else{
+			return HRUtil.parseDateToString(approveDate);
+		}
+	}
+
+	@Transient
+	public String getApproveResultStr(){
+		if(approveResult == null || approveResult == 0)
+			return "未审";
+		else if(approveResult == 1)
+			return "已批";
+		else if(approveResult == 2)
+			return "考虑";
+		else
+			return "不批";
+	}
+}

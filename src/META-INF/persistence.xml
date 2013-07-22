@@ -41,6 +41,14 @@
  <class>com.bus.dto.score.Positiongroup</class>
  <class>com.bus.dto.score.Voucherlist</class>
  
+ <class>com.bus.dto.application.ApplicationIdCards</class>
+ <class>com.bus.dto.application.HRApplication</class>
+ <class>com.bus.dto.application.IdCardsMapper</class>
+ <class>com.bus.dto.application.Training</class>
+ <class>com.bus.dto.application.WorkArrangement</class>
+ <class>com.bus.dto.application.EmployeeRequest</class>
+ <class>com.bus.dto.application.DrivingExam</class>
+ 
  <class>com.bus.dto.logger.ScoreLog</class>
  <class>com.bus.dto.logger.AccountLog</class>
 
