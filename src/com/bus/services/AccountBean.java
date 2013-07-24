@@ -189,4 +189,17 @@ public class AccountBean {
 			return false;
 		}
 	}
+
+	/**
+	 * Change password of user
+	 * @param acc2
+	 */
+	@Transactional
+	public void changePasswd(Account acc2) throws Exception{
+		Account a = em.find(Account.class,acc2.getId());
+		if(a !=null){
+			a.setPassword(acc2.getPassword());
+			em.merge(a);
+		}
+	}
 }

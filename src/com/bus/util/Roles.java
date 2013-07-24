@@ -32,6 +32,7 @@ public interface Roles {
 	public static final String EMPLOYEE_IDCARDS_VIEW = "employee_idcards_view";
 	public static final String EMPLOYEE_IDCARDS_ADD = "employee_idcards_add";
 	public static final String EMPLOYEE_IDCARDS_RM = "employee_idcards_rm";
+	public static final String EMPLOYEE_IDCARDS_FILE_UPLOAD = "employee_idcards_file_upload";
 	public static final String EMPLOYEE_POS_VIEW = "employee_pos_view";
 	public static final String EMPLOYEE_POS_ADD = "employee_pos_add";
 	public static final String EMPLOYEE_POS_RM = "employee_pos_rm";

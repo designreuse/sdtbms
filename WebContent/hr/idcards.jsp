@@ -37,7 +37,6 @@ $(document).ready(function(){
 		dateFormat: 'yy-mm-dd' 
     });
 
-//     disableAll();
     $("form[class=form_all_idcards]").each(function(){
 		$(this).submit(function(){
 			return false;
@@ -66,20 +65,6 @@ $(document).ready(function(){
 	});
     
     $(".btneditidcards").click(function(){
-//     	var value = $(this).attr('value');
-//     	if(value == "none"){
-//     		$(this).attr("value","editting");
-//     		$(this).parent().parent().children("td").each(function(){
-//     			$(this).children("input").each(function(){
-//     				$(this).prop("disabled",false);
-    				
-//     			});
-//     			$(this).children("select").each(function(){
-//     				$(this).prop("disabled",false);
-//     			});
-//     		});
-//         }else{
-    		//submitting
     		var params = $(this).parent().parent().prev().serialize();
     		var url = $(this).parent().parent().prev().attr("action") + "?edit=";
     		$.ajax({
@@ -106,9 +91,13 @@ $(document).ready(function(){
     				});
     		});
     		
-//         }
     });
-//     disableAll();
+    
+	$('.view_jpg').click(function(){
+		var val = $(this).next().val();
+// 		alert(val);
+		window.open(val);
+	});
 });
 
 </script>
@@ -134,15 +123,15 @@ text-align:center;
 						<th>号码</th>
 						<th>初次获得证件日期</th>
 						<th>有效日期</th>
-						<th>图片</th>
 						<th>注释</th>
+						<th>图片</th>
 						</tr>
 					</thead>
 					<tbody>
 					
 					<c:set var="color" value="0" scope="page"/>
 					<c:forEach items="${actionBean.idcards}" var="card" varStatus="loop">
-						<stripes:form class="form_all_idcards" beanclass="com.bus.stripes.actionbean.IDCardsActionBean">
+						
 						<c:choose>
 							<c:when test="${color%2 == 0}">
 								<tr>
@@ -151,8 +140,8 @@ text-align:center;
 								<tr class="alt">
 							</c:otherwise>
 						</c:choose>
+							<stripes:form class="form_all_idcards" beanclass="com.bus.stripes.actionbean.IDCardsActionBean">
 							<td>
-								
 										<stripes:hidden name="idcard.id" value="${card.id}"/>
 										<stripes:hidden name="targetId"/>
 										<ss:secure roles="employee_idcards_rm">
@@ -170,10 +159,20 @@ text-align:center;
 							<td><stripes:text name="idcard.number" value="${card.number}"/></td>
 							<td><stripes:text name="idcard.validfrom" value="${card.validfromstr}"  formatPattern="yyyy-MM-dd" class="datepickerClass"/></td>
 							<td><stripes:text name="idcard.expiredate" value="${card.expiredatestr}"  formatPattern="yyyy-MM-dd" class="datepickerClass"/></td>
-							<td>${card.image}</td>
 							<td><stripes:text name="idcard.remark" value="${card.remark}"/></td>
+							</stripes:form>
+							<td>
+								<c:if test="${card.image != null && card.image.name != null}">
+									<a class="view_jpg" href="javascript:void;">查看</a><input type="hidden" value="${actionBean.context.hrhostidfile}${card.type}/${card.image.name}"/>
+								</c:if>
+								<stripes:form beanclass="com.bus.stripes.actionbean.IDCardsActionBean">
+									<stripes:hidden name="idcard.id" value="${card.id}"/>
+									<stripes:hidden name="targetId"/>
+									<stripes:file name="idfile"/><stripes:submit name="idfileUpload" value="上传"/>
+								</stripes:form>
+							</td>
 						</tr>
-						</stripes:form>
+						
 						<c:set var="color" value="${color + 1}" scope="page"/>
 					</c:forEach>
 					</tbody>
@@ -192,7 +191,6 @@ text-align:center;
 						<th>号码</th>
 						<th>初次获得证件日期</th>
 						<th>有效日期</th>
-						<th>图片</th>
 						<th>注释</th>
 						</tr>
 					</thead>
@@ -211,7 +209,6 @@ text-align:center;
 							<td><stripes:text name="newidcard.number" /></td>
 							<td><stripes:text name="newidcard.validfrom"  formatPattern="yyyy-MM-dd" class="datepickerClass"/></td>
 							<td><stripes:text name="newidcard.expiredate"  formatPattern="yyyy-MM-dd" class="datepickerClass"/></td>
-							<td></td>
 							<td><stripes:text name="newidcard.remark" /></td>
 						</stripes:form>
 						</tr>

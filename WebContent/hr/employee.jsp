@@ -104,7 +104,7 @@
 							<td>政治面貌:</td><td><stripes:select name="employee.politicalstatus"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.politicalStatus}" label="label" value="value"/></stripes:select></td>
 						</tr>
 						<tr>
-							<td>联系电话:</td><td><stripes:text name="employee.homenumber"/></td>
+							<td>住宅电话:</td><td><stripes:text name="employee.homenumber"/></td>
 							<td>手机号码:</td><td><stripes:text class="required" name="employee.mobilenumber"/></td>
 						</tr>
 						<tr>

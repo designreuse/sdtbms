@@ -1,6 +1,7 @@
 package com.bus.services;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -1056,6 +1057,34 @@ public class HRBean{
 		Contract c = em.find(Contract.class, id);
 		c.setStatus("E");
 		em.merge(c);
+	}
+
+	/**
+	 * Get id card from idmanagement by id
+	 * @param id
+	 * @return
+	 */
+	public Idmanagement getIdCardById(Integer id) throws Exception{
+		Idmanagement card = em.find(Idmanagement.class, id);
+		return card;
+	}
+
+	/**
+	 * Save or update the image path
+	 * @param idcard2
+	 */
+	@Transactional
+	public void saveIdCardImage(Idmanagement idcard2) throws Exception{
+		Hrimage image = idcard2.getImage();
+		if(image.getId() == null){
+			em.persist(idcard2.getImage());
+			em.flush();
+			em.merge(idcard2);
+			return;
+		}else{
+			em.merge(image);
+			return;
+		}
 	}
 
 }

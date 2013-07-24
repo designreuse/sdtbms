@@ -49,7 +49,8 @@ $(document).ready(function() {
             		name = $(this).prev().prev().attr("name");
             		value = $(this).prev().prev().attr("value");
             		url = window.location.pathname + "?"+name+"="+value+"&detail=";
-            		window.open(url, "Employee Detail ID:"+value, ["width=800,height=600,scrollbars=yes"]);
+//            		window.open(url, "Employee Detail ID:"+value, ["width=800,height=600,scrollbars=yes"]);
+            		window.open(url);
             		submit = false;
             	}
             	else if(name == "contract"){
@@ -65,7 +66,8 @@ $(document).ready(function() {
             		var pathname = window.location.pathname;
             		var newpath = pathname.substring(0, pathname.indexOf("Employee.action", 0));
             		url = newpath +"IDCards.action" + "?"+name+"="+value;
-            		window.open(url, "Employee identity cards:"+value, ["width=800,height=400,scrollbars=yes"]);
+//            		window.open(url, "Employee identity cards:"+value, ["width=800,height=400,scrollbars=yes"]);
+            		window.open(url);
             		submit =false;
             	}
             	else if(name == "getresign"){

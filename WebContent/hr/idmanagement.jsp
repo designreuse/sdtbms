@@ -7,6 +7,14 @@
 	
     <stripes:layout-component name="contents">
     <script type="text/javascript" src="${pageContext.request.contextPath}/js/hr.js"></script>
+    <script type="text/javascript">
+	$(document).ready(function(){
+		$('.view_jpg').click(function(){
+			var val = $(this).next().val();
+			window.open(val);
+		});
+	});
+	</script>
 		<div id="sub-nav"><div class="page-title">
 			<h1>人事管理</h1>
 			<span><a href="javascript:void" title="Layout Options">人事</a> > <a href="javascript:void" title="Two column layout">证件管理</a></span>
@@ -84,7 +92,11 @@
 							<td>${card.number}</td>
 							<td>${card.validfromstr}</td>
 							<td>${card.expiredatestr}</td>
-							<td>${card.image}</td>
+							<td>
+								<c:if test="${card.image != null && card.image.name != null}">
+									<a class="view_jpg" href="javascript:void;">查看</a><input type="hidden" value="${actionBean.context.hrhostidfile}${card.type}/${card.image.name}"/>
+								</c:if>
+							</td>
 							<td>${card.remark}</td>
 						</tr>
 						<c:set var="color" value="${color + 1}" scope="page"/>

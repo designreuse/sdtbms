@@ -1,5 +1,6 @@
 package com.bus.stripes.actionbean;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import security.action.Secure;
 
 import com.bus.dto.Account;
 import com.bus.dto.Employee;
+import com.bus.dto.Hrimage;
 import com.bus.dto.Idmanagement;
 import com.bus.services.CustomActionBean;
 import com.bus.services.HRBean;
@@ -17,13 +19,14 @@ import com.bus.util.SelectBoxOptions;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.HandlesEvent;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 
-public class IDCardsActionBean extends CustomActionBean implements Permission{
+public class IDCardsActionBean extends CustomActionBean{
 	
 	private HRBean bean;
 	
@@ -33,6 +36,8 @@ public class IDCardsActionBean extends CustomActionBean implements Permission{
 	private Idmanagement newidcard;
 	
 	private String targetId;
+	
+	private FileBean idfile;
 	
 	private void loadOptionList(){
 		typeoptions = SelectBoxOptions.getSelectBoxFromFixOptions(bean.getOptionListById(7));
@@ -83,6 +88,42 @@ public class IDCardsActionBean extends CustomActionBean implements Permission{
 		}
 	}
 	
+	@HandlesEvent(value="idfileUpload")
+	@Secure(roles=Roles.EMPLOYEE_IDCARDS_FILE_UPLOAD)
+	public Resolution idfileUpload(){
+		try{
+			if(idfile != null){
+				Employee e = bean.getEmployeeById(targetId);
+				Idmanagement idcard2 = bean.getIdCardById(idcard.getId());
+				//delete the old file
+				if(idcard2.getImage()!= null){
+					File delFile = new File(idcard2.getImage().getIpath());
+					if(delFile.exists())
+						delFile.delete();
+				}
+				//Save the new file
+				String extension = idfile.getFileName().substring(idfile.getFileName().lastIndexOf("."),idfile.getFileName().length());
+				String filename = e.getFullname()+"_"+idcard2.getType()+"_"+idcard2.getId()+extension;
+				String path = "/var/www/html/bms-id-files/"+idcard2.getType()+"/"+filename;
+				File file = new File(path);
+				idfile.save(file);
+				
+				//Save the new path to database
+				Hrimage image = idcard2.getImage();
+				if(image == null){
+					image = new Hrimage();
+				}
+				image.setName(filename);
+				image.setIpath(path);
+				idcard2.setImage(image);
+				bean.saveIdCardImage(idcard2);
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return defaultAction();
+	}
+	
 	public Idmanagement getIdcard() {
 		return idcard;
 	}
@@ -126,4 +167,11 @@ public class IDCardsActionBean extends CustomActionBean implements Permission{
 		this.newidcard = newidcard;
 	}
 
+	public FileBean getIdfile() {
+		return idfile;
+	}
+
+	public void setIdfile(FileBean idfile) {
+		this.idfile = idfile;
+	}
 }

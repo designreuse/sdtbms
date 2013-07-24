@@ -21,6 +21,11 @@
 						</a>
 						</ss:secure>
 						
+						<a class="btn ui-state-default ui-corner-all" href="${pageContext.request.contextPath}/actionbean/ChangePasswd.action">
+							<span class="ui-icon ui-icon-power"></span>
+							修改密码
+						</a>
+						
 						<a class="btn ui-state-default ui-corner-all" href="${pageContext.request.contextPath}/actionbean/Login.action?logout=">
 							<span class="ui-icon ui-icon-power"></span>
 							退出登录

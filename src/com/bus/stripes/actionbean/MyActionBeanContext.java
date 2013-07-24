@@ -15,6 +15,10 @@ import net.sourceforge.stripes.util.CryptoUtil;
 
 public class MyActionBeanContext extends ActionBeanContext {
 
+	public String getHrhostidfile(){
+		return "http://172.168.4.200/bms-id-files/";
+	}
+	
     public void setAccount(Account acc) {
         getRequest().getSession().setAttribute("account", acc);
     }
@@ -54,5 +58,9 @@ public class MyActionBeanContext extends ActionBeanContext {
         } else {
             return requestURL.append('?').append(queryString).toString();
         }
+    }
+    
+    public String getHrIdFileHost(){
+    	return "http://172.168.4.95/bms-id-files/";
     }
 }
