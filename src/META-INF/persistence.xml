@@ -51,6 +51,10 @@
  
  <class>com.bus.dto.logger.ScoreLog</class>
  <class>com.bus.dto.logger.AccountLog</class>
+ 
+ <class>com.bus.dto.vehicleprofile.VehicleProfile</class>
+ <class>com.bus.dto.vehicleprofile.VehicleMiles</class>
+ <class>com.bus.dto.vehicleprofile.VehicleCheck</class>
 
  <properties>
   <property name="hibernate.show_sql" value="false" />

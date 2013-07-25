@@ -1087,4 +1087,21 @@ public class HRBean{
 		}
 	}
 
+	/**
+	 * Delete the image and its path
+	 * @param cardId
+	 */
+	@Transactional
+	public String deleteIDCardImage(String cardId) throws Exception{
+		Idmanagement card = em.find(Idmanagement.class, Integer.parseInt(cardId));
+		Hrimage image = card.getImage();
+		String ipath = image.getIpath();
+		card.setImage(null);
+		em.merge(card);
+		em.flush();
+		em.remove(image);
+		em.flush();
+		return ipath;
+	}
+
 }

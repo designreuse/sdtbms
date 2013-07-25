@@ -104,7 +104,7 @@ public class IDCardsActionBean extends CustomActionBean{
 				//Save the new file
 				String extension = idfile.getFileName().substring(idfile.getFileName().lastIndexOf("."),idfile.getFileName().length());
 				String filename = e.getFullname()+"_"+idcard2.getType()+"_"+idcard2.getId()+extension;
-				String path = "/var/www/html/bms-id-files/"+idcard2.getType()+"/"+filename;
+				String path = context.getLocalFileLocation()+idcard2.getType()+"/"+filename;
 				File file = new File(path);
 				idfile.save(file);
 				
@@ -122,6 +122,22 @@ public class IDCardsActionBean extends CustomActionBean{
 			e.printStackTrace();
 		}
 		return defaultAction();
+	}
+	
+	@HandlesEvent(value="idfileDelete")
+	@Secure(roles=Roles.EMPLOYEE_IDCARDS_FILE_UPLOAD)
+	public Resolution idfileDelete(){
+		try{
+			String cardId = context.getRequest().getParameter("cardId");
+			String ipath  = bean.deleteIDCardImage(cardId);
+			File file  = new File(ipath);
+			if(file.exists())
+				file.delete();
+			return new StreamingResolution("text/charset=utf8;","删除成功");
+		}catch(Exception e){
+			e.printStackTrace();
+			return context.errorResolutionAjax("删除出错", ""+e.getMessage());
+		}
 	}
 	
 	public Idmanagement getIdcard() {

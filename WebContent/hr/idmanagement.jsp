@@ -57,7 +57,7 @@
 								<Label class='selector'>员工名字:</Label><stripes:text name="selector.name"/>
 								<Label class='selector'>员工工号:</Label><stripes:text name="selector.workerid"/>
 								<Label class='selector'>证件类型:</Label><stripes:select name="selector.type"><stripes:option value="">不限</stripes:option><stripes:options-collection collection="${actionBean.idcardtypes}" label="label" value="value"/></stripes:select>
-								<Label class='selector'>时间帅选:</Label>
+								<Label class='selector'>时间筛选:</Label>
 								<stripes:radio name="selector.date" value="0"/>不按日期排 
 								<stripes:radio name="selector.date" value="1"/>有效日期 
 						</tr>

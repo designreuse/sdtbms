@@ -46,23 +46,26 @@ $(document).ready(function() {
             	var value= "";
             	var url= "";
             	if(name == "detail"){
-            		name = $(this).prev().prev().attr("name");
-            		value = $(this).prev().prev().attr("value");
+            		name = $(this).parent().children().first().attr("name");
+            		value = $(this).parent().children().first().attr("value");
             		url = window.location.pathname + "?"+name+"="+value+"&detail=";
 //            		window.open(url, "Employee Detail ID:"+value, ["width=800,height=600,scrollbars=yes"]);
             		window.open(url);
             		submit = false;
             	}
             	else if(name == "contract"){
-            		value = $(this).prev().prev().prev().attr("value");
+            		value = $(this).parent().children().first().attr("value");
             		$('#contract_target_id').val(value);
             		$('#contract_label_name').html("员工:" + $(this).parents('td').next().next().html());
             		$('#btn_new_contract_dialog').dialog('open');
             		submit=false;
             	}
             	else if(name == "idcards"){
-            		name = $(this).prev().prev().prev().prev().attr("name");
-            		value = $(this).prev().prev().prev().prev().attr("value");
+            		name = $(this).parent().children().first().attr("name");
+            		value = $(this).parent().children().first().attr("value");
+            		
+//            		name = $(this).prev().prev().prev().prev().attr("name");
+//            		value = $(this).prev().prev().prev().prev().attr("value");
             		var pathname = window.location.pathname;
             		var newpath = pathname.substring(0, pathname.indexOf("Employee.action", 0));
             		url = newpath +"IDCards.action" + "?"+name+"="+value;
@@ -71,13 +74,13 @@ $(document).ready(function() {
             		submit =false;
             	}
             	else if(name == "getresign"){
-            		value = $(this).prev().prev().prev().prev().prev().attr("value");
+            		value = $(this).parent().children().first().attr("value");
             		$('#resignemployeeId').val(value);
             		$('#btn_resign_date_dialog').dialog("open");
             		submit = false;
             	}
             	else if(name == "getrejoin"){
-            		value = $(this).prev().prev().prev().prev().prev().attr("value");
+            		value = $(this).parent().children().first().attr("value");
             		$('#rejoinemployeeId').val(value);
             		$('#btn_rejoin_date_dialog').dialog("open");
             		submit = false;

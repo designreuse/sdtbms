@@ -98,8 +98,28 @@ $(document).ready(function(){
 // 		alert(val);
 		window.open(val);
 	});
+
+	callAjaxForEdit("delete_image");
 });
 
+
+function callAjaxForEdit(hyperLinkClassName){
+	$('.'+hyperLinkClassName).click(function(){
+		var action = $(this).next().val();
+		$.ajax({
+			url:action,
+			type:"post",
+			dataType:'text',
+			success:function(response){
+				location.reload();
+			},
+			error:function(response){
+				alert(response);
+				location.reload();
+			}
+		});
+    });
+}
 </script>
 
 
@@ -165,11 +185,13 @@ text-align:center;
 								<c:if test="${card.image != null && card.image.name != null}">
 									<a class="view_jpg" href="javascript:void;">查看</a><input type="hidden" value="${actionBean.context.hrhostidfile}${card.type}/${card.image.name}"/>
 								</c:if>
+								<ss:secure roles="employee_idcards_file_upload">
 								<stripes:form beanclass="com.bus.stripes.actionbean.IDCardsActionBean">
 									<stripes:hidden name="idcard.id" value="${card.id}"/>
 									<stripes:hidden name="targetId"/>
-									<stripes:file name="idfile"/><stripes:submit name="idfileUpload" value="上传"/>
+									<stripes:file name="idfile"/><a class="delete_image" href="javescript:void;">删除</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/IDCards.action?cardId=${card.id}&idfileDelete="/><stripes:submit name="idfileUpload" value="上传"/>
 								</stripes:form>
+								</ss:secure>
 							</td>
 						</tr>
 						
