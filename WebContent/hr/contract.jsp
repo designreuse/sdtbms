@@ -42,9 +42,9 @@
 					<stripes:form beanclass="com.bus.stripes.actionbean.ContractActionBean" focus="">
 						<tr>
 							<td colspan=10 style="text-align:left">
-								<stripes:submit name="prevpage" value="上页"/> 页码: <stripes:text name="pagenum"/> <stripes:hidden name="totalcount"/>  <stripes:submit name="nextpage" value="下页"/>
+								<stripes:submit name="prevpage" value="上页"/> 页码: <stripes:text name="pagenum"/>/${actionBean.totalcount}<stripes:hidden name="totalcount"/>  <stripes:submit name="nextpage" value="下页"/>
 								显示数量:<stripes:text name="lotsize"/>
-								<stripes:submit name="filter" value="提交"/>
+								<stripes:submit name="filter" value="提交"/>${actionBean.rows}行
 							</td>
 						</tr>
 						<tr>
@@ -55,7 +55,7 @@
 								<stripes:radio name="contractselector.dateselector" value="0"/>不限日期 
 								<stripes:radio name="contractselector.dateselector" value="2"/>生效日期
 								<stripes:radio name="contractselector.dateselector" value="3"/>试用期
-								<stripes:radio name="contractselector.dateselector" value="1"/>结束日期 <stripes:text name="contractselector.expireDate" formatPattern="yyyy-MM-dd" class="datepickerClass"/>
+								<stripes:radio name="contractselector.dateselector" value="1"/>结束日期 <stripes:text name="contractselector.expireDate" formatPattern="yyyy-MM-dd" class="datepickerClass"/>---><stripes:text name="contractselector.expireDate2" formatPattern="yyyy-MM-dd" class="datepickerClass"/>
 						</tr>
 						
 					</stripes:form>

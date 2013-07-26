@@ -474,27 +474,21 @@ public class HRBean{
 		}
 	}
 
-	public List<Contract> getContractsBySelector(int pagenum, int lotsize,
-			String statement) {
+	public Map getContractsBySelector(int pagenum, int lotsize,
+			String statement) throws Exception {
 		List<Contract> list = new ArrayList<Contract>();
-		if (statement.contains("=") || statement.contains("<")
-				|| statement.contains(">"))
-			list = em
-					.createQuery(
-							"SELECT q FROM Contract q WHERE status=? AND "
-									+ statement)
-					.setFirstResult(pagenum * lotsize - lotsize)
-					.setParameter(1, "A").setMaxResults(lotsize)
+			list = em.createQuery(statement).setFirstResult(pagenum * lotsize - lotsize).setMaxResults(lotsize)
 					.getResultList();
-		else
-			list = em
-					.createQuery(
-							"SELECT q FROM Contract q WHERE status=? "
-									+ statement)
-					.setFirstResult(pagenum * lotsize - lotsize)
-					.setParameter(1, "A").setMaxResults(lotsize)
-					.getResultList();
-		return list;
+			int endIndex = statement.length();
+			if(statement.indexOf("ORDER BY") != -1)
+				endIndex = statement.indexOf("ORDER BY");
+			String substatement = statement.substring(statement.indexOf("FROM"), endIndex);
+			substatement = "SELECT count(*) "+ substatement;
+			Long count = (Long) em.createQuery(substatement).getSingleResult();
+			HashMap<String,Object> map = new HashMap<String,Object>();
+			map.put("list", list);
+			map.put("count", count);
+		return map;
 	}
 
 	@Transactional
@@ -506,7 +500,7 @@ public class HRBean{
 		try {
 			List<Idmanagement> list = em
 					.createQuery(
-							"SELECT q FROM Idmanagement q WHERE employeeid=?")
+							"SELECT q FROM Idmanagement q WHERE employeeid=? ORDER BY id ASC")
 					.setParameter(1, Integer.parseInt(id)).getResultList();
 			return list;
 		} catch (Exception e) {

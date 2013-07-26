@@ -3,6 +3,7 @@ package com.bus.stripes.actionbean;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import security.action.Secure;
 
@@ -40,6 +41,7 @@ public class ContractActionBean extends CustomActionBean implements Permission{
 	private int pagenum;
 	private int lotsize;
 	private Long totalcount;
+	private Long rows;
 	
 	public List<Contract> getContracts() {
 		return contracts;
@@ -68,30 +70,39 @@ public class ContractActionBean extends CustomActionBean implements Permission{
 			pagenum = 1;
 			lotsize = 20;
 		}
-		setTotalcount(bean.countContracts()/lotsize +1);
+		setRows(bean.countContracts());
+		setTotalcount(getRows()/lotsize +1);
 		getContractsFromSelector();
 		if(pagenum > totalcount)
 			pagenum = Integer.parseInt(totalcount.toString());
 	}
 	
 	private void getContractsFromSelector() {
-		if(employeeselector == null && contractselector == null)
+		if(employeeselector == null && contractselector == null){
 			setContracts(bean.getContracts(pagenum, lotsize));
-		else{
+			setRows(bean.countContracts());
+			setTotalcount(getRows()/lotsize +1);
+		}else{
 			if(employeeselector != null && employeeselector.getName() != null){
 				setContracts(bean.getContractsByName(pagenum, lotsize, employeeselector.getName()));
 			}else if(contractselector != null){
 				String statement = contractselector.getSelectorStatement();
 				try{
 //					statement = URLDecoder.decode(statement, "UTF-8");
-					setContracts(bean.getContractsBySelector(pagenum,lotsize,statement));
 					System.out.println("Using statement:"+statement);
+					Map map = bean.getContractsBySelector(pagenum,lotsize,statement);
+					setContracts((List<Contract>) map.get("list"));
+					setRows((Long) map.get("count"));
+					setTotalcount(getRows()/lotsize +1);
+					
 				}catch(Exception e){
 					e.printStackTrace();
 					setContracts(bean.getContracts(pagenum, lotsize));
 				}
 			}else{
 				setContracts(bean.getContracts(pagenum, lotsize));
+				setRows(bean.countContracts());
+				setTotalcount(getRows()/lotsize +1);
 			}
 		}
 	}
@@ -196,5 +207,11 @@ public class ContractActionBean extends CustomActionBean implements Permission{
 	}
 	public void setContractselector(ContractSelector contractselector) {
 		this.contractselector = contractselector;
+	}
+	public Long getRows() {
+		return rows;
+	}
+	public void setRows(Long rows) {
+		this.rows = rows;
 	}
 }

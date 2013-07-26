@@ -65,8 +65,8 @@ $(document).ready(function(){
 	});
     
     $(".btneditidcards").click(function(){
-    		var params = $(this).parent().parent().prev().serialize();
-    		var url = $(this).parent().parent().prev().attr("action") + "?edit=";
+    		var params = $(this).parent().prev().serialize();
+    		var url = $(this).parent().prev().attr("action") + "?edit=";
     		$.ajax({
     			url:url,
     			type:"post",
@@ -80,17 +80,6 @@ $(document).ready(function(){
     				alert("errors");
     			}
     		});
-    		
-    		$(this).attr('value',"none");
-    		$(this).parent().parent().children("td").each(function(){
-    				$(this).children("input").each(function(){
-    					$(this).prop("disabled",true);
-    				});
-    				$(this).children("select").each(function(){
-    					$(this).prop("disabled",true);
-    				});
-    		});
-    		
     });
     
 	$('.view_jpg').click(function(){
@@ -105,13 +94,16 @@ $(document).ready(function(){
 
 function callAjaxForEdit(hyperLinkClassName){
 	$('.'+hyperLinkClassName).click(function(){
+		var elem = $(this);
 		var action = $(this).next().val();
 		$.ajax({
 			url:action,
 			type:"post",
 			dataType:'text',
 			success:function(response){
-				location.reload();
+				alert(response);
+// 				location.reload();
+				$(elem).parent().parent().children(":first-child").html("");
 			},
 			error:function(response){
 				alert(response);
@@ -173,7 +165,7 @@ text-align:center;
 								
 							</td>
 							<td>
-								${card.id}<stripes:hidden name="idcard.id" value="${cont.id}"/>
+								${card.id}<stripes:hidden name="idcard.id" value="${card.id}"/>
 							</td>
 							<td>${card.type}</td>
 							<td><stripes:text name="idcard.number" value="${card.number}"/></td>
@@ -187,9 +179,9 @@ text-align:center;
 								</c:if>
 								<ss:secure roles="employee_idcards_file_upload">
 								<stripes:form beanclass="com.bus.stripes.actionbean.IDCardsActionBean">
-									<stripes:hidden name="idcard.id" value="${card.id}"/>
+									<input type="hidden" name="cardId" value="${card.id}"/>
 									<stripes:hidden name="targetId"/>
-									<stripes:file name="idfile"/><a class="delete_image" href="javescript:void;">删除</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/IDCards.action?cardId=${card.id}&idfileDelete="/><stripes:submit name="idfileUpload" value="上传"/>
+									<stripes:file name="idfile"/><a class="delete_image" href="javascript:void;">删除</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/IDCards.action?targetId=${actionBean.targetId}&cardId=${card.id}&idfileDelete="/><stripes:submit name="idfileUpload" value="上传"/>
 								</stripes:form>
 								</ss:secure>
 							</td>

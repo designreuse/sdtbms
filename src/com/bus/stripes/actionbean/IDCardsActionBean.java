@@ -50,7 +50,8 @@ public class IDCardsActionBean extends CustomActionBean{
 		setTargetId(context.getRequest().getParameter("targetId"));
 		if(targetId != null)
 			setIdcards(bean.getIdcardsByEmployeeId(targetId));
-		return new ForwardResolution("/hr/idcards.jsp");
+		ForwardResolution f = new ForwardResolution("/hr/idcards.jsp");
+		return f;
 	}
 	
 	@HandlesEvent(value="create")
@@ -94,7 +95,8 @@ public class IDCardsActionBean extends CustomActionBean{
 		try{
 			if(idfile != null){
 				Employee e = bean.getEmployeeById(targetId);
-				Idmanagement idcard2 = bean.getIdCardById(idcard.getId());
+				String cardId = context.getRequest().getParameter("cardId");
+				Idmanagement idcard2 = bean.getIdCardById(Integer.parseInt(cardId));
 				//delete the old file
 				if(idcard2.getImage()!= null){
 					File delFile = new File(idcard2.getImage().getIpath());
