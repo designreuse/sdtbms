@@ -69,8 +69,6 @@ public class LoginActionBean implements ActionBean{
 	
 	@DefaultHandler
 	public Resolution defaultAction(){
-		account = new Account();
-		account.setUsername("jianxing");
 		return new ForwardResolution("/login.jsp");
 	}
 	

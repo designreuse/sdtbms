@@ -55,6 +55,8 @@
  <class>com.bus.dto.vehicleprofile.VehicleProfile</class>
  <class>com.bus.dto.vehicleprofile.VehicleMiles</class>
  <class>com.bus.dto.vehicleprofile.VehicleCheck</class>
+ 
+ <class>com.bus.dto.common.ContractImg</class>
 
  <properties>
   <property name="hibernate.show_sql" value="false" />

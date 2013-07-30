@@ -83,4 +83,8 @@ public class HRUtil {
 		}
 		return map;
 	}
+	
+	public static String getFileExtension(String filename){
+		return filename.substring(filename.lastIndexOf("."),filename.length());
+	}
 }

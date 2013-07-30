@@ -15,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -132,12 +133,12 @@ public class Employee implements Serializable{
 		this.position = position;
 	}
 	
-	@ManyToOne
+	@OneToOne
 	@JoinColumn(name="imageid")
-	public Hrimage getHrimage(){
+	public Hrimage getImage(){
 		return image;
 	}
-	public void setHrimage(Hrimage hrimage){
+	public void setImage(Hrimage hrimage){
 		this.image = hrimage;
 	}
 	
@@ -508,4 +509,5 @@ public class Employee implements Serializable{
 	public void setTransfers(Set<Promoandtransfer> transfers) {
 		this.transfers = transfers;
 	}
+	
 }

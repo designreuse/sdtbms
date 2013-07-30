@@ -5,17 +5,21 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.bus.dto.common.ContractImg;
 import com.bus.util.HRUtil;
 
 @Entity
@@ -36,6 +40,8 @@ public class Contract {
 	private String status;
 	private Date createdate;
 	private String probationdate;
+	
+	private ContractImg image;
 	
 	public void copy(Contract c){
 		type = c.getType();
@@ -189,5 +195,13 @@ public class Contract {
 			return HRUtil.parseDateToString(this.createdate);
 		else
 			return "";
+	}
+
+	@OneToOne(fetch=FetchType.LAZY,mappedBy="contract",cascade = CascadeType.ALL)
+	public ContractImg getImage() {
+		return image;
+	}
+	public void setImage(ContractImg image) {
+		this.image = image;
 	}
 }

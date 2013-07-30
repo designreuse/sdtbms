@@ -36,6 +36,8 @@ public interface Roles {
 	public static final String EMPLOYEE_POS_VIEW = "employee_pos_view";
 	public static final String EMPLOYEE_POS_ADD = "employee_pos_add";
 	public static final String EMPLOYEE_POS_RM = "employee_pos_rm";
+	public static final String EMPLOYEE_CONTRACT_FILE_UPLOAD = "employee_contract_file_upload";
+	public static final String EMPLOYEE_PROFILEPIC_UPLOAD = "employee_profilepic_upload";
 	
 	
 	//For Score System

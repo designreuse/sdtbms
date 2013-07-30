@@ -122,7 +122,7 @@ public class HRBean{
 			Position p = getPositionByName(e.getPosition().getName());
 			e.setPosition(p);
 			Hrimage image = em.find(Hrimage.class, 0);
-			e.setHrimage(image);
+			e.setImage(image);
 			if (e.getStatus() == null || e.getStatus().equals(""))
 				e.setStatus("A");
 			e.setCreatetime(e.getFirstworktime() == null ? new Date() : e
@@ -1096,6 +1096,16 @@ public class HRBean{
 		em.remove(image);
 		em.flush();
 		return ipath;
+	}
+
+	/**
+	 * Get contract by contract id
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
+	public Contract getContractById(int id) throws Exception {
+		return em.find(Contract.class, id);
 	}
 
 }
