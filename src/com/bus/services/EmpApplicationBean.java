@@ -21,18 +21,7 @@ import com.bus.dto.application.HRApplication;
 import com.bus.dto.application.IdCardsMapper;
 import com.bus.dto.score.Scoretype;
 
-public class EmpApplicationBean {
-
-	@PersistenceContext
-	protected EntityManager em;
-	
-	public EntityManager getEntityManager() {
-		return this.em;
-	}
-
-	public void setEntityManager(EntityManager entityManager) {
-		this.em = entityManager;
-	}
+public class EmpApplicationBean  extends EMBean{
 
 	/**
 	 * Get employment request form by default 

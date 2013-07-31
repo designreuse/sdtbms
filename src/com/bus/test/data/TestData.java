@@ -50,7 +50,7 @@ public class TestData {
 		e.setStatus("A");
 		Hrimage i = new Hrimage();
 		i.setId(1);
-		e.setHrimage(i);
+		e.setImage(i);
 		return e;
 	}
 	

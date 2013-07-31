@@ -26,6 +26,7 @@ http://www.springframework.org/schema/mvc http://www.springframework.org/schema/
 	<bean id="scoreBean" class="com.bus.services.ScoreBean"></bean>
 	<bean id="empApplicationBean" class="com.bus.services.EmpApplicationBean"></bean>
 	<bean id="commonBean" class="com.bus.services.CommonBean"></bean>
+	<bean id="vBean" class="com.bus.services.VehicleBean"></bean>
 
 	<bean id="entityManagerFactory"
 		class="org.springframework.orm.jpa.LocalEntityManagerFactoryBean">

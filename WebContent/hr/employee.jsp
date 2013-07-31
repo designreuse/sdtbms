@@ -93,7 +93,7 @@
 							<td rowspan=1>姓名:</td><td rowspan=1><stripes:text class="required" name="employee.fullname"/></td>
 							<td colspan=2 rowspan=9 style="text-align: center;vertical-align:none;">
 								<div>
-									新建后上传&nbsp;<stripes:hidden name="employee.hrimage.id"/>
+									新建后上传&nbsp;
 								</div>
 							</td>
 						</tr>
@@ -146,88 +146,13 @@
 							<td>调入时间:</td><td><stripes:text name="employee.transfertime" formatPattern="yyyy-MM-dd" class="datepickerClass"/></td>
 						</tr>
 						<tr>
-							<td>职称:</td><td colspan=3><stripes:select class="required" name="employee.workertype"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.workertype}" label="label" value="value"/></stripes:select></td>
+							<td>职称:</td><td colspan=3><stripes:select name="employee.workertype"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.workertype}" label="label" value="value"/></stripes:select></td>
 						</tr>
 						<tr>
 							<td>注释:</td>
 							<td colspan=3><stripes:textarea style="width:80%;" name="employee.remark"></stripes:textarea></td>
 						</tr>
 					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-<!-- 						<tr> -->
-<%-- 							<td>姓名:</td><td><stripes:text class="required" name="employee.fullname"/></td> --%>
-<%-- 							<td>籍贯:</td><td><stripes:text class="required" name="employee.pob"/></td> --%>
-<%-- 								<td rowspan="8">照片:</td><td rowspan="7">&nbsp;<stripes:hidden name="employee.hrimage.id"/></td> --%>
-<!-- 						</tr> -->
-<!-- 						<tr> -->
-<%-- 							<td>编号<a href="javascript:void;" id="getNewWorkerId">(工)</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?getnewworkerid="/>:</td><td><stripes:text class="required" name="employee.documentkey"/></td> --%>
-<%-- 							<td>工号:</td><td><stripes:text class="required" name="employee.workerid"/><a href="javascript:void;" id="checkWorkerId">(查)</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?checkworkerid="/></td> --%>
-						
-<!-- 						</tr> -->
-<!-- 						<tr> -->
-<%-- 							<td>性别:</td><td><stripes:radio name="employee.sex" value="男"/>男 &nbsp; &nbsp; <stripes:radio name="employee.sex" value="女"/>女</td> --%>
-<%-- 							<td>身份证:</td><td><stripes:text class="required" name="employee.identitycode"/></td> --%>
-<!-- 						</tr> -->
-<!-- 						<tr> -->
-<%-- 							<td>出生年月:</td><td><stripes:text  name="employee.dob"  formatPattern="yyyy-MM-dd" class="datepickerClass required"/></td> --%>
-<%-- 							<td>民族:</td><td><stripes:select class="required" name="employee.ethnic"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.ethnic}" label="label" value="value"/></stripes:select></td> --%>
-<!-- 						</tr> -->
-<!-- 						<tr> -->
-<%-- 							<td>婚姻状况:</td><td><stripes:select class="required" name="employee.marriage"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.marriage}" label="label" value="value"/></stripes:select></td> --%>
-<%-- 							<td>政治面貌:</td><td><stripes:select name="employee.politicalstatus"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.politicalStatus}" label="label" value="value"/></stripes:select></td> --%>
-<!-- 						</tr> -->
-<!-- 						<tr> -->
-<%-- 							<td>住宅电话:</td><td><stripes:text name="employee.homenumber"/></td> --%>
-<%-- 							<td>手机号码:</td><td><stripes:text class="required" name="employee.mobilenumber"/></td> --%>
-<!-- 						</tr> -->
-<!-- 						<tr> -->
-<%-- 							<td>电子邮箱:</td><td><stripes:text name="employee.email"/></td> --%>
-<%-- 							<td>其它联系方式:</td><td><stripes:text name="employee.othercontact"/></td> --%>
-<!-- 						</tr> -->
-<!-- 						<tr> -->
-<%-- 							<td>家庭地址:</td><td><stripes:text class="required" name="employee.homeaddress"/></td> --%>
-<%-- 							<td>邮编:</td><td><stripes:text name="employee.postcode"/></td> --%>
-<!-- 						</tr> -->
-<!-- 						<tr> -->
-<%-- 							<td>入党时间:</td><td><stripes:text name="employee.timeofjoinrpc" formatPattern="yyyy-MM-dd" class="datepickerClass"/></td> --%>
-<%-- 							<td>参加工作时间:</td><td><stripes:text name="employee.firstworktime"  formatPattern="yyyy-MM-dd" class="datepickerClass required"/></td> --%>
-<%-- 							<td>职级:</td><td><stripes:select class="required" name="employee.joblevel"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.joblevel}" label="label" value="value"/></stripes:select></td> --%>
-<!-- 						</tr> -->
-<!-- 						<tr> -->
-<%-- 							<td>文化程度:</td><td><stripes:select class="required" name="employee.qualification"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.qualification}" label="label" value="value"/></stripes:select></td> --%>
-<%-- 							<td>部门:</td><td><stripes:select class="required" name="employee.department.id"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.department}" label="label" value="value"/></stripes:select></td> --%>
-<%-- 							<td>职位:</td><td><stripes:select class="required" name="employee.position.id"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.position}" label="label" value="value"/></stripes:select></td> --%>
-<!-- 						</tr> -->
-<!-- 						<tr> -->
-<%-- 							<td>所属镇街:</td><td><stripes:select name="employee.placebelong"><stripes:option value=""></stripes:option><stripes:options-collection collection="${actionBean.placebelongs}" label="label" value="label"/></stripes:select></td> --%>
-<%-- 							<td>户籍类型:</td><td><stripes:select class="required" name="employee.domiciletype"><stripes:option value="">请选择...</stripes:option><stripes:options-collection collection="${actionBean.domiciletypes}" label="label" value="value"/></stripes:select></td> --%>
-<%-- 							<td>特殊身份:</td><td><stripes:select name="employee.army"><stripes:options-collection collection="${actionBean.specialPeople}" label="label" value="value"/></stripes:select></td> --%>
-<!-- 						</tr> -->
-<!-- 						<tr> -->
-<%-- 							<td>最后毕业学校:</td><td><stripes:text name="employee.colleage"></stripes:text></td> --%>
-<%-- 							<td>专业:</td><td colspan=3><stripes:text name="employee.major"/></td> --%>
-<!-- 						</tr> -->
-<!-- 						<tr> -->
-<!-- 							<td>调入时间:</td> -->
-<%-- 							<td><stripes:text name="employee.transfertime" formatPattern="yyyy-MM-dd" class="datepickerClass"/></td> --%>
-<!-- 							<td>职称:</td> -->
-<%-- 							<td colspan=3><stripes:select class="reqired" name="employee.workertype"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.workertype}" label="label" value="value"/></stripes:select></td> --%>
-<!-- 						</tr> -->
-<!-- 						<tr> -->
-<!-- 							<td>注释:</td> -->
-<%-- 							<td colspan=5><stripes:textarea name="employee.remark"></stripes:textarea></td> --%>
-<!-- 						</tr> -->
 					</table>
 				</stripes:form>
 				</div>

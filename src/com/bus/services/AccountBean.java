@@ -18,18 +18,7 @@ import com.bus.dto.Groups;
 import com.bus.dto.logger.AccountLog;
 import com.bus.util.LoggerAction;
 
-public class AccountBean {
-
-	@PersistenceContext
-	protected EntityManager em;
-
-	public EntityManager getEntityManager() {
-		return this.em;
-	}
-
-	public void setEntityManager(EntityManager entityManager) {
-		this.em = entityManager;
-	}
+public class AccountBean  extends EMBean{
 
 	@Transactional
 	public void saveAccount(Account a, Account user) throws Exception{

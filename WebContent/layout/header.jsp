@@ -46,13 +46,20 @@
 					<li>
 						<a href="${pageContext.request.contextPath}/actionbean/Scorehome.action" class="sf-with-ul">积分系统</a>
 					</li>
+					</ss:secure>
 					
 					<ss:secure roles="employment_system">
 					<li>
 						<a href="${pageContext.request.contextPath}/actionbean/Employment.action" class="sf-with-ul">招聘系统</a>
 					</li>
 					</ss:secure>
+					
+					<ss:secure roles="vehicle_system">
+					<li>
+						<a href="${pageContext.request.contextPath}/actionbean/VehicleProfile.action" class="sf-with-ul">车辆档案</a>
+					</li>
 					</ss:secure>
+					
 					</ul>
 			</div>
 		</div>

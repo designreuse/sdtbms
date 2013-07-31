@@ -30,18 +30,7 @@ import com.bus.dto.score.Voucherlist;
 import com.bus.util.LoggerAction;
 
 
-public class ScoreBean {
-
-	@PersistenceContext
-	protected EntityManager em;
-
-	public EntityManager getEntityManager() {
-		return this.em;
-	}
-
-	public void setEntityManager(EntityManager entityManager) {
-		this.em = entityManager;
-	}
+public class ScoreBean  extends EMBean{
 
 	/**
 	 * Get the score types from giving page, if page or lotsize = -1, it will select all records

@@ -187,7 +187,7 @@ label.tabSubTitle{
 							<td colspan=2 rowspan=9 style="text-align: center;vertical-align:none;">
 								<div>
 									<stripes:hidden name="employee.id"/>
-									<img src="${actionBean.context.hrhostidfile}profilepic/${actionBean.employee.image.name}" height="100%" width="200" alt="读取失败" />
+									<img src="${actionBean.context.hrhostidfile}profilepic/${actionBean.employee.image.name}" height="240px" width="180px" alt="读取失败" />
 								</div>
 							</td>
 						</tr>

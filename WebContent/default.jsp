@@ -22,6 +22,7 @@
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/ui/ui.dialog.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/custom.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/ui/ui.tabs.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/common.js"></script>
 
 <link href="${pageContext.request.contextPath}/css/ui/ui.base.css" rel="stylesheet" media="all" />
 

@@ -1,15 +1,24 @@
 package com.bus.dto.vehicleprofile;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import com.bus.dto.Employee;
+import com.bus.util.HRUtil;
 
 @Entity
 @XmlRootElement
@@ -135,6 +144,11 @@ public class VehicleProfile implements Serializable{
 	@Column(name="ecotype")
 	private String ecotype;
 	
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "vehicle")
+	private List<VehicleMiles> miles;
+	
+	@Transient
+	private List<Employee> drivers;
 	
 	public String getEcotype() {
 		return ecotype;
@@ -419,5 +433,50 @@ public class VehicleProfile implements Serializable{
 		this.aircond = aircond;
 	}
 	
+	public List<VehicleMiles> getMiles() {
+		return miles;
+	}
+	public void setMiles(List<VehicleMiles> miles) {
+		this.miles = miles;
+	}
 	
+	public List<Employee> getDrivers() {
+		return drivers;
+	}
+	public void setDrivers(List<Employee> drivers) {
+		this.drivers = drivers;
+	}
+	
+	
+	@Transient
+	public String getDatepurchaseStr() {
+		if(datepurchase == null)
+			return "";
+		else
+			return HRUtil.parseDateToString(datepurchase);
+	}
+	
+	@Transient
+	public String getDateuseStr() {
+		if(dateuse == null)
+			return "";
+		return HRUtil.parseDateToString(dateuse);
+	}
+	
+	@Transient
+	public String getTotalmiles(){
+		if(miles == null || miles.size() < 1)
+			return "";
+		double mile = miles.get(miles.size()-1).getHistorytotal();
+		DecimalFormat df = new DecimalFormat("###,###,###.##");
+		return df.format(mile);
+	}
+	
+	@Transient
+	public String getDriverStr(){
+		if(drivers == null)
+			return "";
+		else
+			return "N.A.";
+	}
 }

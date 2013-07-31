@@ -9,18 +9,7 @@ import com.bus.dto.Employee;
 import com.bus.dto.Hrimage;
 import com.bus.dto.common.ContractImg;
 
-public class CommonBean {
-
-	@PersistenceContext
-	protected EntityManager em;
-
-	public EntityManager getEntityManager() {
-		return this.em;
-	}
-
-	public void setEntityManager(EntityManager entityManager) {
-		this.em = entityManager;
-	}
+public class CommonBean extends EMBean{
 
 	/**
 	 * Save the contract image file

@@ -88,4 +88,9 @@ public interface Roles {
 	public static final String EMPLOYMENT_APPLY_EXAM = "employment_apply_exam";
 	public static final String EMPLOYMENT_IDCARD = "employment_application_idcard_setting";
 	
+	
+	//For Vehicle System
+	public static final String VEHICLE_SYSTEM = "vehicle_system";
+	public static final String VEHICLE_PROFILE_VIEW = "vehicle_system";
+	public static final String VEHICLE_PROFILE_EDIT = "vehicle_profile_edit";
 }
