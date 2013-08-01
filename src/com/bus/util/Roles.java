@@ -93,4 +93,12 @@ public interface Roles {
 	public static final String VEHICLE_SYSTEM = "vehicle_system";
 	public static final String VEHICLE_PROFILE_VIEW = "vehicle_system";
 	public static final String VEHICLE_PROFILE_EDIT = "vehicle_profile_edit";
+	public static final String VEHICLE_MILE_VIEW = "vehicle_mile_view";
+	public static final String VEHICLE_MILE_EDIT = "vehicle_mile_edit";
+	public static final String VEHICLE_FILE_CHECK = "vehicle_file_check";
+	public static final String VEHICLE_FILE_MAINTENANCE = "vehicle_file_maintenance";
+	public static final String VEHICLE_FILE_REPAIR = "vehicle_file_repair";
+	public static final String VEHICLE_FILE_FULLCHECK = "vehicle_file_fullcheck"; 
+	public static final String VEHICLE_FILE_ANNUL = "vehicle_file_annul";
+	public static final String VEHICLE_FILE_EXTRAS = "vehicle_file_extras";
 }

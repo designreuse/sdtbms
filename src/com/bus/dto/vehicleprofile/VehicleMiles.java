@@ -11,6 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
@@ -25,7 +26,7 @@ public class VehicleMiles implements Serializable{
 	
 	@ManyToOne
 	@JoinColumn(name="vid")
-	private VehicleMiles vehicle;
+	private VehicleProfile vehicle;
 	
 	@Column(name="vyear")
 	private Integer vyear;
@@ -72,6 +73,52 @@ public class VehicleMiles implements Serializable{
 	@Column(name="historytotal")
 	private Float historytotal;
 	
+	@Transient
+	public void copy(VehicleMiles editmile) {
+		this.vyear = editmile.getVyear();
+		this.jan = editmile.getJan();
+		this.feb = editmile.getFeb();
+		this.mar = editmile.getMar();
+		this.apr = editmile.getApr();
+		this.may = editmile.getMay();
+		this.jun = editmile.getJun();
+		this.jul = editmile.getJul();
+		this.aug = editmile.getAug();
+		this.sep = editmile.getSep();
+		this.octo = editmile.getOcto();
+		this.nov = editmile.getNov();
+		this.dece = editmile.getDece();
+	}
+	
+	@Transient
+	public void calculate() {
+		float total = 0F;
+		if(jan != null)
+			total += jan;
+		if(feb != null)
+			total += feb;
+		if(mar != null)
+			total += mar;
+		if(apr != null)
+			total += apr;
+		if(may != null)
+			total += may;
+		if(jun != null)
+			total += jun;
+		if(jul != null)
+			total += jul;
+		if(aug != null)
+			total += aug;
+		if(sep != null)
+			total += sep;
+		if(octo != null)
+			total += octo;
+		if(nov != null)
+			total += nov;
+		if(dece != null)
+			total += dece;
+		setYeartotal(total);
+	}
 	
 	public Integer getId() {
 		return id;
@@ -79,10 +126,10 @@ public class VehicleMiles implements Serializable{
 	public void setId(Integer id) {
 		this.id = id;
 	}
-	public VehicleMiles getVehicle() {
+	public VehicleProfile getVehicle() {
 		return vehicle;
 	}
-	public void setVehicle(VehicleMiles vehicle) {
+	public void setVehicle(VehicleProfile vehicle) {
 		this.vehicle = vehicle;
 	}
 	public Integer getVyear() {
@@ -175,7 +222,5 @@ public class VehicleMiles implements Serializable{
 	public void setHistorytotal(Float historytotal) {
 		this.historytotal = historytotal;
 	}
-	
-	
-	
+
 }

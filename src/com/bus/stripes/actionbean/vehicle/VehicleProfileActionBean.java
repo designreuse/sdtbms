@@ -1,11 +1,14 @@
 package com.bus.stripes.actionbean.vehicle;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import security.action.Secure;
 import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.HandlesEvent;
 import net.sourceforge.stripes.action.RedirectResolution;
@@ -14,10 +17,13 @@ import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 
+import com.bus.dto.vehicleprofile.VehicleCheck;
+import com.bus.dto.vehicleprofile.VehicleFiles;
 import com.bus.dto.vehicleprofile.VehicleProfile;
 import com.bus.services.CustomActionBean;
 import com.bus.services.VehicleBean;
 import com.bus.stripes.selector.VehicleSelector;
+import com.bus.util.HRUtil;
 import com.bus.util.Roles;
 
 @UrlBinding(value="/actionbean/VehicleProfile.action")
@@ -27,6 +33,16 @@ public class VehicleProfileActionBean extends CustomActionBean{
 	private List<VehicleProfile> profiles;
 	private VehicleProfile profile;
 	private VehicleSelector selector;
+	private VehicleCheck check;
+	private VehicleCheck editCheck;
+	private FileBean checkFile;
+	
+	//List files
+	private List<VehicleCheck> maintenances;
+	private List<VehicleCheck> repairs;
+	private List<VehicleCheck> fullchecks;
+	private List<VehicleCheck> annul;
+	private List<VehicleCheck> extras;
 	
 	private int pagenum;
 	private int lotsize;
@@ -102,6 +118,11 @@ public class VehicleProfileActionBean extends CustomActionBean{
 			if(targetId == null)
 				return new StreamingResolution("text/charset=UTF-8;","数据上传出错");
 			profile = vBean.getVehicleProfileById(Integer.parseInt(targetId));
+			maintenances = vBean.getVehicleCheckByTypeMaintennance();
+			repairs = vBean.getVehicleCheckByTypeRepaire();
+			fullchecks = vBean.getVehicleCheckByTypeFullCheck();
+			annul = vBean.getVehicleCheckByTypeAnnul();
+			extras = vBean.getVehicleCheckByTypeExtras();
 			return new ForwardResolution("/vehicle/detail.jsp");
 		}catch(Exception e){
 			return new StreamingResolution("text/charset=UTF-8;","数据获取出错."+e.getMessage());
@@ -119,6 +140,94 @@ public class VehicleProfileActionBean extends CustomActionBean{
 			return new StreamingResolution("text/charset=UTF-8;","修改成功");
 		}catch(Exception e){
 			return new StreamingResolution("text/charset=UTF-8;","修改失败."+e.getMessage());
+		}
+	}
+	
+	@HandlesEvent(value="addVehicleCheck")
+	@Secure(roles=Roles.VEHICLE_FILE_CHECK)
+	public Resolution addVehicleCheck(){
+		try{
+			String targetId = context.getRequest().getParameter("targetId");
+			String link = context.getRequest().getParameter("returnLink");
+			if(link == null) link = "/actionbean/VehicleProfile.action";
+			if(targetId == null)
+				return context.errorResolution("ID 没有上传", "上传数据出错.");
+			VehicleProfile vptemp = vBean.getVehicleProfileById(Integer.parseInt(targetId));
+			check.setVehicle(vptemp);
+			check.setCreator(context.getUser());
+			VehicleFiles vf = null;
+			if(checkFile != null){
+				String filename = "车辆_" + check.getCtype() + "_" +vptemp.getId() + HRUtil.getFileExtension(checkFile.getFileName());
+				String ipath = context.getLocalFileLocation() + "车辆/"+check.getCtype() + "/"+filename;
+				File file = new File(ipath);
+				checkFile.save(file);
+				
+				vf = new VehicleFiles();
+				vf.setCreator(context.getUser());
+				vf.setUdate(new Date());
+				vf.setFilename(filename);
+				vf.setIpath(ipath);
+				vBean.saveVehicleFile(vf);
+			}
+			if(vf != null)
+				check.setImage(vf);
+			vBean.saveVehicleCheck(check);
+			return new RedirectResolution(link);
+		}catch(Exception e){
+			return context.errorResolution("服务器保存出错", "请联系管理员.错误:"+e.getMessage());
+		}
+	}
+	
+	/**
+	 * Currently only file upload updatetable
+	 * @return
+	 */
+	@HandlesEvent(value="updateVehicleCheck")
+	@Secure(roles=Roles.VEHICLE_FILE_CHECK)
+	public Resolution updateVehicleCheck(){
+		String ipath = "";
+		try{
+			VehicleFiles image = new VehicleFiles();
+			String checkId = context.getRequest().getParameter("checkId");
+			String link = context.getRequest().getParameter("returnLink");
+			if(checkFile != null){
+				VehicleCheck vc = vBean.getVehicleCheckById(Integer.parseInt(checkId));
+				if(vc.getImage() != null){
+					image = vc.getImage();
+					File oldF = new File(vc.getImage().getIpath());
+					oldF.delete();
+				}
+				String filename = "车辆_" + vc.getCtype() + "_" +vc.getVehicle().getId() + HRUtil.getFileExtension(checkFile.getFileName());
+				ipath = context.getLocalFileLocation() + "车辆/"+vc.getCtype() + "/"+filename;
+				File newF = new File(ipath);
+				checkFile.save(newF);
+				image.setIpath(ipath);
+				image.setFilename(filename);
+				image.setCreator(context.getUser());
+				image.setUdate(new Date());
+				image = vBean.saveVehicleFile(image);
+				if(vc.getImage() == null){
+					vc.setImage(image);
+					vBean.updateVehicleCheck(vc);
+				}
+			}
+			return new RedirectResolution(link);
+		}catch(Exception e){
+			return defaultAction();
+		}
+	}
+	
+	@HandlesEvent(value="deleteVechileCheck")
+	@Secure(roles=Roles.VEHICLE_FILE_CHECK)
+	public Resolution deleteVechileCheck(){
+		try{
+			String checkId = context.getRequest().getParameter("checkId");
+			if(checkId == null)
+				return context.errorResolutionAjax("没用ID可用", "没有ID可用，请按提示删除。");
+			vBean.removeVehicleCheck(checkId);
+			return new StreamingResolution("text/charset=utf-8;","删除成功");
+		}catch(Exception e){
+			return context.errorResolutionAjax("服务器删除出错", "遇到问题."+e.getMessage());
 		}
 	}
 	
@@ -203,6 +312,78 @@ public class VehicleProfileActionBean extends CustomActionBean{
 		this.profile = profile;
 	}
 
+	public VehicleCheck getCheck() {
+		return check;
+	}
+
+	public void setCheck(VehicleCheck check) {
+		this.check = check;
+	}
+
+	public FileBean getCheckFile() {
+		return checkFile;
+	}
+
+	public void setCheckFile(FileBean checkFile) {
+		this.checkFile = checkFile;
+	}
+
+	public List<VehicleCheck> getMaintenances() {
+		return maintenances;
+	}
+
+	public void setMaintenances(List<VehicleCheck> maintenances) {
+		this.maintenances = maintenances;
+	}
+
+	public VehicleCheck getEditCheck() {
+		return editCheck;
+	}
+
+	public void setEditCheck(VehicleCheck editCheck) {
+		this.editCheck = editCheck;
+	}
+
+	public List<VehicleCheck> getRepairs() {
+		return repairs;
+	}
+
+	public void setRepairs(List<VehicleCheck> repairs) {
+		this.repairs = repairs;
+	}
+
+	public VehicleSelector getSelector() {
+		return selector;
+	}
+
+	public void setSelector(VehicleSelector selector) {
+		this.selector = selector;
+	}
+
+	public List<VehicleCheck> getFullchecks() {
+		return fullchecks;
+	}
+
+	public void setFullchecks(List<VehicleCheck> fullchecks) {
+		this.fullchecks = fullchecks;
+	}
+
+	public List<VehicleCheck> getAnnul() {
+		return annul;
+	}
+
+	public void setAnnul(List<VehicleCheck> annul) {
+		this.annul = annul;
+	}
+
+	public List<VehicleCheck> getExtras() {
+		return extras;
+	}
+
+	public void setExtras(List<VehicleCheck> extras) {
+		this.extras = extras;
+	}
+	
 
 	
 }

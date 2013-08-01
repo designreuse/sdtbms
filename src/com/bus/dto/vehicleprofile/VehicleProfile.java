@@ -467,9 +467,13 @@ public class VehicleProfile implements Serializable{
 	public String getTotalmiles(){
 		if(miles == null || miles.size() < 1)
 			return "";
-		double mile = miles.get(miles.size()-1).getHistorytotal();
+		double total = 0D;
+		for(VehicleMiles m : miles){
+			if(m.getYeartotal() != null)
+				total += m.getYeartotal();
+		}
 		DecimalFormat df = new DecimalFormat("###,###,###.##");
-		return df.format(mile);
+		return df.format(total);
 	}
 	
 	@Transient

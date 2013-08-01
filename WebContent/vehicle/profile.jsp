@@ -83,6 +83,12 @@
 			var link = "${pageContext.request.contextPath}/actionbean/VehicleProfile.action?targetId="+targetId+"&vehicleDetail=";
 			window.open(link);
         });
+
+        $('#btnMiles').click(function(){
+        	var targetId = $(this).parent().children().first().val();
+        	var link = "${pageContext.request.contextPath}/actionbean/VehicleMiles.action?vid="+targetId;
+        	window.location = link;			
+       	});
     });
     </script>
 	<style type="text/css">
@@ -295,7 +301,9 @@
 										<ss:secure roles="vehicle_profile_edit">
 											<stripes:submit id="btnDeleteVehicle" name="deleteVehicle" value="删除"/>
 										</ss:secure>
-										
+										<ss:secure roles="vehicle_mile_view">
+											<button id="btnMiles">公里数</button>
+										</ss:secure>
 										<stripes:submit id="btnVehicleDetail" name="VehicleDetail" value="详细资料"/>
 								</stripes:form>
 							</td>

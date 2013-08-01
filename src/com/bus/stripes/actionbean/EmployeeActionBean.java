@@ -201,9 +201,13 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 	@HandlesEvent(value = "create")
 	@Secure(roles=Roles.EMPLOYEE_EDIT)
 	public Resolution create() {
-		employee.setAccount(context.getUser());
-		bean.saveEmployee(employee);
-        return new StreamingResolution("text;charset=utf-8", new StringReader("新建档案成功"));
+		try{
+			employee.setAccount(context.getUser());
+			bean.saveEmployee(employee);
+			return new StreamingResolution("text;charset=utf-8", new StringReader("新建档案成功"));
+		}catch(Exception e){
+			return context.errorResolutionAjax("出错啦。", "错误报告:" + e.getMessage());
+		}
     }
 	
 	@HandlesEvent(value="delete")

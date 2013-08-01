@@ -51,6 +51,24 @@ $(document).ready(function(){
     
 	$('#fileTabs').tabs();
 
+	$('.delVC').click(function(){
+		var id = $(this).closest("tr").children().first().children().first().next().val();
+		var del = confirm("真的要删除ID:"+id+"?");
+		var formurl =  "${pageContext.request.contextPath}/actionbean/VehicleProfile.action?checkId="+id+"&deleteVechileCheck=";
+		if(!del)
+			return;
+		$.ajax({
+			url:formurl,
+			type:"post",
+			dataType:'text',
+			success:function(response){
+				location.reload();
+			},
+			error:function(response){
+				alert("errors");
+			}
+		});
+	});
 });
 
 function clearFormTextBox(form){
@@ -264,37 +282,350 @@ label.tabSubTitle{
 <!-- 	use for status comparison -->
 	<div id="fileTabs">
 		<ul>
-				<li><a href="#fileTabs-1">合同附件</a></li>
-				<li><a href="#fileTabs-2">证件附件</a></li>
+				<li><a href="#fileTabs-1">一保&二保</a></li>
+				<li><a href="#fileTabs-2">维修记录</a></li>
+				<li><a href="#fileTabs-3">综合检测</a></li>
+				<li><a href="#fileTabs-4">年审</a></li>
+				<li><a href="#fileTabs-5">附加证件</a></li>
 		</ul>
 		<div id="fileTabs-1">
-			<label class="tabSubTitle">合同附件</label><br/>
+			<label class="tabSubTitle">一保&二保</label><br/>
 			<br/>
-			<table class="normal">
-				<tr>
-					<td>Id</td>
-					<td>开始日期</td>
-					<td>结束日期</td>
-					<td>图片连接</td>
-					<td>图片</td>
-				</tr>
-			
-			</table>
-		</div>
-		
-		<div id="fileTabs-2">
-			<label class="tabSubTitle">证件附件</label><br/>
+			<div>
+				<ss:secure roles="vehicle_file_maintenance">
+				<stripes:form beanclass="com.bus.stripes.actionbean.vehicle.VehicleProfileActionBean">
+				<input type="hidden" name="returnLink" value="${returnLink}"/>
+				<input type="hidden" name="targetId" value="${actionBean.profile.id}"/>
+					<table class="normalAdd">
+						<tr>
+							<td>类型</td>
+							<td>间隔公里数</td>
+							<td>日期</td>
+							<td>注释</td>
+							<td>文件</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><stripes:select name="check.ctype"><stripes:option value="一保">一保</stripes:option><stripes:option value="二保">二保</stripes:option></stripes:select></td>
+							<td><stripes:text name="check.miles"/></td>
+							<td><stripes:text name="check.cdate" formatPattern="yyyy-MM-dd" class="required datepickerClass"/></td>
+							<td><stripes:text name="check.remark"/></td>
+							<td><stripes:file name="checkFile" /></td>
+							<td><stripes:submit name="addVehicleCheck" value="添加"/></td>
+						</tr>
+					</table>
+				</stripes:form>
+				</ss:secure>
+			</div>
+			<br/>
 			<br/>
 			<table class="normal">
 				<tr>
 					<td>Id</td>
 					<td>类型</td>
-					<td>号码</td>
-					<td>有效日期</td>
-					<td>图片连接</td>
-					<td>图片</td>
+					<td>间隔公里数</td>
+					<td>日期</td>
+					<td>文件</td>
+					<td>注释</td>
+					<td></td>
 				</tr>
-				
+				<c:forEach items="${actionBean.maintenances}" var="maint" varStatus="loop">
+				<stripes:form beanclass="com.bus.stripes.actionbean.vehicle.VehicleProfileActionBean">
+					<tr>
+						<td>${maint.id}
+							<input type="hidden" name="returnLink" value="${returnLink}"/>
+							<input type="hidden" name="checkId" value="${maint.id}"/>
+						</td>
+						<td>${maint.ctype}</td>
+						<td>${maint.miles}</td>
+						<td>${maint.cdateStr}</td>
+						<td>
+							<a target="_blank" href="${actionBean.context.hrhostidfile}车辆/${maint.ctype}/${maint.image.filename}">查看</a>
+							<stripes:file name="checkFile"/>
+						</td>
+						<td>${maint.remark}</td>
+						<td>
+							<ss:secure roles="vehicle_file_maintenance">
+								<stripes:submit name="updateVehicleCheck" value="更新"/>
+								<a class="delVC" href="javascript:void;">删除</a>
+							</ss:secure>
+						</td>
+					</tr>
+				</stripes:form>
+				</c:forEach>
+			</table>
+		</div>
+		
+		<div id="fileTabs-2">
+			<label class="tabSubTitle">维修记录</label><br/>
+			<br/>
+			<div>
+				<ss:secure roles="vehicle_file_repair">
+				<stripes:form beanclass="com.bus.stripes.actionbean.vehicle.VehicleProfileActionBean">
+				<input type="hidden" name="returnLink" value="${returnLink}"/>
+				<input type="hidden" name="targetId" value="${actionBean.profile.id}"/>
+					<table class="normalAdd">
+						<tr>
+							<td>类型</td>
+							<td>间隔公里数</td>
+							<td>日期</td>
+							<td>注释</td>
+							<td>文件</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><stripes:select name="check.ctype"><stripes:option value="小修">小修</stripes:option><stripes:option value="大修">大修</stripes:option><stripes:option value="中修">中修</stripes:option></stripes:select></td>
+							<td><stripes:text name="check.miles"/></td>
+							<td><stripes:text name="check.cdate" formatPattern="yyyy-MM-dd" class="required datepickerClass"/></td>
+							<td><stripes:text name="check.remark"/></td>
+							<td><stripes:file name="checkFile" /></td>
+							<td><stripes:submit name="addVehicleCheck" value="添加"/></td>
+						</tr>
+					</table>
+				</stripes:form>
+				</ss:secure>
+			</div>
+			<br/>
+			<br/>
+			<table class="normal">
+				<tr>
+					<td>Id</td>
+					<td>类型</td>
+					<td>间隔公里数</td>
+					<td>日期</td>
+					<td>文件</td>
+					<td>注释</td>
+					<td></td>
+				</tr>
+				<c:forEach items="${actionBean.repairs}" var="rep" varStatus="loop">
+				<stripes:form beanclass="com.bus.stripes.actionbean.vehicle.VehicleProfileActionBean">
+					<tr>
+						<td>${rep.id}
+							<input type="hidden" name="returnLink" value="${returnLink}"/>
+							<input type="hidden" name="checkId" value="${rep.id}"/>
+						</td>
+						<td>${rep.ctype}</td>
+						<td>${rep.miles}</td>
+						<td>${rep.cdateStr}</td>
+						<td>
+							<a target="_blank" href="${actionBean.context.hrhostidfile}车辆/${rep.ctype}/${rep.image.filename}">查看</a>
+							<stripes:file name="checkFile"/>
+						</td>
+						<td>${rep.remark}</td>
+						<td>
+							<ss:secure roles="vehicle_file_repair">
+								<stripes:submit name="updateVehicleCheck" value="更新"/>
+								<a class="delVC" href="javascript:void;">删除</a>
+							</ss:secure>
+						</td>
+					</tr>
+				</stripes:form>
+				</c:forEach>
+			</table>
+		</div>
+		
+		<div id="fileTabs-3">
+			<label class="tabSubTitle">综合检测</label><br/>
+			<br/>
+			<div>
+				<ss:secure roles="vehicle_file_fullcheck">
+				<stripes:form beanclass="com.bus.stripes.actionbean.vehicle.VehicleProfileActionBean">
+				<input type="hidden" name="returnLink" value="${returnLink}"/>
+				<input type="hidden" name="targetId" value="${actionBean.profile.id}"/>
+					<table class="normalAdd">
+						<tr>
+							<td>类型</td>
+							<td>间隔公里数</td>
+							<td>日期</td>
+							<td>注释</td>
+							<td>文件</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><stripes:text name="check.ctype" value="综合" readonly="readonly"/></td>
+							<td><stripes:text name="check.miles"/></td>
+							<td><stripes:text name="check.cdate" formatPattern="yyyy-MM-dd" class="required datepickerClass"/></td>
+							<td><stripes:text name="check.remark"/></td>
+							<td><stripes:file name="checkFile" /></td>
+							<td><stripes:submit name="addVehicleCheck" value="添加"/></td>
+						</tr>
+					</table>
+				</stripes:form>
+				</ss:secure>
+			</div>
+			<br/>
+			<br/>
+			<table class="normal">
+				<tr>
+					<td>Id</td>
+					<td>类型</td>
+					<td>间隔公里数</td>
+					<td>日期</td>
+					<td>文件</td>
+					<td>注释</td>
+					<td></td>
+				</tr>
+				<c:forEach items="${actionBean.fullchecks}" var="rep" varStatus="loop">
+				<stripes:form beanclass="com.bus.stripes.actionbean.vehicle.VehicleProfileActionBean">
+					<tr>
+						<td>${rep.id}
+							<input type="hidden" name="returnLink" value="${returnLink}"/>
+							<input type="hidden" name="checkId" value="${rep.id}"/>
+						</td>
+						<td>${rep.ctype}</td>
+						<td>${rep.miles}</td>
+						<td>${rep.cdateStr}</td>
+						<td>
+							<a target="_blank" href="${actionBean.context.hrhostidfile}车辆/${rep.ctype}/${rep.image.filename}">查看</a>
+							<stripes:file name="checkFile"/>
+						</td>
+						<td>${rep.remark}</td>
+						<td>
+							<ss:secure roles="vehicle_file_fullcheck">
+								<stripes:submit name="updateVehicleCheck" value="更新"/>
+								<a class="delVC" href="javascript:void;">删除</a>
+							</ss:secure>
+						</td>
+					</tr>
+				</stripes:form>
+				</c:forEach>
+			</table>
+		</div>
+		
+		<div id="fileTabs-4">
+			<label class="tabSubTitle">年审</label><br/>
+			<br/>
+			<div>
+				<ss:secure roles="vehicle_file_annul">
+				<stripes:form beanclass="com.bus.stripes.actionbean.vehicle.VehicleProfileActionBean">
+				<input type="hidden" name="returnLink" value="${returnLink}"/>
+				<input type="hidden" name="targetId" value="${actionBean.profile.id}"/>
+					<table class="normalAdd">
+						<tr>
+							<td>类型</td>
+							<td>间隔公里数</td>
+							<td>日期</td>
+							<td>注释</td>
+							<td>文件</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><stripes:text name="check.ctype" value="年审" readonly="readonly"/></td>
+							<td><stripes:text name="check.miles"/></td>
+							<td><stripes:text name="check.cdate" formatPattern="yyyy-MM-dd" class="required datepickerClass"/></td>
+							<td><stripes:text name="check.remark"/></td>
+							<td><stripes:file name="checkFile" /></td>
+							<td><stripes:submit name="addVehicleCheck" value="添加"/></td>
+						</tr>
+					</table>
+				</stripes:form>
+				</ss:secure>
+			</div>
+			<br/>
+			<br/>
+			<table class="normal">
+				<tr>
+					<td>Id</td>
+					<td>类型</td>
+					<td>间隔公里数</td>
+					<td>日期</td>
+					<td>文件</td>
+					<td>注释</td>
+					<td></td>
+				</tr>
+				<c:forEach items="${actionBean.annul}" var="rep" varStatus="loop">
+				<stripes:form beanclass="com.bus.stripes.actionbean.vehicle.VehicleProfileActionBean">
+					<tr>
+						<td>${rep.id}
+							<input type="hidden" name="returnLink" value="${returnLink}"/>
+							<input type="hidden" name="checkId" value="${rep.id}"/>
+						</td>
+						<td>${rep.ctype}</td>
+						<td>${rep.miles}</td>
+						<td>${rep.cdateStr}</td>
+						<td>
+							<a target="_blank" href="${actionBean.context.hrhostidfile}车辆/${rep.ctype}/${rep.image.filename}">查看</a>
+							<stripes:file name="checkFile"/>
+						</td>
+						<td>${rep.remark}</td>
+						<td>
+							<ss:secure roles="vehicle_file_annul">
+								<stripes:submit name="updateVehicleCheck" value="更新"/>
+								<a class="delVC" href="javascript:void;">删除</a>
+							</ss:secure>
+						</td>
+					</tr>
+				</stripes:form>
+				</c:forEach>
+			</table>
+		</div>
+		
+		<div id="fileTabs-5">
+			<label class="tabSubTitle">附加证件</label><br/>
+			<br/>
+			<div>
+				<ss:secure roles="vehicle_file_extras">
+				<stripes:form beanclass="com.bus.stripes.actionbean.vehicle.VehicleProfileActionBean">
+				<input type="hidden" name="returnLink" value="${returnLink}"/>
+				<input type="hidden" name="targetId" value="${actionBean.profile.id}"/>
+					<table class="normalAdd">
+						<tr>
+							<td>类型</td>
+							<td>间隔公里数</td>
+							<td>日期</td>
+							<td>注释</td>
+							<td>文件</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><stripes:text name="check.ctype" value="附件" readonly="readonly"/></td>
+							<td><stripes:text name="check.miles"/></td>
+							<td><stripes:text name="check.cdate" formatPattern="yyyy-MM-dd" class="required datepickerClass"/></td>
+							<td><stripes:text name="check.remark"/></td>
+							<td><stripes:file name="checkFile" /></td>
+							<td><stripes:submit name="addVehicleCheck" value="添加"/></td>
+						</tr>
+					</table>
+				</stripes:form>
+				</ss:secure>
+			</div>
+			<br/>
+			<br/>
+			<table class="normal">
+				<tr>
+					<td>Id</td>
+					<td>类型</td>
+					<td>间隔公里数</td>
+					<td>日期</td>
+					<td>文件</td>
+					<td>注释</td>
+					<td></td>
+				</tr>
+				<c:forEach items="${actionBean.extras}" var="rep" varStatus="loop">
+				<stripes:form beanclass="com.bus.stripes.actionbean.vehicle.VehicleProfileActionBean">
+					<tr>
+						<td>${rep.id}
+							<input type="hidden" name="returnLink" value="${returnLink}"/>
+							<input type="hidden" class="check_id" name="checkId" value="${rep.id}"/>
+						</td>
+						<td>${rep.ctype}</td>
+						<td>${rep.miles}</td>
+						<td>${rep.cdateStr}</td>
+						<td>
+							<a target="_blank" href="${actionBean.context.hrhostidfile}车辆/${rep.ctype}/${rep.image.filename}">查看</a>
+							<stripes:file name="checkFile"/>
+						</td>
+						<td>${rep.remark}</td>
+						<td>
+							<ss:secure roles="vehicle_file_extras">
+								<stripes:submit name="updateVehicleCheck" value="更新"/>
+								&nbsp;&nbsp;
+								<a class="delVC" href="javascript:void;">删除</a>
+							</ss:secure>
+						</td>
+					</tr>
+				</stripes:form>
+				</c:forEach>
 			</table>
 		</div>
 	</div>

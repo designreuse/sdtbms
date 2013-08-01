@@ -13,7 +13,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import com.bus.dto.Account;
+import com.bus.util.HRUtil;
 
 @Entity
 @XmlRootElement
@@ -30,7 +34,7 @@ public class VehicleCheck implements Serializable{
 	private VehicleProfile vehicle;
 	
 	@Column(name="ctype")
-	private Integer ctype;
+	private String ctype;
 	
 	@Column(name="miles")
 	private Float miles;
@@ -38,9 +42,16 @@ public class VehicleCheck implements Serializable{
 	@Column(name="cdate")
 	private Date cdate;
 	
-	@Column(name="filename")
-	private String filename;
+	@Column(name="remark")
+	private String remark;
 	
+	@OneToOne
+	@JoinColumn(name="fid")
+	private VehicleFiles image;
+	
+	@ManyToOne
+	@JoinColumn(name="creator")
+	private Account creator;
 	
 	public Integer getId() {
 		return id;
@@ -54,10 +65,10 @@ public class VehicleCheck implements Serializable{
 	public void setVehicle(VehicleProfile vehicle) {
 		this.vehicle = vehicle;
 	}
-	public Integer getCtype() {
+	public String getCtype() {
 		return ctype;
 	}
-	public void setCtype(Integer ctype) {
+	public void setCtype(String ctype) {
 		this.ctype = ctype;
 	}
 	public Float getMiles() {
@@ -72,12 +83,29 @@ public class VehicleCheck implements Serializable{
 	public void setCdate(Date cdate) {
 		this.cdate = cdate;
 	}
-	public String getFilename() {
-		return filename;
+	public VehicleFiles getImage() {
+		return image;
 	}
-	public void setFilename(String filename) {
-		this.filename = filename;
+	public void setImage(VehicleFiles image) {
+		this.image = image;
+	}
+	public Account getCreator() {
+		return creator;
+	}
+	public void setCreator(Account creator) {
+		this.creator = creator;
+	}
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
 	}
 	
-	
+	@Transient
+	public String getCdateStr(){
+		if(cdate == null)
+			return "";
+		return HRUtil.parseDateToString(cdate);
+	}
 }
