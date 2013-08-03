@@ -9,6 +9,9 @@
     
     <script type="text/javascript">
     $(document).ready(function(){
+    	buildBasicDatePickDialog("date_select_dialog",200,150);
+    	callAjaxForEditWithDatePicker("btnThrow");
+        
     	$("#btn_new_vehicle_link").click(function() {
     		$('#btn_new_vehicle_dialog').dialog('open');
 			return true;
@@ -53,15 +56,15 @@
     		}
     	});
 
-    	$('#vehicleListFunctionForm').submit(function(){
+    	$('.vehicleListFunctionForm').submit(function(){
 			return false;
         });
 
-        $('#btnDeleteVehicle').click(function(){
+        $('.btnDeleteVehicle').click(function(){
         		var deleteV = confirm("确定删除车辆资料？");
         		if(deleteV){
-            		var link = $('#vehicleListFunctionForm').attr("action");
-            		var params = $('#vehicleListFunctionForm').serialize() + "&deleteVehicle=";
+            		var link = $(this).parent().attr("action");
+            		var params = $(this).parent().serialize() + "&deleteVehicle=";
         			$.ajax({
 						url:link,
 						type:"post",
@@ -78,13 +81,13 @@
         		}
         });
 
-        $('#btnVehicleDetail').click(function(){
+        $('.btnVehicleDetail').click(function(){
 			var targetId = $(this).parent().children().first().val();
 			var link = "${pageContext.request.contextPath}/actionbean/VehicleProfile.action?targetId="+targetId+"&vehicleDetail=";
 			window.open(link);
         });
 
-        $('#btnMiles').click(function(){
+        $('.btnMiles').click(function(){
         	var targetId = $(this).parent().children().first().val();
         	var link = "${pageContext.request.contextPath}/actionbean/VehicleMiles.action?vid="+targetId;
         	window.location = link;			
@@ -110,6 +113,9 @@
 		}
 		table.vehiclelist tbody td{
 			text-align:center;
+		}
+		tr.expired{
+			background-color:red;
 		}
 	</style>
 		<div id="sub-nav"><div class="page-title">
@@ -176,6 +182,10 @@
 						<tr>
 							<td>车辆类型:</td><td><stripes:text  class="required" name="profile.vtype"/></td>
 							<td>评定等级:</td><td><stripes:text  class="required" name="profile.vlevel"/></td>
+						</tr>
+						<tr>
+							<td>购置凭证税号:</td><td><stripes:text  class="required" name="profile.ptaxnumber"/></td>
+							<td>强制报废日期:</td><td><stripes:text  name="profile.dateinvalidate" formatPattern="yyyy-MM-dd" class="required datepickerClass"/></td>
 						</tr>
 						<tr>
 							<td class="subtitle" colspan=4>车辆参数配置<hr/></td>
@@ -250,6 +260,11 @@
 				
 				<!--  Display Vehicle List   -->
 				<div>
+					<ss:secure roles="administrator_system">
+						<stripes:form beanclass="com.bus.stripes.actionbean.vehicle.VehicleProfileActionBean">
+							车辆档案详细资料导入:<stripes:file name="detailFile"/><stripes:submit name="vehicleDetailFileUpload"/>	
+						</stripes:form>
+					</ss:secure>
 					<div class="inner-page-title">
 						车辆档案信息
 					</div>
@@ -267,6 +282,15 @@
 							</td>
 						</tr>
 						<tr>
+							<td colspan=13 style="text-align:left;">
+								车牌号:<stripes:text name="selector.vid"/>
+								<br/><br/>
+								显示报废:<stripes:radio name="selector.throwed" value="1"/>是<stripes:radio name="selector.throwed" value="0"/>否
+								<br/>
+								报废日期:(从)<stripes:text name="selector.expire1"  formatPattern="yyyy-MM-dd" class="datepickerClass"/>---(到)<stripes:text name="selector.expire2"  formatPattern="yyyy-MM-dd" class="datepickerClass"/>
+							</td>
+						</tr>
+						<tr>
 							<td colspan=11 style="text-align:left">
 								<stripes:submit name="filter" value="提交"/>
 							</td>
@@ -278,6 +302,8 @@
 						<th>车牌号</th>
 						<th>购进日期</th>
 						<th>运行日期</th>
+						<th>报废日期</th>
+						<th>强制报废</th>
 						<th>使用性质</th>
 						<th>总行驶里程</th>
 						<th>当前驾驶员</th>
@@ -286,25 +312,29 @@
 					<tbody>
 					
 					<c:set var="color" value="0" scope="page"/>
+					<c:set var="statusE" value="E" scope="page"/>
 					<c:forEach items="${actionBean.profiles}" var="veh" varStatus="loop">
 						<c:choose>
-							<c:when test="${color%2 == 0}">
-								<tr>
+							<c:when test="${veh.status == statusE}">
+								<tr class="expired">
 							</c:when>
 							<c:otherwise>
 								<tr class="alt">
 							</c:otherwise>
 						</c:choose>
 							<td>
-								<stripes:form id="vehicleListFunctionForm" beanclass="com.bus.stripes.actionbean.vehicle.VehicleProfileActionBean">
+								<stripes:form class="vehicleListFunctionForm" beanclass="com.bus.stripes.actionbean.vehicle.VehicleProfileActionBean">
 										<input type="hidden" name="targetId" value="${veh.id}"/>
 										<ss:secure roles="vehicle_profile_edit">
-											<stripes:submit id="btnDeleteVehicle" name="deleteVehicle" value="删除"/>
+											<stripes:submit class="btnDeleteVehicle" name="deleteVehicle" value="删除"/>
+											<c:if test="${veh.status != statusE}">
+												<button class="btnThrow">报废</button><input type="hidden" value="${pageContext.request.contextPath}/actionbean/VehicleProfile.action?vid=${veh.id}&throwVehicle="/>
+											</c:if>
 										</ss:secure>
 										<ss:secure roles="vehicle_mile_view">
-											<button id="btnMiles">公里数</button>
+											<button class="btnMiles">公里数</button>
 										</ss:secure>
-										<stripes:submit id="btnVehicleDetail" name="VehicleDetail" value="详细资料"/>
+										<stripes:submit class="btnVehicleDetail" name="VehicleDetail" value="详细资料"/>
 								</stripes:form>
 							</td>
 							<td>
@@ -313,6 +343,8 @@
 							<td>${veh.vid}</td>
 							<td>${veh.datepurchaseStr}</td>
 							<td>${veh.dateuseStr}</td>
+							<td>${veh.throwdateStr}</td>
+							<td>${veh.dateinvalidateStr}</td>
 							<td>${veh.servicetype}</td>
 							<td>${veh.totalmiles}</td>
 							<td>${veh.driverStr}</td>
@@ -329,6 +361,10 @@
 				<!-- End of main content -->
 			</div>
 			<div class="clear"></div>
+			<div id="date_select_dialog" title="选择日期">
+				<label>日期:</label><input type="text" id="date_select_box" class="datepickerClass"/>
+				<input type="hidden" id="opener" value=""/>
+			</div>
 		</div>
 	</div>
     </stripes:layout-component>

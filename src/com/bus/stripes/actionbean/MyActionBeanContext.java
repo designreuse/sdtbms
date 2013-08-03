@@ -51,7 +51,7 @@ public class MyActionBeanContext extends ActionBeanContext {
     }
     
     public Resolution errorResolutionAjax(String error,String detail){
-    	return new StreamingResolution("text;charset=utf-8;",error+"-"+detail);
+    	return new StreamingResolution("text/charset=utf-8;",error+"-"+detail);
     }
     
     public String getFullURL() {

@@ -44,6 +44,8 @@ public class VehicleProfile implements Serializable{
 	private Date dateuse;
 	@Column(name="ptaxnumber")
 	private String ptaxnumber;
+	@Column(name="transportid")
+	private String transportid;
 	@Column(name="source")
 	private String source;
 	@Column(name="servicetype")
@@ -144,11 +146,22 @@ public class VehicleProfile implements Serializable{
 	@Column(name="ecotype")
 	private String ecotype;
 	
+	@Column(name="status")
+	private String status;
+	
+	@Column(name="throwdate")
+	private Date throwdate;
+	
+	@Column(name="dateinvalidate")
+	private Date dateinvalidate;
+	
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "vehicle")
 	private List<VehicleMiles> miles;
 	
 	@Transient
 	private List<Employee> drivers;
+	
+	
 	
 	public String getEcotype() {
 		return ecotype;
@@ -448,6 +461,18 @@ public class VehicleProfile implements Serializable{
 	}
 	
 	
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public Date getThrowdate() {
+		return throwdate;
+	}
+	public void setThrowdate(Date throwdate) {
+		this.throwdate = throwdate;
+	}
 	@Transient
 	public String getDatepurchaseStr() {
 		if(datepurchase == null)
@@ -482,5 +507,31 @@ public class VehicleProfile implements Serializable{
 			return "";
 		else
 			return "N.A.";
+	}
+	
+	@Transient
+	public String getThrowdateStr(){
+		if(throwdate == null)
+			return "";
+		return HRUtil.parseDateToString(throwdate);
+	}
+	public String getTransportid() {
+		return transportid;
+	}
+	public void setTransportid(String transportid) {
+		this.transportid = transportid;
+	}
+	public Date getDateinvalidate() {
+		return dateinvalidate;
+	}
+	public void setDateinvalidate(Date dateinvalidate) {
+		this.dateinvalidate = dateinvalidate;
+	}
+	
+	@Transient
+	public String getDateinvalidateStr(){
+		if(dateinvalidate == null)
+			return "";
+		return HRUtil.parseDateToString(dateinvalidate);
 	}
 }

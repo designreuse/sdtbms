@@ -39,11 +39,13 @@ public class HRUtil {
 
 	public static Date parseDate(String str, String strFormat) throws Exception{
 		try {
+			if(str.equals(""))
+				return null;
 			SimpleDateFormat sdf = new SimpleDateFormat(strFormat);
 			Date date = sdf.parse(str);
 			return date;
 		} catch (ParseException e) {
-			String[] formats = new String[]{"yyyy/MM/dd","yyyy-MM-dd","yyyy.MM.dd"};
+			String[] formats = new String[]{"yyyy/MM/dd","yyyy-MM-dd","yyyy.MM.dd","yyyy年MM月","yyyy年MM月dd日"};
 			for(int i=0; i<formats.length;i++){
 				try {
 					SimpleDateFormat sdf = new SimpleDateFormat(formats[i]);

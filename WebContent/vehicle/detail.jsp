@@ -196,6 +196,10 @@ label.tabSubTitle{
 							<td>评定等级:</td><td><stripes:text  class="required" name="profile.vlevel"/></td>
 						</tr>
 						<tr>
+							<td>购置凭证税号:</td><td><stripes:text  class="required" name="profile.ptaxnumber"/></td>
+							<td>强制报废日期:</td><td><stripes:text  name="profile.dateinvalidate" formatPattern="yyyy-MM-dd" class="required datepickerClass"/></td>
+						</tr>
+						<tr>
 							<td class="subtitle" colspan=4>车辆参数配置<hr/></td>
 						</tr>
 						<tr>
@@ -642,6 +646,5 @@ label.tabSubTitle{
 </div>
 
 <!-- extra dialogs -->
-
 </body>
 </html>

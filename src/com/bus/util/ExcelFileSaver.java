@@ -7,6 +7,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,19 +28,22 @@ import com.bus.dto.Employee;
 import com.bus.dto.Idmanagement;
 import com.bus.dto.Position;
 import com.bus.dto.Promoandtransfer;
+import com.bus.dto.vehicleprofile.VehicleProfile;
 import com.bus.services.HRBean;
+import com.bus.services.VehicleBean;
 
 public class ExcelFileSaver {
 	
 	private DataInputStream datais=null;
 	private BufferedReader bf=null;
-	private String strLine;
+	public String strLine = "";
 	private int index = 0;
 	
 	public ExcelFileSaver(FileInputStream fis){
 		try{
 			datais = new DataInputStream(fis);
 			bf = new BufferedReader(new InputStreamReader(datais));
+			strLine = "";
 			this.index = 0;
 		}catch (Exception e){//Catch exception if any
 			System.err.println("Error: " + e.getMessage());
@@ -47,6 +52,8 @@ public class ExcelFileSaver {
 	
 	public boolean hasNextLine(){
 		try {
+			if(strLine == null)
+				return false;
 			strLine = bf.readLine();
 			this.index++;
 			if(strLine == null){
@@ -573,5 +580,40 @@ public class ExcelFileSaver {
 			}
 		}
 		return str;
+	}
+
+	public String saveVehicleDetail(VehicleBean vBean, Account user) throws Exception{
+		String str="";
+		vBean.saveVehicleProfilesFromFile(this);
+		return str;
+	}
+	
+	public String getValueFromName(String str, String name){
+		int indexName = str.indexOf(name);
+		int indexStart = str.indexOf(",",indexName)+1;
+//		System.out.println("starting ****** "+indexStart +" FOR "+ name);
+		int indexEnd = str.indexOf(",",indexStart);
+		int indexIFConon = str.indexOf("\"",indexStart);
+		if(indexIFConon == indexStart){
+			indexEnd = str.indexOf("\"",indexIFConon+1);
+			indexStart += 1;
+		}
+		String value =str.substring(indexStart,indexEnd);
+//		System.out.println("ending ****** "+indexEnd +" Value "+ value + " indexIFConon :" +indexIFConon);
+
+		return value.trim();
+	}
+	
+	public String removeNoneNumber(String value) {
+		char c[] = value.toCharArray();
+		int index = value.length();
+		for(int i=0;i<c.length;i++){
+			if(!Character.isDigit(c[i])){
+				index = i;
+				break;
+			}
+		}
+		String v = value.substring(0,index);
+		return v;
 	}
 }

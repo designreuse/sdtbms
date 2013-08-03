@@ -1,6 +1,8 @@
 package com.bus.util;
 
 public interface Roles {
+	
+	public static final String ADMINISTRATOR = "administrator_system";
 
 	//For employee system
 	public static final String EMPLOYEE_SYSTEM = "employee_system";

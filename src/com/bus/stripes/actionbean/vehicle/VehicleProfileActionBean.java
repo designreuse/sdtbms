@@ -1,6 +1,7 @@
 package com.bus.stripes.actionbean.vehicle;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,6 +24,7 @@ import com.bus.dto.vehicleprofile.VehicleProfile;
 import com.bus.services.CustomActionBean;
 import com.bus.services.VehicleBean;
 import com.bus.stripes.selector.VehicleSelector;
+import com.bus.util.ExcelFileSaver;
 import com.bus.util.HRUtil;
 import com.bus.util.Roles;
 
@@ -43,6 +45,9 @@ public class VehicleProfileActionBean extends CustomActionBean{
 	private List<VehicleCheck> fullchecks;
 	private List<VehicleCheck> annul;
 	private List<VehicleCheck> extras;
+	
+	//file upload
+	private FileBean detailFile;
 	
 	private int pagenum;
 	private int lotsize;
@@ -118,11 +123,11 @@ public class VehicleProfileActionBean extends CustomActionBean{
 			if(targetId == null)
 				return new StreamingResolution("text/charset=UTF-8;","数据上传出错");
 			profile = vBean.getVehicleProfileById(Integer.parseInt(targetId));
-			maintenances = vBean.getVehicleCheckByTypeMaintennance();
-			repairs = vBean.getVehicleCheckByTypeRepaire();
-			fullchecks = vBean.getVehicleCheckByTypeFullCheck();
-			annul = vBean.getVehicleCheckByTypeAnnul();
-			extras = vBean.getVehicleCheckByTypeExtras();
+			maintenances = vBean.getVehicleCheckByTypeMaintennance(profile.getId());
+			repairs = vBean.getVehicleCheckByTypeRepaire(profile.getId());
+			fullchecks = vBean.getVehicleCheckByTypeFullCheck(profile.getId());
+			annul = vBean.getVehicleCheckByTypeAnnul(profile.getId());
+			extras = vBean.getVehicleCheckByTypeExtras(profile.getId());
 			return new ForwardResolution("/vehicle/detail.jsp");
 		}catch(Exception e){
 			return new StreamingResolution("text/charset=UTF-8;","数据获取出错."+e.getMessage());
@@ -229,6 +234,40 @@ public class VehicleProfileActionBean extends CustomActionBean{
 		}catch(Exception e){
 			return context.errorResolutionAjax("服务器删除出错", "遇到问题."+e.getMessage());
 		}
+	}
+	
+	@HandlesEvent(value="throwVehicle")
+	@Secure(roles = Roles.VEHICLE_PROFILE_EDIT)
+	public Resolution throwVehicle(){
+		try{
+			String vid = context.getRequest().getParameter("vid");
+			String dateval = context.getRequest().getParameter("dateval");
+			if(vid == null || dateval == null)
+				return context.errorResolutionAjax("没有提供ID或日期", "请确保vid&dateval已经发送");
+			Date dateVal = HRUtil.parseDate(dateval, "yyyy-MM-dd");
+			vBean.throwVehicle(vid, dateVal);
+			return new StreamingResolution("text/charset=utf-8;","完成报废");
+		}catch(Exception e){
+			e.printStackTrace();
+			return context.errorResolutionAjax("报废出错", "错误信息:"+e.getMessage());
+		}
+	}
+	
+	@HandlesEvent(value="vehicleDetailFileUpload")
+	@Secure(roles = Roles.ADMINISTRATOR)
+	public Resolution vehicleDetailFileUpload(){
+		try{
+			if(detailFile != null){
+				ExcelFileSaver saver = new ExcelFileSaver((FileInputStream)detailFile.getInputStream());
+				String result = saver.saveVehicleDetail(vBean,context.getUser());
+				if(!result.equals("")){
+					return  context.errorResolution("上传车辆档案出错", result);
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return defaultAction();
 	}
 	
 	@HandlesEvent(value="filter")
@@ -382,6 +421,14 @@ public class VehicleProfileActionBean extends CustomActionBean{
 
 	public void setExtras(List<VehicleCheck> extras) {
 		this.extras = extras;
+	}
+
+	public FileBean getDetailFile() {
+		return detailFile;
+	}
+
+	public void setDetailFile(FileBean detailFile) {
+		this.detailFile = detailFile;
 	}
 	
 
