@@ -262,7 +262,13 @@
 				<div>
 					<ss:secure roles="administrator_system">
 						<stripes:form beanclass="com.bus.stripes.actionbean.vehicle.VehicleProfileActionBean">
-							车辆档案详细资料导入:<stripes:file name="detailFile"/><stripes:submit name="vehicleDetailFileUpload"/>	
+							车辆档案详细资料导入:<stripes:file name="detailFile"/><stripes:submit name="vehicleDetailFileUpload"/>
+							<br/>
+							车辆保养维修日期导入:<stripes:file name="repairFile"/><stripes:submit name="vehicleRepaireDatesUpload"/>
+							<br/>
+							车队车队长导入：<stripes:file name="teamFile"/><stripes:submit name="vehicleTeamFileUpload"/>
+							<br/>
+							新车辆导入：<stripes:file name="newVehicleFile"/><stripes:submit name="vehicleNewFileUpload"/>
 						</stripes:form>
 					</ss:secure>
 					<div class="inner-page-title">
@@ -300,13 +306,13 @@
 						<th>操作</th>
 						<th>Id</th>
 						<th>车牌号</th>
-						<th>购进日期</th>
-						<th>运行日期</th>
+						<th>车队</th>
+						<th>号码</th>
+						<th>路线</th>
 						<th>报废日期</th>
 						<th>强制报废</th>
 						<th>使用性质</th>
 						<th>总行驶里程</th>
-						<th>当前驾驶员</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -341,13 +347,13 @@
 								${veh.id}
 							</td>
 							<td>${veh.vid}</td>
-							<td>${veh.datepurchaseStr}</td>
-							<td>${veh.dateuseStr}</td>
+							<td>${veh.team.team.name}</td>
+							<td>${veh.lane.lane.num}</td>
+							<td>${veh.lane.lane.detail}</td>
 							<td>${veh.throwdateStr}</td>
 							<td>${veh.dateinvalidateStr}</td>
 							<td>${veh.servicetype}</td>
 							<td>${veh.totalmiles}</td>
-							<td>${veh.driverStr}</td>
 						</tr>
 						<c:set var="color" value="${color + 1}" scope="page"/>
 					</c:forEach>

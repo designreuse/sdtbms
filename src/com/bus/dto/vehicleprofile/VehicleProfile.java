@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,6 +14,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -157,6 +159,18 @@ public class VehicleProfile implements Serializable{
 	
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "vehicle")
 	private List<VehicleMiles> miles;
+	
+	@OneToOne(fetch=FetchType.LAZY,mappedBy="vehicle",cascade = CascadeType.ALL)
+	private VehicleTeamMember team;
+	
+	@OneToOne(fetch=FetchType.LAZY,mappedBy="vehicle",cascade = CascadeType.ALL)
+	private VehicleLaneMapper lane;
+	
+	@Column(name="productioncode")
+	private String productioncode;
+	
+	@Column(name="selfid")
+	private String selfid;
 	
 	@Transient
 	private List<Employee> drivers;
@@ -472,6 +486,32 @@ public class VehicleProfile implements Serializable{
 	}
 	public void setThrowdate(Date throwdate) {
 		this.throwdate = throwdate;
+	}
+	public VehicleTeamMember getTeam() {
+		return team;
+	}
+	public void setTeam(VehicleTeamMember team) {
+		this.team = team;
+	}
+	
+	
+	public VehicleLaneMapper getLane() {
+		return lane;
+	}
+	public void setLane(VehicleLaneMapper lane) {
+		this.lane = lane;
+	}
+	public String getProductioncode() {
+		return productioncode;
+	}
+	public void setProductioncode(String productioncode) {
+		this.productioncode = productioncode;
+	}
+	public String getSelfid() {
+		return selfid;
+	}
+	public void setSelfid(String selfid) {
+		this.selfid = selfid;
 	}
 	@Transient
 	public String getDatepurchaseStr() {

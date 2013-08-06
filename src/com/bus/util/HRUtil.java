@@ -45,7 +45,7 @@ public class HRUtil {
 			Date date = sdf.parse(str);
 			return date;
 		} catch (ParseException e) {
-			String[] formats = new String[]{"yyyy/MM/dd","yyyy-MM-dd","yyyy.MM.dd","yyyy年MM月","yyyy年MM月dd日"};
+			String[] formats = new String[]{"yyyy/MM/dd","yyyy-MM-dd","yyyy.MM.dd","yyyy年MM月","yyyy年MM月dd日","yyyy.MM-dd","yyyy-MM.dd"};
 			for(int i=0; i<formats.length;i++){
 				try {
 					SimpleDateFormat sdf = new SimpleDateFormat(formats[i]);

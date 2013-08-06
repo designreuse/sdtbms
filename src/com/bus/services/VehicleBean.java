@@ -9,10 +9,13 @@ import java.util.Map;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bus.dto.Employee;
 import com.bus.dto.vehicleprofile.VehicleCheck;
 import com.bus.dto.vehicleprofile.VehicleFiles;
 import com.bus.dto.vehicleprofile.VehicleMiles;
 import com.bus.dto.vehicleprofile.VehicleProfile;
+import com.bus.dto.vehicleprofile.VehicleTeam;
+import com.bus.dto.vehicleprofile.VehicleTeamLeader;
 import com.bus.util.ExcelFileSaver;
 import com.bus.util.HRUtil;
 
@@ -340,10 +343,39 @@ public class VehicleBean extends EMBean {
 					.createQuery("SELECT q FROM VehicleProfile q WHERE vid=?")
 					.setParameter(1, vid).getSingleResult();
 		} catch (Exception e) {
+			System.out.println(e.getMessage());
 			return null;
 		}
 	}
+	
+	public VehicleProfile getVehicleProfileLikeVid(String vid, String selfId) {
+		try {
+			return (VehicleProfile) em
+					.createQuery("SELECT q FROM VehicleProfile q WHERE vid LIKE '%"+ vid+"%'")
+					.getSingleResult();
+		} catch (Exception e) {
+			try{
+				if(e.getMessage().trim().equals("result returns more than one elements")){
+					return (VehicleProfile) em
+							.createQuery("SELECT q FROM VehicleProfile q WHERE vid LIKE '%"+ vid+"%' AND vid LIKE '%"+ selfId+"%' ")
+							.getSingleResult();
+				}else{
+					System.out.println(e.getMessage());
+					return null;
+				}
+			}catch(Exception e2){
+				System.out.println(e2.getMessage());
+				return null;
+			}
+		}
+	}
 
+	/**
+	 * Save vehicle details from file See:ExcelFileSaver.java
+	 * @param saver
+	 * @return
+	 * @throws Exception
+	 */
 	@Transactional
 	public String saveVehicleProfilesFromFile(ExcelFileSaver saver)
 			throws Exception {
@@ -458,6 +490,405 @@ public class VehicleBean extends EMBean {
 						System.out.println(vp.getVid() + " Already exists.");
 					}
 				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			em.getTransaction().rollback(); // to terminate transactions;
+		}
+		return str;
+	}
+
+	/**
+	 * Save vehicle repair records from file See:ExcelFileSaver.java
+	 * @param excelFileSaver
+	 * @return
+	 */
+	@Transactional
+	public String saveVehicleRepaireDatesFromFile(ExcelFileSaver saver) throws Exception{
+		String str = "";
+		int cast = 0;
+		//Get year at first line
+		saver.hasNextLine();
+		String yearString = saver.strLine; 
+		try {
+			while (saver.hasNextLine()) {
+				if (saver.strLine.contains("车牌号码")) {
+					List<String> profile = new ArrayList<String>();
+					String vidStr = saver.strLine;
+					while (saver.hasNextLine()
+							&& !saver.strLine.contains("填表人")) {
+						profile.add(saver.strLine);
+					}
+					String vid = saver.removeNoneNumber(vidStr.split(",")[1]);
+					String selfId = saver.getValueFromName(vidStr, "自编号");
+					VehicleProfile vp = this.getVehicleProfileLikeVid(vid,selfId);
+					if(vp == null){
+						str += "NH - VID:"+vid +".<br/>";
+//						throw new Exception("No vehicle found for vid:"+vid);
+						continue;
+					}
+					VehicleMiles  vm = this.getVehicleMilesByVidAndYear(vp.getId(),Integer.parseInt(yearString));
+					if(vm == null){
+						vm = new VehicleMiles();
+						vm.setVehicle(vp);
+						vm.setVyear(Integer.parseInt(yearString));
+					}
+					if(profile.size() < 15){
+						str += "EINFO - VID:" + vid+"<br/>";
+//						throw new Exception("Not enough vehicle info ("+profile.size()+") for vid:"+vid);
+						continue;
+					}
+					for(int i=2;i<14;i++){
+						String line = profile.get(i);
+						String lineArr[] = line.split(",",-1);
+						if(lineArr.length < 9){
+							str += "ELINFO - VID:"+vid + " Line " + i + " length too short "+lineArr.length+". ["+line+"]<br/>";
+//							throw new Exception("ELINFO - VID:"+vid + " Line " + i + " length too short.<br/>");
+							continue;
+						}
+						String monthIndex = lineArr[0];
+						String drivers = lineArr[1];
+						String miles = lineArr[2];
+						String firstMaint = lineArr[3];
+						String secMaint = lineArr[4];
+						String check = lineArr[5]; 
+						String annul = lineArr[6];
+						String midRepaire = lineArr[7];
+						String bigRepaire = lineArr[8];
+						Integer month = Integer.parseInt(monthIndex);
+						
+						
+						//Set miles
+						float mile = 0;
+						if(miles != null && !miles.trim().equals(""))
+							mile = Float.parseFloat(miles);
+						switch(month){
+						case 1:
+							vm.setJan(mile);
+							break;
+						case 2:
+							vm.setFeb(mile);
+							break;
+						case 3:
+							vm.setMar(mile);
+							break;
+						case 4:
+							vm.setApr(mile);
+							break;
+						case 5:
+							vm.setMay(mile);
+							break;
+						case 6:
+							vm.setJun(mile);
+							break;
+						case 7:
+							vm.setJul(mile);
+							break;
+						case 8:
+							vm.setAug(mile);
+							break;
+						case 9:
+							vm.setSep(mile);
+							break;
+						case 10:
+							vm.setOcto(mile);
+							break;
+						case 11:
+							vm.setNov(mile);
+							break;
+						case 12:
+							vm.setDece(mile);
+							break;
+						default:
+							str += "EMINFO - VID:"+vid+ " month index:"+month+ " has error.<br/>";
+							throw new Exception("EMINFO - VID:"+vid+ " month index:"+month+ " has error.<br/>");
+						}
+						
+						//Check maintenance
+						if(firstMaint != null && !firstMaint.equals("")){
+							String dates[] = firstMaint.split(" ");
+							for(String date:dates){
+								Date tempD = HRUtil.parseDate(date, "yyy-MM-dd");
+								VehicleCheck tempVC = new VehicleCheck();
+								tempVC.setVehicle(vp);
+								tempVC.setCdate(tempD);
+								tempVC.setCtype(VehicleCheck.ctypes[0]);
+								em.persist(tempVC);
+							}
+						}
+						
+						//Check 2nd maintenance
+						if(secMaint != null && !secMaint.trim().equals("")){
+							String dates[] = secMaint.split(" ");
+							for(String date:dates){
+								Date tempD = HRUtil.parseDate(date, "yyy-MM-dd");
+								VehicleCheck tempVC = new VehicleCheck();
+								tempVC.setVehicle(vp);
+								tempVC.setCdate(tempD);
+								tempVC.setCtype(VehicleCheck.ctypes[1]);
+								em.persist(tempVC);
+							}
+						}
+						
+						//Check 2nd maintenance
+						if(secMaint != null && !secMaint.trim().equals("")){
+							String dates[] = secMaint.split(" ");
+							for(String date:dates){
+								Date tempD = HRUtil.parseDate(date, "yyy-MM-dd");
+								VehicleCheck tempVC = new VehicleCheck();
+								tempVC.setVehicle(vp);
+								tempVC.setCdate(tempD);
+								tempVC.setCtype(VehicleCheck.ctypes[1]);
+								em.persist(tempVC);
+							}
+						}
+						
+						//Check mid repair
+						if(midRepaire != null && !midRepaire.trim().equals("")){
+							String dates[] = midRepaire.split(" ");
+							for(String date:dates){
+								Date tempD = HRUtil.parseDate(date, "yyy-MM-dd");
+								VehicleCheck tempVC = new VehicleCheck();
+								tempVC.setVehicle(vp);
+								tempVC.setCdate(tempD);
+								tempVC.setCtype(VehicleCheck.ctypes[3]);
+								em.persist(tempVC);
+							}
+						}
+						
+						//Check big repair
+						if(bigRepaire != null && !bigRepaire.trim().equals("")){
+							String dates[] = bigRepaire.split(" ");
+							for(String date:dates){
+								Date tempD = HRUtil.parseDate(date, "yyy-MM-dd");
+								VehicleCheck tempVC = new VehicleCheck();
+								tempVC.setVehicle(vp);
+								tempVC.setCdate(tempD);
+								tempVC.setCtype(VehicleCheck.ctypes[4]);
+								em.persist(tempVC);
+							}
+						}
+						
+						//Check full repair
+						if(check != null && !check.trim().equals("")){
+							String dates[] = check.split(" ");
+							for(String date:dates){
+								Date tempD = HRUtil.parseDate(date, "yyy-MM-dd");
+								VehicleCheck tempVC = new VehicleCheck();
+								tempVC.setVehicle(vp);
+								tempVC.setCdate(tempD);
+								tempVC.setCtype(VehicleCheck.ctypes[5]);
+								em.persist(tempVC);
+							}
+						}
+						
+						//Check annul
+						if(annul != null && !annul.trim().equals("")){
+							Date tempD = HRUtil.parseDate(annul, "yyy-MM-dd");
+							VehicleCheck tempVC = new VehicleCheck();
+							tempVC.setVehicle(vp);
+							tempVC.setCdate(tempD);
+							tempVC.setCtype(VehicleCheck.ctypes[6]);
+							em.persist(tempVC);
+						}
+					}
+					
+					if(vm.getId() == null){
+						vm.calculate();
+						em.persist(vm);
+					}
+					else
+						em.merge(vm);
+					
+					cast ++;
+					System.out.println("##############CAST :" + (++cast) + " "
+							+ vp.getVid());
+				}
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			em.getTransaction().rollback(); // to terminate transactions;
+		}
+		return str;
+	}
+
+	/**
+	 * 
+	 * @param id
+	 * @param parseInt
+	 * @return
+	 */
+	public VehicleMiles getVehicleMilesByVidAndYear(Integer id, int year) {
+		try{
+			VehicleMiles vm = (VehicleMiles) em.createQuery("SELECT q FROM VehicleMiles q WHERE vid=? AND vyear=?")
+					.setParameter(1, id).setParameter(2,year).getSingleResult();
+			return vm;
+		}catch(Exception e){
+			System.out.println(e.getMessage());
+			return null;
+		}
+	}
+
+	/**
+	 * Save team name and leader
+	 * @param saver
+	 * @return
+	 * @throws Exception
+	 */
+	@Transactional
+	public String saveTeamNameAndLeaderFromFile(ExcelFileSaver saver) throws Exception{
+		String str = "";
+		int cast = 0;
+		try {
+			while (saver.hasNextLine()) {
+				if(saver.strLine == null || saver.strLine.equals(""))
+					continue;
+				String vals[] = saver.strLine.split(",");
+				String teamName = vals[0];
+				String teamLeader = vals[1];
+				VehicleTeam team = getTeamByName(teamName);
+				if(team == null){
+					team = new VehicleTeam();
+					team.setName(teamName);
+					em.persist(team);
+					em.flush();
+				}
+				Employee emp = null;
+				try{
+					emp = (Employee) em.createQuery("SELECT q FROM Employee q WHERE fullname=?")
+						.setParameter(1, teamLeader).getSingleResult();
+				}catch(Exception e){
+					System.out.println("No such Employee name:"+teamLeader);
+				}
+				if(emp == null){
+					str += "NH - "+teamLeader +". <br/>";
+					continue;
+				}
+				VehicleTeamLeader leader = getLeaderByTeamOrLeader(teamName,teamLeader);
+				if(leader == null){
+					leader = new VehicleTeamLeader();
+					leader.setLeader(emp);
+					leader.setTeam(team);
+					em.persist(leader);
+				}
+				System.out.println("###########Casted "+ (++cast));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			em.getTransaction().rollback(); // to terminate transactions;
+		}
+		return str;
+	}
+
+	/**
+	 * Set either be null or both not null
+	 * @param teamName
+	 * @param teamLeader
+	 * @return
+	 */
+	public VehicleTeamLeader getLeaderByTeamOrLeader(String teamName,
+			String teamLeader) {
+		try{
+			if(teamName == null){
+				return (VehicleTeamLeader) em.createQuery("SELECT q FROM VehicleTeamLeader q WHERE q.leader.fullname='"+teamLeader+"'").getSingleResult();
+			}else if(teamLeader == null){
+				return (VehicleTeamLeader) em.createQuery("SELECT q FROM VehicleTeamLeader q WHERE q.team.name='"+teamName+"'").getSingleResult();
+			}else{
+				return (VehicleTeamLeader) em.createQuery("SELECT q FROM VehicleTeamLeader q WHERE q.leader.fullname=? AND q.team.name=?")
+						.setParameter(1, teamLeader).setParameter(2, teamName).getSingleResult();
+			}
+		}catch(Exception e){
+			System.out.println("No such team leader exist yet:"+teamName+" "+teamLeader);
+			return null;
+		}
+	}
+
+	/**
+	 * Get a team by its name
+	 * @param teamName
+	 * @return
+	 */
+	public VehicleTeam getTeamByName(String teamName) {
+		try{
+			return (VehicleTeam) em.createQuery("SELECT q FROM VehicleTeam q WHERE name=?").setParameter(1, teamName).getSingleResult();
+		}catch(Exception e){
+			System.out.println("No such team exist:"+teamName);
+			return null;
+		}
+	}
+
+	/**
+	 * Save govn bus from file ,new vehicle
+	 * @param saver
+	 * @return
+	 * @throws Exception
+	 */
+	@Transactional
+	public String saveNewVehicleFromFile(ExcelFileSaver saver) throws Exception{
+		String str = "";
+		int cast = 0;
+		try {
+			while (saver.hasNextLine()) {
+				String vals[] = saver.strLine.split("," ,-1);
+				if(vals.length < 16){
+					str += "Length too short:["+saver.strLine+"].<br/>";
+					continue;
+				}
+				String selfid = vals[0];
+				String vid = vals[1];
+				if(vid.equals("") && selfid.equals("")){
+					str += "Empty String meet ["+saver.strLine+"]<br/>.";
+					continue;
+				}
+				String basedModel = vals[2];
+				String engineModel="";
+				String engineNum = "";
+				if(vals[3] != null && !vals[3].equals("")){
+					String engine[] = vals[3].split("、");
+					engineModel  = engine[0];
+					if(engine.length > 1)
+						engineNum = engine[1];
+				}
+				String frameNum = vals[4];
+				String totalWeight  = vals[5];
+				String color = vals[6];
+				String model = vals[7];
+				String bodysize = vals[8];
+				String vlevel = vals[9];
+				String sits = vals[10];
+				String fuel = vals[11];
+				String subsides = vals[12];
+				String joindate = vals[13];
+				String dateinvalide = vals[14];
+				String productionCode = vals[15];
+				
+				VehicleProfile vp = getVehicleProfileLikeVid(vid, selfid);
+				if(vp != null){
+					System.out.println("Vehicle :" + vid + " "+ selfid+ " exists.<br/>");
+					continue;
+				}
+				vp = new VehicleProfile();
+				vp.setVid(vid);
+				vp.setSelfid(selfid);
+				vp.setBasednum(basedModel);
+				vp.setEnginemodel(engineModel);
+				vp.setEnginenum(engineNum);
+				vp.setFramenum(frameNum);
+				vp.setTotalweight(Integer.parseInt(saver.removeNoneNumber(totalWeight)));
+				vp.setColor(color);
+				vp.setModel(model);
+				vp.setBodysize(bodysize);
+				vp.setVlevel(vlevel);
+				vp.setSits(sits);
+				vp.setFueltype(fuel);
+				vp.setSubsides(subsides);
+				vp.setDatejoin(HRUtil.parseDate(joindate, "yyyy/MM/dd"));
+				vp.setDateinvalidate(HRUtil.parseDate(dateinvalide, "yyyy/MM/dd"));
+				vp.setProductioncode(productionCode);
+				em.persist(vp);
+				
+				System.out.println("###########Casted "+ (++cast));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

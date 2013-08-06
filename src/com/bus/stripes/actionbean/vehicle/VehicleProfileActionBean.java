@@ -39,6 +39,7 @@ public class VehicleProfileActionBean extends CustomActionBean{
 	private VehicleCheck editCheck;
 	private FileBean checkFile;
 	
+	
 	//List files
 	private List<VehicleCheck> maintenances;
 	private List<VehicleCheck> repairs;
@@ -48,6 +49,9 @@ public class VehicleProfileActionBean extends CustomActionBean{
 	
 	//file upload
 	private FileBean detailFile;
+	private FileBean repairFile;
+	private FileBean teamFile;
+	private FileBean newVehicleFile;
 	
 	private int pagenum;
 	private int lotsize;
@@ -270,6 +274,57 @@ public class VehicleProfileActionBean extends CustomActionBean{
 		return defaultAction();
 	}
 	
+	@HandlesEvent(value="vehicleRepaireDatesUpload")
+	@Secure(roles = Roles.ADMINISTRATOR)
+	public Resolution vehicleRepaireDatesUpload(){
+		try{
+			if(repairFile != null){
+				ExcelFileSaver saver = new ExcelFileSaver((FileInputStream)repairFile.getInputStream());
+				String result = saver.insertRepaireDatesToVehicles(vBean,context.getUser());
+				if(!result.equals("")){
+					return  context.errorResolution("上传车辆档案出错", result);
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return defaultAction();
+	}
+	
+	@HandlesEvent(value="vehicleTeamFileUpload")
+	@Secure(roles = Roles.ADMINISTRATOR)
+	public Resolution vehicleTeamFileUpload(){
+		try{
+			if(teamFile != null){
+				ExcelFileSaver saver = new ExcelFileSaver((FileInputStream)teamFile.getInputStream());
+				String result = saver.saveTeamNameAndLeader(vBean,context.getUser());
+				if(!result.equals("")){
+					return  context.errorResolution("上传车辆档案出错", result);
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return defaultAction();
+	}
+	
+	@HandlesEvent(value="vehicleNewFileUpload")
+	@Secure(roles = Roles.ADMINISTRATOR)
+	public Resolution vehicleNewFileUpload(){
+		try{
+			if(newVehicleFile != null){
+				ExcelFileSaver saver = new ExcelFileSaver((FileInputStream)newVehicleFile.getInputStream());
+				String result = saver.saveNewVehicle(vBean,context.getUser());
+				if(!result.equals("")){
+					return  context.errorResolution("上传车辆档案出错", result);
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return defaultAction();
+	}
+	
 	@HandlesEvent(value="filter")
 	public Resolution filter(){
 		return defaultAction();
@@ -429,6 +484,30 @@ public class VehicleProfileActionBean extends CustomActionBean{
 
 	public void setDetailFile(FileBean detailFile) {
 		this.detailFile = detailFile;
+	}
+
+	public FileBean getRepairFile() {
+		return repairFile;
+	}
+
+	public void setRepairFile(FileBean repairFile) {
+		this.repairFile = repairFile;
+	}
+
+	public FileBean getTeamFile() {
+		return teamFile;
+	}
+
+	public void setTeamFile(FileBean teamFile) {
+		this.teamFile = teamFile;
+	}
+
+	public FileBean getNewVehicleFile() {
+		return newVehicleFile;
+	}
+
+	public void setNewVehicleFile(FileBean newVehicleFile) {
+		this.newVehicleFile = newVehicleFile;
 	}
 	
 

@@ -24,6 +24,9 @@ import com.bus.util.HRUtil;
 @Table(name="vehiclecheck")
 public class VehicleCheck implements Serializable{
 
+	@Transient
+	public static String[] ctypes = {"一保","二保","小修","中修","大修","综合","年审","附件"};
+	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name="id")

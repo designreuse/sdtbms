@@ -446,6 +446,8 @@ public class Employee implements Serializable{
 			Calendar cnow = Calendar.getInstance();
 			cnow.setTime(new Date());
 			Integer yearint = cnow.get(Calendar.YEAR) - c.get(Calendar.YEAR);
+			if(cnow.get(Calendar.DAY_OF_YEAR) < c.get(Calendar.DAY_OF_YEAR))
+				yearint--;
 			Integer monthint = (cnow.get(Calendar.MONTH) - c.get(Calendar.MONTH) + 12)%12;
 			Integer dayint  = (cnow.get(Calendar.DAY_OF_MONTH) - c.get(Calendar.DAY_OF_MONTH)+30)%30;
 			return yearint.toString()+"岁"+monthint.toString()+"月"+dayint.toString()+"日";

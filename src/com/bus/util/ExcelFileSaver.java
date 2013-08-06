@@ -582,14 +582,47 @@ public class ExcelFileSaver {
 		return str;
 	}
 
+	/**
+	 * Save vehicle detail from files 第一公交分公司
+	 * @param vBean
+	 * @param user
+	 * @return
+	 * @throws Exception
+	 */
 	public String saveVehicleDetail(VehicleBean vBean, Account user) throws Exception{
 		String str="";
-		vBean.saveVehicleProfilesFromFile(this);
+		str = vBean.saveVehicleProfilesFromFile(this);
+		return str;
+	}
+	
+	/**
+	 * Save vehicle repaire dates from files 第一公交分公司
+	 * @param vBean
+	 * @param user
+	 * @return
+	 */
+	public String insertRepaireDatesToVehicles(VehicleBean vBean, Account user) throws Exception{
+		String str="";
+		str = vBean.saveVehicleRepaireDatesFromFile(this);
+		return str;
+	}
+	
+	/**
+	 * Save team name and leader
+	 * @param vBean
+	 * @param user
+	 * @return
+	 */
+	public String saveTeamNameAndLeader(VehicleBean vBean, Account user) throws Exception{
+		String str="";
+		str = vBean.saveTeamNameAndLeaderFromFile(this);
 		return str;
 	}
 	
 	public String getValueFromName(String str, String name){
 		int indexName = str.indexOf(name);
+		if(indexName == -1)
+			return "N/A";
 		int indexStart = str.indexOf(",",indexName)+1;
 //		System.out.println("starting ****** "+indexStart +" FOR "+ name);
 		int indexEnd = str.indexOf(",",indexStart);
@@ -606,14 +639,27 @@ public class ExcelFileSaver {
 	
 	public String removeNoneNumber(String value) {
 		char c[] = value.toCharArray();
-		int index = value.length();
+		StringBuilder builder = new StringBuilder();
 		for(int i=0;i<c.length;i++){
-			if(!Character.isDigit(c[i])){
-				index = i;
-				break;
+			if(Character.isDigit(c[i])){
+				builder.append(c[i]);
 			}
 		}
-		String v = value.substring(0,index);
-		return v;
+		return builder.toString();
 	}
+
+	/**
+	 * New vehicle from file only Bus
+	 * @param vBean
+	 * @param user
+	 * @return
+	 * @throws Exception
+	 */
+	public String saveNewVehicle(VehicleBean vBean, Account user) throws Exception{
+		String str="";
+		str = vBean.saveNewVehicleFromFile(this);
+		return str;
+	}
+
+
 }
