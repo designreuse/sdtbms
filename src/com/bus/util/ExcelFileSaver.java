@@ -661,5 +661,36 @@ public class ExcelFileSaver {
 		return str;
 	}
 
+	/**
+	 * Upload team and lane information
+	 * @param vBean
+	 * @param user
+	 * @return
+	 * @throws Exception
+	 */
+	public String saveTeamAndLane(VehicleBean vBean, Account user) throws Exception{
+		String str="";
+		str = vBean.saveTeamAndLaneFromFile(this);
+		return str;
+	}
+
+	public String saveVehicleRecordIds(VehicleBean vBean, Account user) throws Exception{
+		String str="";
+		str = vBean.saveRecordIdsFromFile(this);
+		return str;
+	}
+
+	public String assignVehiclesToCompanyOne(VehicleBean vBean, Account user) throws Exception{
+		String str="";
+		str = vBean.assignVehiclesToCompanyOneFromFile(this);
+		return str;
+	}
+
+	public String saveMilesToEachMonth(VehicleBean vBean, Account user) throws Exception{
+		String str="";
+		str = vBean.saveMilesFromFile(this);
+		return str;
+	}
+
 
 }

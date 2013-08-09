@@ -1,10 +1,15 @@
 package com.bus.dto.vehicleprofile;
 
+import java.util.List;
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -24,6 +29,9 @@ public class VehicleTeam {
 	@Column(name="description")
 	private String description;
 
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "team")
+	private Set<VehicleTeamLeader> leaders;
+	
 	public Integer getId() {
 		return id;
 	}
@@ -47,6 +55,13 @@ public class VehicleTeam {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
+
+	public Set<VehicleTeamLeader> getLeaders() {
+		return leaders;
+	}
+
+	public void setLeaders(Set<VehicleTeamLeader> leaders) {
+		this.leaders = leaders;
+	}
 	
 }

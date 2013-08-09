@@ -103,4 +103,9 @@ public interface Roles {
 	public static final String VEHICLE_FILE_FULLCHECK = "vehicle_file_fullcheck"; 
 	public static final String VEHICLE_FILE_ANNUL = "vehicle_file_annul";
 	public static final String VEHICLE_FILE_EXTRAS = "vehicle_file_extras";
+	public static final String VEHICLE_TEAM_VIEW = "vehicle_team_view";
+	public static final String VEHICLE_TEAM_EDIT = "vehicle_team_edit";
+	public static final String VEHICLE_TEAM_EDIT_TEAM = "vehicle_team_edit_team";
+	public static final String VEHICLE_ROUTE_VIEW = "vehicle_route_view";
+	public static final String VEHICLE_ROUTE_EDIT = "vehicle_route_edit";
 }

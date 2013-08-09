@@ -27,6 +27,12 @@ public class VehicleSelector implements BMSSelector{
 	private Integer throwed;
 	private Date expire1;
 	private Date expire2;
+	private String teamId;
+	
+	private String selfid;
+	private String laneId;
+	private String subcompany;
+	private Integer order;
 	
 	@Override
 	public String getSelectorStatement() {
@@ -34,6 +40,30 @@ public class VehicleSelector implements BMSSelector{
 		String query = "SELECT q FROM VehicleProfile q WHERE ";
 		if(vid != null){
 			query += "vid LIKE '%"+vid+"%'";
+			set++;
+		}
+		if(selfid != null){
+			if(set>0)
+				query += " AND";
+			query += " selfid LIKE '%"+ selfid+"%'";
+			set++;
+		}
+		if(teamId != null){
+			if(set>0)
+				query += " AND";
+			query += " q.team.team.id="+teamId;
+			set++;
+		}
+		if(laneId != null){
+			if(set>0)
+				query += " AND";
+			query += " q.lane.lane.id="+laneId;
+			set++;
+		}
+		if(subcompany!=null){
+			if(set>0)
+				query += " AND";
+			query += " subcompany='"+subcompany+"'";
 			set++;
 		}
 		if(throwed != null && throwed == 1){
@@ -57,11 +87,45 @@ public class VehicleSelector implements BMSSelector{
 			}else if(expire1 != null){
 				query += " dateinvalidate >='"+HRUtil.parseDateToString(expire1)+"'";
 			}
+			set++;
 		}
-		query += " ORDER BY datepurchase DESC";
+		if(set==0){
+			query = query.substring(0,query.indexOf("WHERE"));
+		}
+		if(order == null)
+			query += " ORDER BY selfid";
+		else{
+			if (order == 2){
+				query += " ORDER BY datejoin ASC";
+			}else if(order == 3){
+				query += " ORDER BY dateinvalidate ASC";
+			}else
+				query += " ORDER BY selfid";
+		}
 		return query;
 	}
 
+	public String getTeamSelectorStatement() {
+		int set = 0;
+		String query = "SELECT q FROM VehicleProfile q WHERE ";
+		if(vid != null){
+			query += "vid LIKE '%"+vid+"%'";
+			set++;
+		}
+		if(teamId == null){
+			if(set>0)
+				query += " AND";
+			query += " NOT EXISTS (SELECT m FROM VehicleTeamMember m WHERE q.id=m.vehicle.id)";
+		}else{
+			if(set>0)
+				query += " AND";
+			query += " q.team.team.id="+teamId;
+		}
+		query += " ORDER BY q.selfid";
+		return query;
+	}
+
+	
 	public String getVid() {
 		return vid;
 	}
@@ -78,4 +142,45 @@ public class VehicleSelector implements BMSSelector{
 		this.throwed = throwed;
 	}
 
+	public String getTeamId() {
+		return teamId;
+	}
+
+	public void setTeamId(String teamId) {
+		this.teamId = teamId;
+	}
+
+	public String getSelfid() {
+		return selfid;
+	}
+
+	public void setSelfid(String selfid) {
+		this.selfid = selfid;
+	}
+
+	public String getLaneId() {
+		return laneId;
+	}
+
+	public void setLaneId(String laneId) {
+		this.laneId = laneId;
+	}
+
+	public String getSubcompany() {
+		return subcompany;
+	}
+
+	public void setSubcompany(String subcompany) {
+		this.subcompany = subcompany;
+	}
+
+	public Integer getOrder() {
+		return order;
+	}
+
+	public void setOrder(Integer order) {
+		this.order = order;
+	}
+
+	
 }

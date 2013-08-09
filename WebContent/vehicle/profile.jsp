@@ -162,6 +162,10 @@
 							<td>入户日期:</td><td><stripes:text  name="profile.datejoin"  formatPattern="yyyy-MM-dd" class="required datepickerClass"/></td>
 						</tr>
 						<tr>
+							<td>自编号:</td><td><stripes:text  class="required" name="profile.selfid"/></td>
+							<td>登记证号:</td><td><stripes:text  class="required" name="profile.recordid"/></td>
+						</tr>
+						<tr>
 							<td>使用性质:</td><td><stripes:text  class="required" name="profile.servicetype"/></td>
 							<td>运行日期:</td><td><stripes:text  name="profile.dateuse"  formatPattern="yyyy-MM-dd" class="required datepickerClass"/></td>
 						</tr>
@@ -186,6 +190,18 @@
 						<tr>
 							<td>购置凭证税号:</td><td><stripes:text  class="required" name="profile.ptaxnumber"/></td>
 							<td>强制报废日期:</td><td><stripes:text  name="profile.dateinvalidate" formatPattern="yyyy-MM-dd" class="required datepickerClass"/></td>
+						</tr>
+						<tr>
+							<td>分公司:</td>
+							<td>
+								<stripes:select name="profile.subcompany" class="required">
+									<stripes:option value="公交一">公交一</stripes:option>
+									<stripes:option value="公交二">公交二</stripes:option>
+									<stripes:option value="长途">长途</stripes:option>
+									<stripes:option value="其它">其它</stripes:option>
+								</stripes:select>
+							</td>
+							<td>出厂编号:</td><td><stripes:text name="profile.productioncode"/></td>
 						</tr>
 						<tr>
 							<td class="subtitle" colspan=4>车辆参数配置<hr/></td>
@@ -266,9 +282,17 @@
 							<br/>
 							车辆保养维修日期导入:<stripes:file name="repairFile"/><stripes:submit name="vehicleRepaireDatesUpload"/>
 							<br/>
-							车队车队长导入：<stripes:file name="teamFile"/><stripes:submit name="vehicleTeamFileUpload"/>
+							车队车队长导入:<stripes:file name="teamFile"/><stripes:submit name="vehicleTeamFileUpload"/>
 							<br/>
-							新车辆导入：<stripes:file name="newVehicleFile"/><stripes:submit name="vehicleNewFileUpload"/>
+							新车辆导入:<stripes:file name="newVehicleFile"/><stripes:submit name="vehicleNewFileUpload"/>
+							<br/>
+							车辆分队以及路线导入:<stripes:file name="teamLaneFile"/><stripes:submit name="vehicleTeamAndLaneUpload"/>
+							<br/>
+							登记证号:<stripes:file name="recordIdFile"/><stripes:submit name="vehicleRecordIdUpload"/>
+							<br/>
+							公交一公司车辆:<stripes:file name="subCompanyOneFile"/><stripes:submit name="vehicleSubCompanyOneListUpload"/>
+							<br/>
+							总公里数上传:<stripes:file name="totlMilesFile"/><stripes:submit name="vehicleMilesUpload"/>
 						</stripes:form>
 					</ss:secure>
 					<div class="inner-page-title">
@@ -289,8 +313,30 @@
 						</tr>
 						<tr>
 							<td colspan=13 style="text-align:left;">
-								车牌号:<stripes:text name="selector.vid"/>
-								<br/><br/>
+								车牌号:<stripes:text name="selector.vid"/> 自编号:<stripes:text name="selector.selfid"/>
+								<br/>
+								车队:<stripes:select name="selector.teamId"><stripes:option value="">不限</stripes:option><stripes:options-collection collection="${actionBean.teams}" label="name" value="id"/></stripes:select>
+								<br/>
+								线路:<stripes:select name="selector.laneId">
+											<stripes:option value="">不限</stripes:option>
+											<c:forEach items="${actionBean.lanes}" var="lane" varStatus="loop">
+												<stripes:option value="${lane.id}">${lane.num}&nbsp;&nbsp;${lane.detail}</stripes:option>
+											</c:forEach>
+									</stripes:select>
+								<br/>
+								分公司:
+								<stripes:select name="selector.subcompany">
+									<stripes:option value="">不限</stripes:option>
+									<stripes:option value="公交一">公交一</stripes:option>
+									<stripes:option value="公交二">公交二</stripes:option>
+									<stripes:option value="长途">长途</stripes:option>
+									<stripes:option value="其它">其它</stripes:option>
+								</stripes:select>
+								<br/>
+								排序:<stripes:radio value="" name="selector.order"/>不限
+									<stripes:radio value="2" name="selector.order"/>入户日期
+									<stripes:radio value="3" name="selector.order"/>报废日期
+								<br/>
 								显示报废:<stripes:radio name="selector.throwed" value="1"/>是<stripes:radio name="selector.throwed" value="0"/>否
 								<br/>
 								报废日期:(从)<stripes:text name="selector.expire1"  formatPattern="yyyy-MM-dd" class="datepickerClass"/>---(到)<stripes:text name="selector.expire2"  formatPattern="yyyy-MM-dd" class="datepickerClass"/>
@@ -304,14 +350,15 @@
 					</stripes:form>
 						<tr>
 						<th>操作</th>
-						<th>Id</th>
+						<th>自编号</th>
 						<th>车牌号</th>
+						<th>登记证号</th>
 						<th>车队</th>
+						<th>分公司</th>
 						<th>号码</th>
 						<th>路线</th>
 						<th>报废日期</th>
 						<th>强制报废</th>
-						<th>使用性质</th>
 						<th>总行驶里程</th>
 						</tr>
 					</thead>
@@ -343,16 +390,15 @@
 										<stripes:submit class="btnVehicleDetail" name="VehicleDetail" value="详细资料"/>
 								</stripes:form>
 							</td>
-							<td>
-								${veh.id}
-							</td>
+							<td>${veh.selfid}</td>
 							<td>${veh.vid}</td>
-							<td>${veh.team.team.name}</td>
+							<td>${veh.recordid}</td>
+							<td><a href="${pageContext.request.contextPath}/actionbean/VehicleTeam.action?teamId=${veh.team.team.id}">${veh.team.team.name}</a></td>
+							<td>${veh.subcompany}</td>
 							<td>${veh.lane.lane.num}</td>
-							<td>${veh.lane.lane.detail}</td>
+							<td><a href="${pageContext.request.contextPath}/actionbean/VehicleLane.action?targetId=${veh.lane.lane.id}&routeDetail=">${veh.lane.lane.detail}</a></td>
 							<td>${veh.throwdateStr}</td>
 							<td>${veh.dateinvalidateStr}</td>
-							<td>${veh.servicetype}</td>
 							<td>${veh.totalmiles}</td>
 						</tr>
 						<c:set var="color" value="${color + 1}" scope="page"/>

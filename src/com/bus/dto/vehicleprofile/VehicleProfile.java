@@ -172,6 +172,12 @@ public class VehicleProfile implements Serializable{
 	@Column(name="selfid")
 	private String selfid;
 	
+	@Column(name="recordid")
+	private String recordid;
+	
+	@Column(name="subcompany")
+	private String subcompany;
+	
 	@Transient
 	private List<Employee> drivers;
 	
@@ -568,6 +574,19 @@ public class VehicleProfile implements Serializable{
 		this.dateinvalidate = dateinvalidate;
 	}
 	
+	public String getRecordid() {
+		return recordid;
+	}
+	public void setRecordid(String recordid) {
+		this.recordid = recordid;
+	}
+	
+	public String getSubcompany() {
+		return subcompany;
+	}
+	public void setSubcompany(String subcompany) {
+		this.subcompany = subcompany;
+	}
 	@Transient
 	public String getDateinvalidateStr(){
 		if(dateinvalidate == null)

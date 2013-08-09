@@ -174,6 +174,10 @@ label.tabSubTitle{
 							<td>入户日期:</td><td><stripes:text  name="profile.datejoin"  formatPattern="yyyy-MM-dd" class="required datepickerClass"/></td>
 						</tr>
 						<tr>
+							<td>自编号:</td><td><stripes:text  class="required" name="profile.selfid"/></td>
+							<td>登记证号:</td><td><stripes:text  class="required" name="profile.recordid"/></td>
+						</tr>
+						<tr>
 							<td>使用性质:</td><td><stripes:text  class="required" name="profile.servicetype"/></td>
 							<td>运行日期:</td><td><stripes:text  name="profile.dateuse"  formatPattern="yyyy-MM-dd" class="required datepickerClass"/></td>
 						</tr>
@@ -198,6 +202,18 @@ label.tabSubTitle{
 						<tr>
 							<td>购置凭证税号:</td><td><stripes:text  class="required" name="profile.ptaxnumber"/></td>
 							<td>强制报废日期:</td><td><stripes:text  name="profile.dateinvalidate" formatPattern="yyyy-MM-dd" class="required datepickerClass"/></td>
+						</tr>
+						<tr>
+							<td>分公司:</td>
+							<td>
+								<stripes:select name="profile.subcompany" class="required">
+									<stripes:option value="公交一">公交一</stripes:option>
+									<stripes:option value="公交二">公交二</stripes:option>
+									<stripes:option value="长途">长途</stripes:option>
+									<stripes:option value="其它">其它</stripes:option>
+								</stripes:select>
+							</td>
+							<td>出厂编号:</td><td><stripes:text name="profile.productioncode"/></td>
 						</tr>
 						<tr>
 							<td class="subtitle" colspan=4>车辆参数配置<hr/></td>

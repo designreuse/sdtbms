@@ -1,22 +1,20 @@
 package com.bus.dto.vehicleprofile;
 
-import java.util.Set;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ * Mirror of VehicleLane but with out OneToMany Tag, for faster loading purpose
+ * See use hint in VehicleBean.getAllVehicleLaneNames();
+ * @author Administrator
+ *
+ */
 @Entity
-@XmlRootElement
-@Table(name="vehiclelane")
-public class VehicleLane {
+public class VehicleLaneMirror {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -28,9 +26,6 @@ public class VehicleLane {
 	
 	@Column(name="detail")
 	private String detail;
-
-	@OneToMany(fetch=FetchType.EAGER,mappedBy="lane")
-	private Set<VehicleLaneMapper> mappers;
 	
 	public Integer getId() {
 		return id;
@@ -54,22 +49,5 @@ public class VehicleLane {
 
 	public void setDetail(String detail) {
 		this.detail = detail;
-	}
-
-	public Set<VehicleLaneMapper> getMapper() {
-		return mappers;
-	}
-
-	public void setMapper(Set<VehicleLaneMapper> mapper) {
-		this.mappers = mapper;
-	}
-	
-	@Transient
-	public String getVehicleCount(){
-		if(mappers == null)
-			return "0";
-		else{
-			return mappers.size()+"";
-		}
 	}
 }

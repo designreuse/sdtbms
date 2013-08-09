@@ -20,7 +20,9 @@ import net.sourceforge.stripes.integration.spring.SpringBean;
 
 import com.bus.dto.vehicleprofile.VehicleCheck;
 import com.bus.dto.vehicleprofile.VehicleFiles;
+import com.bus.dto.vehicleprofile.VehicleLane;
 import com.bus.dto.vehicleprofile.VehicleProfile;
+import com.bus.dto.vehicleprofile.VehicleTeam;
 import com.bus.services.CustomActionBean;
 import com.bus.services.VehicleBean;
 import com.bus.stripes.selector.VehicleSelector;
@@ -38,6 +40,8 @@ public class VehicleProfileActionBean extends CustomActionBean{
 	private VehicleCheck check;
 	private VehicleCheck editCheck;
 	private FileBean checkFile;
+	private List<VehicleTeam> teams;
+	private List<VehicleLane> lanes;
 	
 	
 	//List files
@@ -52,6 +56,10 @@ public class VehicleProfileActionBean extends CustomActionBean{
 	private FileBean repairFile;
 	private FileBean teamFile;
 	private FileBean newVehicleFile;
+	private FileBean teamLaneFile;
+	private FileBean recordIdFile;
+	private FileBean subCompanyOneFile;
+	private FileBean totlMilesFile;
 	
 	private int pagenum;
 	private int lotsize;
@@ -71,11 +79,14 @@ public class VehicleProfileActionBean extends CustomActionBean{
 				pagenum = 1;
 				lotsize = 20;
 			}
+			teams = vBean.getVehicleTeams();
+			lanes = vBean.getAllVehicleLaneNames();
 			Map map = null;
 			if(selector == null){
 				map = vBean.getVehicles(pagenum, lotsize);
 			}else{
 				String statement = selector.getSelectorStatement();
+				System.out.println("Using statement:"+statement);
 				map = vBean.getVehicles(pagenum, lotsize,statement);
 			}
 			setRecordsTotal((Long) map.get("count"));
@@ -144,8 +155,11 @@ public class VehicleProfileActionBean extends CustomActionBean{
 		try{
 			if(profile.getId() == null)
 				return new StreamingResolution("text/charset=UTF-8;","数据上传失败，id没上传.");
-			else
+			else{
+				VehicleProfile vp = vBean.getVehicleProfileById(profile.getId());
+				profile.setStatus(vp.getStatus());
 				vBean.saveVehicle(profile);
+			}
 			return new StreamingResolution("text/charset=UTF-8;","修改成功");
 		}catch(Exception e){
 			return new StreamingResolution("text/charset=UTF-8;","修改失败."+e.getMessage());
@@ -324,6 +338,75 @@ public class VehicleProfileActionBean extends CustomActionBean{
 		}
 		return defaultAction();
 	}
+	
+	@HandlesEvent(value="vehicleTeamAndLaneUpload")
+	@Secure(roles = Roles.ADMINISTRATOR)
+	public Resolution vehicleTeamAndLaneUpload(){
+		try{
+			if(teamLaneFile != null){
+				ExcelFileSaver saver = new ExcelFileSaver((FileInputStream)teamLaneFile.getInputStream());
+				String result = saver.saveTeamAndLane(vBean,context.getUser());
+				if(!result.equals("")){
+					return  context.errorResolution("上传车辆档案出错", result);
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return defaultAction();
+	}
+	
+	@HandlesEvent(value="vehicleRecordIdUpload")
+	@Secure(roles = Roles.ADMINISTRATOR)
+	public Resolution vehicleRecordIdUpload(){
+		try{
+			if(recordIdFile != null){
+				ExcelFileSaver saver = new ExcelFileSaver((FileInputStream)recordIdFile.getInputStream());
+				String result = saver.saveVehicleRecordIds(vBean,context.getUser());
+				if(!result.equals("")){
+					return  context.errorResolution("上传车辆档案出错", result);
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return defaultAction();
+	}
+	
+	@HandlesEvent(value="vehicleSubCompanyOneListUpload")
+	@Secure(roles = Roles.ADMINISTRATOR)
+	public Resolution vehicleSubCompanyOneListUpload(){
+		try{
+			if(subCompanyOneFile != null){
+				ExcelFileSaver saver = new ExcelFileSaver((FileInputStream)subCompanyOneFile.getInputStream());
+				String result = saver.assignVehiclesToCompanyOne(vBean,context.getUser());
+				if(!result.equals("")){
+					return  context.errorResolution("上传车辆档案出错", result);
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return defaultAction();
+	}
+	
+	@HandlesEvent(value="vehicleMilesUpload")
+	@Secure(roles = Roles.ADMINISTRATOR)
+	public Resolution vehicleMilesUpload(){
+		try{
+			if(totlMilesFile != null){
+				ExcelFileSaver saver = new ExcelFileSaver((FileInputStream)totlMilesFile.getInputStream());
+				String result = saver.saveMilesToEachMonth(vBean,context.getUser());
+				if(!result.equals("")){
+					return  context.errorResolution("上传车辆档案出错", result);
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return defaultAction();
+	}
+	
 	
 	@HandlesEvent(value="filter")
 	public Resolution filter(){
@@ -508,6 +591,54 @@ public class VehicleProfileActionBean extends CustomActionBean{
 
 	public void setNewVehicleFile(FileBean newVehicleFile) {
 		this.newVehicleFile = newVehicleFile;
+	}
+
+	public FileBean getTeamLaneFile() {
+		return teamLaneFile;
+	}
+
+	public void setTeamLaneFile(FileBean teamLaneFile) {
+		this.teamLaneFile = teamLaneFile;
+	}
+
+	public FileBean getRecordIdFile() {
+		return recordIdFile;
+	}
+
+	public void setRecordIdFile(FileBean recordIdFile) {
+		this.recordIdFile = recordIdFile;
+	}
+
+	public FileBean getSubCompanyOneFile() {
+		return subCompanyOneFile;
+	}
+
+	public void setSubCompanyOneFile(FileBean subCompanyOneFile) {
+		this.subCompanyOneFile = subCompanyOneFile;
+	}
+
+	public FileBean getTotlMilesFile() {
+		return totlMilesFile;
+	}
+
+	public void setTotlMilesFile(FileBean totlMilesFile) {
+		this.totlMilesFile = totlMilesFile;
+	}
+
+	public List<VehicleTeam> getTeams() {
+		return teams;
+	}
+
+	public void setTeams(List<VehicleTeam> teams) {
+		this.teams = teams;
+	}
+
+	public List<VehicleLane> getLanes() {
+		return lanes;
+	}
+
+	public void setLanes(List<VehicleLane> lanes) {
+		this.lanes = lanes;
 	}
 	
 

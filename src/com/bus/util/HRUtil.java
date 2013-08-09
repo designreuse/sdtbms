@@ -89,4 +89,17 @@ public class HRUtil {
 	public static String getFileExtension(String filename){
 		return filename.substring(filename.lastIndexOf("."),filename.length());
 	}
+	
+	
+	public static String removeNoneNumber(String value) {
+		char c[] = value.toCharArray();
+		StringBuilder builder = new StringBuilder();
+		for(int i=0;i<c.length;i++){
+			if(Character.isDigit(c[i])){
+				builder.append(c[i]);
+			}
+		}
+		return builder.toString();
+	}
+
 }

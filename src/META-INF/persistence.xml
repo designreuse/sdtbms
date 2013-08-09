@@ -57,11 +57,13 @@
  <class>com.bus.dto.vehicleprofile.VehicleCheck</class>
  <class>com.bus.dto.vehicleprofile.VehicleFiles</class>
  <class>com.bus.dto.vehicleprofile.VehicleLane</class>
+ <class>com.bus.dto.vehicleprofile.VehicleLaneMirror</class>
  <class>com.bus.dto.vehicleprofile.VehicleTeam</class>
  <class>com.bus.dto.vehicleprofile.VehicleTeamLeader</class>
  <class>com.bus.dto.vehicleprofile.VehicleLaneMapper</class>
  <class>com.bus.dto.vehicleprofile.VehicleDriver</class>
  <class>com.bus.dto.vehicleprofile.VehicleTeamMember</class>
+ 
  
  <class>com.bus.dto.common.ContractImg</class>
 

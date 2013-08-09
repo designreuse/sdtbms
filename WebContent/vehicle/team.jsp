@@ -1,0 +1,205 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ss" uri="/WEB-INF/StripesSecurityManager.tld" %>
+<stripes:layout-render name="../default.jsp">
+	
+    <stripes:layout-component name="contents">
+    <script type="text/javascript">
+
+    	$(document).ready(function(){
+        	$('#quitTeam').click(function(){
+				var teamid = $(this).parent().children().first().val();
+				if(teamid == ""){
+					alert("没有选中在队伍的车辆");
+					return;	
+				}else{
+					if(confirm("真的要从${actionBean.team.name}移除车辆吗?")){
+						$('#selectListForm').append("<input type='submit' id='callToSubmit' name='quitTeam'/>");
+						$('#selectListForm #callToSubmit').click();
+					}
+				}
+            });
+
+            $('#joinTeam').click(function(){
+            	var id = $(this).next().val();
+            	$('.submitTeamId').val(id);
+            	$('#selectListForm').append("<input type='submit' id='callToSubmit' name='joinTeam'/>");
+            	$('#selectListForm #callToSubmit').click();
+            });
+        });
+     </script>
+	<style type="text/css">
+	</style>
+		<div id="sub-nav"><div class="page-title">
+			<h1>车辆档案</h1>
+			<span><a href="#" title="Layout Options">车辆</a> > <a href="#" title="Two column layout">档案管理</a> > 查看</span>
+		</div></div>
+		
+		<div id="page-layout"><div id="page-content">
+			<div id="page-content-wrapper">
+			
+			
+			
+			<!-- Side bar ****************************************************************** -->
+			<jsp:include page="/vehicle/sidebar.jsp" />
+			
+			
+			
+		<!-- Side bar ****************************************************************** -->
+				<!-- Start of main content -->
+				<div id="rightcontent">
+				
+				<!-- 新建档案  Dialog-->
+				<div id="hr_top_button_bar" style="height:40px;">&nbsp;  
+				
+				<a class="btn ui-state-default ui-corner-all" href="javascript:location.reload();">
+					刷新
+				</a>
+				</div>
+				
+				
+				<!--  Display Vehicle List   -->
+				<div>
+				<div class="inner-page-title">
+						车队信息
+						<br/>
+						<c:choose>
+						<c:when test="${actionBean.team == null}">
+							没有安排车队
+						</c:when>
+						<c:otherwise>
+							车队:${actionBean.team.name} &nbsp; 车队长:
+							<c:forEach items="${actionBean.leaders}" var="leader" varStatus="loop">
+								<a target="_blank" href="${pageContext.request.contextPath}/actionbean/Employee.action?targetId=${leader.id}&detail=">${leader.fullname}</a>、
+							</c:forEach>
+						</c:otherwise>
+					</c:choose>
+					</div>
+					
+					<div class="hastable">
+				
+				<table class="vehiclelist">
+					<thead>
+					<stripes:form beanclass="com.bus.stripes.actionbean.vehicle.VehicleTeamActionBean" >
+						<tr>
+							<td colspan=11 style="text-align:left;">
+								车牌号:<stripes:text name="selector.vid"/>
+								&nbsp;&nbsp;&nbsp;
+								车队:<stripes:select name="selector.teamId"><stripes:option value="">没车队的车辆</stripes:option><stripes:options-collection collection="${actionBean.teamsNow }" label="name" value="id"/></stripes:select>
+							</td>
+						</tr>
+						<tr>
+							<td colspan=11 style="text-align:left">
+								<stripes:submit name="filter" value="提交"/>共找到${actionBean.totalcount}行记录
+							</td>
+						</tr>
+					</stripes:form>
+						<tr>
+						<th>操作</th>
+						<th>自编号</th>
+						<th>车牌号</th>
+						<th>登记证号</th>
+						<th>分公司</th>
+						<th>号码</th>
+						<th>路线</th>
+						<th>报废日期</th>
+						<th>强制报废</th>
+						<th>总行驶里程</th>
+						</tr>
+					</thead>
+					<tbody>
+					
+					<c:set var="color" value="0" scope="page"/>
+					<c:set var="statusE" value="E" scope="page"/>
+					<stripes:form id="selectListForm" beanclass="com.bus.stripes.actionbean.vehicle.VehicleTeamActionBean">
+						<input type="hidden" class="submitTeamId" name="teamId" value="${actionBean.team.id}"/>
+					<c:forEach items="${actionBean.members}" var="veh" varStatus="loop">
+						<c:choose>
+							<c:when test="${veh.status == statusE}">
+								<tr class="expired">
+							</c:when>
+							<c:otherwise>
+								<tr class="alt">
+							</c:otherwise>
+						</c:choose>
+							<td>
+								<stripes:checkbox name="selectedVehicles" value="${veh.id}"/>
+							</td>
+							<td>${veh.selfid}</td>
+							<td><a href="${pageContext.request.contextPath}/actionbean/VehicleProfile.action?targetId=${veh.id}&vehicleDetail=">${veh.vid}</a></td>
+							<td>${veh.recordid}</td>
+							<td>${veh.subcompany}</td>
+							<td>${veh.lane.lane.num}</td>
+							<td><a href="${pageContext.request.contextPath}/actionbean/VehicleLane.action?targetId=${veh.lane.lane.id}&routeDetail=">${veh.lane.lane.detail}</a></td>
+							<td>${veh.throwdateStr}</td>
+							<td>${veh.dateinvalidateStr}</td>
+							<td>${veh.totalmiles}</td>
+						</tr>
+						<c:set var="color" value="${color + 1}" scope="page"/>
+					</c:forEach>
+					</stripes:form>
+					<ss:secure roles="vehicle_team_edit">
+					<tr>
+						<td colspan=11>
+							<input type="hidden" value="${actionBean.team.id}"/>
+							<button id='quitTeam'>脱离车队</button>
+							<button id='joinTeam'>加入车队</button>
+							<select>
+								<c:forEach items="${actionBean.teamsNow}" var="t" varStatus="loop">
+									<option value="${t.id}">${t.name}</option>								
+								</c:forEach>
+							</select>
+						</td>
+					</tr>
+					</ss:secure>
+					</tbody>
+				</table>
+				</div>
+				</div>
+				
+				<ss:secure roles="vehicle_team_edit_team">
+					<div>
+						<div>
+						--新建车队--
+						<stripes:form beanclass="com.bus.stripes.actionbean.vehicle.VehicleTeamActionBean">
+							车队:<stripes:text name="newTeam.name"/>
+							<stripes:submit name="newTeamAction" value="新建"/>
+						</stripes:form>
+						</div>
+						<div>
+						--删除车队--
+						<stripes:form beanclass="com.bus.stripes.actionbean.vehicle.VehicleTeamActionBean">
+							车队:<stripes:select name="deleteId"><stripes:option value="">没车队的车辆</stripes:option><stripes:options-collection collection="${actionBean.teamsNow }" label="name" value="id"/></stripes:select>
+							<stripes:submit name="deleteTeamAction" value="删除" id="delBtn"/>
+						</stripes:form>
+						</div>
+						<div>
+						--添加车队长--
+						<stripes:form beanclass="com.bus.stripes.actionbean.vehicle.VehicleTeamActionBean">
+							车队:<stripes:select name="deleteId"><stripes:option value="">没车队的车辆</stripes:option><stripes:options-collection collection="${actionBean.teamsNow }" label="name" value="id"/></stripes:select>
+							车队长工号(6位):<stripes:text name="leader.workerid"/>
+							车队长名字:<stripes:text name="leader.fullname"/>
+							<stripes:submit name="addTeamLeaderAction" value="添加"/>
+						</stripes:form>
+						</div>
+						<div>
+						--删除车队长--
+						<stripes:form beanclass="com.bus.stripes.actionbean.vehicle.VehicleTeamActionBean">
+							车队:<stripes:select name="deleteId"><stripes:options-collection collection="${actionBean.teamsNow}" label="name" value="id"/></stripes:select>
+							删除车队长:<stripes:select name="deleteLeaderId"><stripes:options-collection collection="${actionBean.leaders }" label="fullname" value="id"/></stripes:select>
+							<stripes:submit name="deleteTeamLeaderAction" value="删除"/>
+						</stripes:form>
+						</div>
+					</div>
+				</ss:secure>
+			
+				</div>
+				<!-- End of main content -->
+			</div>
+			<div class="clear"></div>
+		</div>
+	</div>
+    </stripes:layout-component>
+</stripes:layout-render>

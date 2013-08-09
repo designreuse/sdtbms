@@ -19,7 +19,16 @@
 									<a href="${pageContext.request.contextPath}/actionbean/VehicleProfile.action" title="档案查看">档案管理</a>
 								</li>
 								</ss:secure>
-								
+								 <ss:secure roles="vehicle_team_view">
+								<li>
+									<a href="${pageContext.request.contextPath}/actionbean/VehicleTeam.action" title="车队管理">车队管理</a>
+								</li>
+								</ss:secure>
+								 <ss:secure roles="vehicle_route_view">
+								<li>
+									<a href="${pageContext.request.contextPath}/actionbean/VehicleLane.action" title="线路管理">线路管理</a>
+								</li>
+								</ss:secure>
 							</ul>
 						</div>
 					</div>

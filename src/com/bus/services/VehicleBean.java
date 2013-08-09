@@ -12,10 +12,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.bus.dto.Employee;
 import com.bus.dto.vehicleprofile.VehicleCheck;
 import com.bus.dto.vehicleprofile.VehicleFiles;
+import com.bus.dto.vehicleprofile.VehicleLane;
+import com.bus.dto.vehicleprofile.VehicleLaneMapper;
+import com.bus.dto.vehicleprofile.VehicleLaneMirror;
 import com.bus.dto.vehicleprofile.VehicleMiles;
 import com.bus.dto.vehicleprofile.VehicleProfile;
 import com.bus.dto.vehicleprofile.VehicleTeam;
 import com.bus.dto.vehicleprofile.VehicleTeamLeader;
+import com.bus.dto.vehicleprofile.VehicleTeamMember;
 import com.bus.util.ExcelFileSaver;
 import com.bus.util.HRUtil;
 
@@ -33,7 +37,7 @@ public class VehicleBean extends EMBean {
 		if (pagenum == -1 || pagenum == 0) {
 			List<VehicleProfile> list = em
 					.createQuery(
-							"SELECT q FROM VehicleProfile q ORDER BY datepurchase DESC")
+							"SELECT q FROM VehicleProfile q ORDER BY selfid")
 					.getResultList();
 			Long count = (Long) em.createQuery(
 					"SELECT count(q) FROM VehicleProfile q").getSingleResult();
@@ -42,7 +46,7 @@ public class VehicleBean extends EMBean {
 		} else {
 			List<VehicleProfile> list = em
 					.createQuery(
-							"SELECT q FROM VehicleProfile q ORDER BY datepurchase DESC")
+							"SELECT q FROM VehicleProfile q ORDER BY selfid")
 					.setFirstResult(pagenum * lotsize - lotsize)
 					.setMaxResults(lotsize).getResultList();
 			Long count = (Long) em.createQuery(
@@ -355,14 +359,9 @@ public class VehicleBean extends EMBean {
 					.getSingleResult();
 		} catch (Exception e) {
 			try{
-				if(e.getMessage().trim().equals("result returns more than one elements")){
-					return (VehicleProfile) em
-							.createQuery("SELECT q FROM VehicleProfile q WHERE vid LIKE '%"+ vid+"%' AND vid LIKE '%"+ selfId+"%' ")
+				return (VehicleProfile) em
+							.createQuery("SELECT q FROM VehicleProfile q WHERE vid LIKE '%"+ HRUtil.removeNoneNumber(vid)+"%' AND selfid LIKE '%"+ HRUtil.removeNoneNumber(selfId)+"%' ")
 							.getSingleResult();
-				}else{
-					System.out.println(e.getMessage());
-					return null;
-				}
 			}catch(Exception e2){
 				System.out.println(e2.getMessage());
 				return null;
@@ -385,18 +384,34 @@ public class VehicleBean extends EMBean {
 			while (saver.hasNextLine()) {
 				if (saver.strLine.contains("车牌号")) {
 					String fullDetail = saver.strLine;
-					while (saver.hasNextLine()
-							&& !saver.strLine.contains("汽车技术档案卡")) {
+					while (saver.hasNextLine()&& !saver.strLine.contains("汽车技术档案卡")) {
 						fullDetail += "," + saver.strLine;
 					}
-					VehicleProfile vp = new VehicleProfile();
-					vp.setVid(saver.getValueFromName(fullDetail, "车牌号"));
-					if (vp.getVid() == null || vp.getVid().equals("")){
-						str += "第" + cast + "台车辆档案的车牌为空，不添加.<br/>";
+					String vidStr = saver.getValueFromName(fullDetail, "车牌号");
+					if(vidStr.trim().equals("")){
+						str += "E-No vid:["+fullDetail+"].<br/>";
 						continue;
 					}
+					String selfid = null;
+					String vid = null;
+					if(vidStr.indexOf("(") == -1){
+						selfid = "";
+						vid = vidStr.trim();
+					}else{
+						selfid = vidStr.substring(vidStr.indexOf("(")+1,vidStr.indexOf(")"));
+						vid = vidStr.substring(0,vidStr.indexOf("(")).trim();
+					}
+					VehicleProfile vp = getVehicleProfileLikeVid(vid, selfid);
+					if(vp == null){
+						str += "E-No vehicleFound for :["+vidStr+"].<br/>";
+						continue;
+					}
+					
 					vp.setCompany(saver.getValueFromName(fullDetail, "车属单位"));
 					vp.setCompanyaddr(saver.getValueFromName(fullDetail, "地址"));
+					String recordid = saver.getValueFromName(fullDetail, "登记证编号");
+					if(!recordid.trim().equals(""))
+						vp.setRecordid(recordid);
 					vp.setDatejoin(HRUtil.parseDate(
 							saver.getValueFromName(fullDetail, "入户日期"),
 							"yyyy/MM/dd"));
@@ -478,17 +493,10 @@ public class VehicleBean extends EMBean {
 					vp.setHangmodel(saver.getValueFromName(fullDetail, "悬挂形式"));
 					vp.setDrivemode(saver.getValueFromName(fullDetail, "驱动形式"));
 					vp.setAircond(saver.getValueFromName(fullDetail, "空调"));
-					
-					vp.setStatus("A");
-					
+
+					em.merge(vp);
 					System.out.println("##############CAST :" + (++cast) + " "
 							+ vp.getVid());
-
-					if (getVehicleProfileByVid(vp.getVid()) == null) {
-						em.persist(vp);
-					} else {
-						System.out.println(vp.getVid() + " Already exists.");
-					}
 				}
 			}
 		} catch (Exception e) {
@@ -895,6 +903,513 @@ public class VehicleBean extends EMBean {
 			em.getTransaction().rollback(); // to terminate transactions;
 		}
 		return str;
+	}
+
+	/**
+	 * Save team and lane from file
+	 * @param saver
+	 * @return
+	 * @throws Exception
+	 */
+	@Transactional
+	public String saveTeamAndLaneFromFile(ExcelFileSaver saver) throws Exception{
+		String str = "";
+		int cast = 0;
+		try {
+			String team[] = null;
+			while (saver.hasNextLine()) {
+				if(saver.strLine.contains("team")){
+//					System.out.println("Team found:"+saver.strLine);
+					cast = 0;
+					team = saver.strLine.split("\\:",-1);
+					if(team.length != 2){
+						str += "Team:"+saver.strLine+" length too short.<br/>";
+						throw new Exception(str);
+					}
+				}else{
+					if(team == null){
+						str += "Team:["+saver.strLine+"] No team assign.<br/>";
+						continue;
+					}
+					String vals[] = saver.strLine.split(",",-1);
+					if(vals.length < 9){
+						str += "EDetail:["+saver.strLine+"] Not valid record.<br/>";
+						continue;
+					}
+					String selfId = vals[1];
+					String vid = vals[2];
+//					System.out.println(vals[7] + " C:"+saver.removeNoneNumber(vals[7]));
+					String laneNum = saver.removeNoneNumber(vals[7]);
+					String laneDetail = vals[8];
+					
+					VehicleProfile vp = getVehicleProfileLikeVid(vid, selfId);
+					if(vp == null){
+						str += "ENH vid:["+saver.strLine+"].<br/>";
+						throw new Exception("Cannot find vehicle ["+vid+"].");
+					}
+					
+					//To assign team
+					VehicleTeam vteam = getTeamByName(team[1]);
+					if(vteam == null){
+						str += "ENH vid:["+saver.strLine+"].<br/>";
+						throw new Exception("Cannot find team ["+team[1]+"].");
+					}
+					VehicleTeamMember vtm = getVehicleTeamMemberByVpId(vp.getId());
+					if(vtm == null){
+						vtm = new VehicleTeamMember();
+						vtm.setVehicle(vp);
+						vtm.setTeam(vteam);
+						em.persist(vtm);
+					}
+					
+					//To map to lane
+					VehicleLane vlane = null;
+					if(laneNum.equals("")){
+						System.out.println("Might be movable Lane number, set to 0.");
+						laneNum = "0";
+//						throw new Exception("stop");
+					}
+					vlane = getVehicleLaneByLaneNum(laneNum);
+					if(vlane == null){
+						vlane = new VehicleLane();
+						vlane.setNum(laneNum);
+						vlane.setDetail(laneDetail);
+						em.persist(vlane);
+						em.flush();
+					}
+					VehicleLaneMapper laneMapper = getVehicleLaneMapperByVpId(vp.getId());
+					if(laneMapper == null){
+						laneMapper = new VehicleLaneMapper();
+						laneMapper.setLane(vlane);
+						laneMapper.setVehicle(vp);
+						em.persist(laneMapper);
+						em.flush();
+					}
+				}
+				System.out.println("###########Casted "+team[1]+" :"+ (++cast));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			em.getTransaction().rollback(); // to terminate transactions;
+		}
+		return str;
+	}
+
+	/**
+	 * Get vehicle lane mapper by profile d since oneToOne Mapping
+	 * @param id
+	 * @return
+	 */
+	public VehicleLaneMapper getVehicleLaneMapperByVpId(Integer id) {
+		try{
+			return (VehicleLaneMapper) em.createQuery("SELECT q FROM VehicleLaneMapper q WHERE vid=?").setParameter(1, id).getSingleResult();
+		}catch(Exception e){
+			System.out.println("Cannot find vehicle lane mapper with vp id:"+id);
+			return null;
+		}
+	}
+
+	/**
+	 * 
+	 * @param laneNum
+	 * @param laneDetail
+	 * @return
+	 */
+	private VehicleLane getVehicleLaneByLaneNum(String laneNum) {
+		try{
+			return (VehicleLane) em.createQuery("SELECT q FROM VehicleLane q WHERE num=?").setParameter(1, laneNum).getSingleResult();
+		}catch(Exception e){
+			System.out.println("Cannot find vehicle lane number :"+laneNum);
+			return null;
+		}
+	}
+
+	/**
+	 * Get vehicle team member by profile id, as its one to one mapping
+	 * @param id
+	 * @return
+	 */
+	public VehicleTeamMember getVehicleTeamMemberByVpId(Integer id) {
+		try{
+			return (VehicleTeamMember) em.createQuery("SELECT q FROM VehicleTeamMember q WHERE vid=?").setParameter(1, id).getSingleResult();
+		}catch(Exception e){
+			System.out.println("Cannot find vehicle team member with vp id:"+id);
+			return null;
+		}
+	}
+
+	/**
+	 * Save the 登记证号 to vehicles from file
+	 * @param saver
+	 * @return
+	 * @throws Exception
+	 */
+	@Transactional
+	public String saveRecordIdsFromFile(ExcelFileSaver saver) throws Exception{
+		String str = "";
+		int cast = 0;
+		try {
+			while (saver.hasNextLine()) {
+				String vals[] = saver.strLine.split(",",-1);
+				if(vals.length != 3){
+					str += "ELine length too shrot:["+saver.strLine+"].<br/>";
+					continue;
+				}
+				String selfid = vals[0];
+				String vid = vals[1];
+				String recordid = vals[2];
+				VehicleProfile vp = getVehicleProfileLikeVid(vid, selfid);
+				if(vp == null){
+					str += "EVP cannot find vehicle:["+saver.strLine+"].<br/>";
+					continue;
+				}
+				vp.setRecordid(recordid);
+				em.merge(vp);
+				System.out.println("###########Casted "+vid+" :"+ (++cast));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			em.getTransaction().rollback(); // to terminate transactions;
+		}
+		return str;
+	}
+
+	/**
+	 * Assign to 公交一公司
+	 * @param saver
+	 * @return
+	 * @throws Exception
+	 */
+	@Transactional
+	public String assignVehiclesToCompanyOneFromFile (ExcelFileSaver saver) throws Exception{
+		String str = "";
+		int cast = 0;
+		try {
+			while (saver.hasNextLine()) {
+				String vals[] = saver.strLine.split(",",-1);
+				if(vals.length != 2){
+					str += "ELine length not valid:["+saver.strLine+"].<br/>";
+					continue;
+				}
+				String selfid = vals[0];
+				String vid = vals[1];
+				VehicleProfile vp = getVehicleProfileLikeVid(vid, selfid);
+				if(vp == null){
+					str += "EVP cannot find vehicle:["+saver.strLine+"].<br/>";
+					continue;
+				}
+				vp.setSubcompany("公交一");
+				em.merge(vp);
+				System.out.println("###########Casted "+vid+" :"+ (++cast));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			em.getTransaction().rollback(); // to terminate transactions;
+		}
+		return str;
+	}
+
+	/**
+	 * Save miles for a year
+	 * e.g.
+	 * 2011,,
+	 * 1月,,
+	 * selfid,vid,miles
+	 * selfid,vid,miles
+	 * 2月
+	 * selfid,vid,miles
+	 * @param saver
+	 * @return
+	 * @throws Exception
+	 */
+	@Transactional
+	public String saveMilesFromFile(ExcelFileSaver saver) throws Exception{
+		String str = "";
+		int cast = 0;
+		saver.hasNextLine();
+		int year = Integer.parseInt(saver.strLine.split(",",-1)[0]);
+		
+		Integer month = null;
+		try {
+			while (saver.hasNextLine()) {
+				if(saver.strLine.contains("月")){
+					month = Integer.parseInt(saver.removeNoneNumber(saver.strLine));
+					System.out.println("Set Month To:"+month);
+					continue;
+				}
+				String vals[] = saver.strLine.split(",",-1);
+				if(vals.length != 3){
+					str += "E - length:["+saver.strLine+"].<br/>";
+					continue;
+				}
+				String selfid = vals[0];
+				String vid = vals[1];
+				String miles = vals[2];
+				
+				//Get vehicle miles Obect
+				VehicleProfile vp = getVehicleProfileLikeVid(vid, selfid);
+				if(vp == null){
+					str += "E - NVP:["+saver.strLine+"].<br/>";
+					continue;
+				}
+				VehicleMiles vm = getVehicleMilesByVidAndYear(vp.getId(), year);
+				if(vm == null){
+					vm = new VehicleMiles();
+					vm.setVehicle(vp);
+				}
+				vm.setVyear(year);
+				//Set miles
+				float mile = 0;
+				if(miles != null && !miles.trim().equals(""))
+					mile = Float.parseFloat(miles);
+				switch(month){
+				case 1:
+					vm.setJan(mile);
+					break;
+				case 2:
+					vm.setFeb(mile);
+					break;
+				case 3:
+					vm.setMar(mile);
+					break;
+				case 4:
+					vm.setApr(mile);
+					break;
+				case 5:
+					vm.setMay(mile);
+					break;
+				case 6:
+					vm.setJun(mile);
+					break;
+				case 7:
+					vm.setJul(mile);
+					break;
+				case 8:
+					vm.setAug(mile);
+					break;
+				case 9:
+					vm.setSep(mile);
+					break;
+				case 10:
+					vm.setOcto(mile);
+					break;
+				case 11:
+					vm.setNov(mile);
+					break;
+				case 12:
+					vm.setDece(mile);
+					break;
+				default:
+					str += "EMINFO - VID:"+vid+ " month index:"+month+ " has error.<br/>";
+					throw new Exception("EMINFO - VID:"+vid+ " month index:"+month+ " has error.<br/>");
+				}
+				
+				vm.calculate();
+				if(vm.getId() == null)
+					em.persist(vm);
+				else
+					em.merge(vm);
+				em.flush();
+				
+				System.out.println("###########Casted "+vid+" :"+ (++cast));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			em.getTransaction().rollback(); // to terminate transactions;
+		}
+		return str;
+	}
+
+	/**
+	 * Get vehicles by team id
+	 * @param teamId
+	 * @return
+	 * @throws Exception
+	 */
+	public Map getVehicleProfileByTeamId(String teamId) throws Exception{
+		List<VehicleProfile> members = null;
+		Long count = null;
+		if(teamId == null || teamId.equals("")){
+			members = em.createQuery("SELECT q FROM VehicleProfile q WHERE " +
+					" NOT EXISTS (SELECT h FROM VehicleTeamMember h WHERE q.id=h.vehicle.id) ORDER BY q.selfid")
+					.getResultList();
+			count = (Long) em.createQuery("SELECT count(q) FROM VehicleProfile q WHERE " +
+					" NOT EXISTS (SELECT h FROM VehicleTeamMember h WHERE q.id=h.vehicle.id)")
+					.getSingleResult();
+		}else{
+			VehicleTeam team = em.find(VehicleTeam.class, Integer.parseInt(teamId));
+			members = em.createQuery("SELECT q FROM VehicleProfile q WHERE" +
+					" q.team.team=:teama  ORDER BY q.selfid").setParameter("teama", team).getResultList();
+			count = (Long) em.createQuery("SELECT count(q) FROM VehicleProfile q WHERE" +
+					" q.team.team=:teama").setParameter("teama", team).getSingleResult();
+		}
+		Map map  = new HashMap<String,Object>();
+		map.put("list", members);
+		map.put("count", count);
+		return map;
+	}
+
+	public VehicleTeam getVehicleTeamByTeamId(String teamId) {
+		try{
+			return em.find(VehicleTeam.class, Integer.parseInt(teamId));
+		}catch(Exception e){
+			System.out.println(e.getMessage());
+			return null;
+		}
+	}
+
+	public List<VehicleTeam> getVehicleTeams() {
+		try{
+			return em.createQuery("SELECT q FROM VehicleTeam q").getResultList();
+		}catch(Exception e){
+			System.out.println(e.getMessage());
+			return new ArrayList<VehicleTeam>();
+		}
+	}
+
+	public Map getVehicleProfileByTeamStatement(String teamSelectorStatement) throws Exception{
+		List<VehicleProfile> members = null;
+		members = em.createQuery(teamSelectorStatement).getResultList();
+		String substatem = teamSelectorStatement.substring(teamSelectorStatement.indexOf("FROM"), teamSelectorStatement.indexOf("ORDER BY"));
+		substatem = "SELECT count(q) "+ substatem;
+		Long count = (Long)em.createQuery(substatem).getSingleResult();
+		Map map  = new HashMap<String,Object>();
+		map.put("list", members);
+		map.put("count", count);
+		return map;
+	}
+
+	@Transactional
+	public void saveTeam(VehicleTeam newTeam) throws Exception{
+		em.persist(newTeam);
+	}
+
+	@Transactional
+	public void removeTeam(String deleteId) throws Exception{
+		VehicleTeam delTeam = getVehicleTeamByTeamId(deleteId);
+		em.remove(delTeam);
+	}
+
+	@Transactional
+	public void saveTeamLeader(VehicleTeamLeader l) throws Exception{
+		em.persist(l);
+	}
+
+	@Transactional
+	public void removeTeamLeader(VehicleTeam t, Employee e) throws Exception{
+		VehicleTeamLeader leader = (VehicleTeamLeader) em.createQuery("SELECT q FROM VehicleTeamLeader q WHERE q.team=:teamt AND q.leader=:leadere")
+				.setParameter("teamt", t).setParameter("leadere", e).getSingleResult();
+		em.remove(leader);
+	}
+
+	@Transactional
+	public void quitTeam(String teamId, List<String> selectedVehicles) throws Exception{
+		for(String v:selectedVehicles){
+			if(v == null){
+				System.out.println(v);
+				continue;
+			}
+			VehicleTeamMember member = (VehicleTeamMember) em.createQuery("SELECT q FROM VehicleTeamMember q WHERE" +
+					" vid=? AND teamid=?").setParameter(1, Integer.parseInt(v)).setParameter(2, Integer.parseInt(teamId)).getSingleResult();
+			em.createNativeQuery("DELETE FROM vehicleteammember WHERE vid="+Integer.parseInt(v)).executeUpdate();
+		}
+	}
+
+	@Transactional
+	public void JoinTeam(String teamId, List<String> selectedVehicles) throws Exception{
+		for(String v:selectedVehicles){
+			if(v == null){
+				continue;
+			}
+			VehicleTeam t = getVehicleTeamByTeamId(teamId);
+			VehicleProfile vp = getVehicleProfileById(Integer.parseInt(v));
+			VehicleTeamMember member = getVehicleTeamMemberByVpId(vp.getId());
+			if(member == null)
+				member = new VehicleTeamMember();
+			member.setTeam(t);
+			member.setVehicle(vp);
+			if(member.getId() == null)
+				em.persist(member);
+			else
+				em.merge(member);
+//			System.out.println("Done");
+		}
+	}
+
+	public Map getAllVehicleLanes() throws Exception{
+		List<VehicleLane> lanes = em.createQuery("SELECT q FROM VehicleLane q ORDER BY num").getResultList();
+		Long count = (Long) em.createQuery("SELECT count(q) FROM VehicleLane q").getSingleResult();
+		Map map  = new HashMap<String,Object>();
+		map.put("list", lanes);
+		map.put("count", count);
+		return map;
+	}
+
+	public VehicleLane getVehicleLaneById(String targetId) {
+		try{
+			return em.find(VehicleLane.class, Integer.parseInt(targetId));
+		}catch(Exception e){
+			return null;
+		}
+	}
+
+	public boolean isRouteExist(VehicleLane newRoute){
+		try{
+			VehicleLane lane = (VehicleLane) em.createQuery("SELECT q FROM VehicleLane q WHERE num=? AND detail=?")
+					.setParameter(1, newRoute.getNum().trim()).setParameter(2, newRoute.getDetail().trim()).getSingleResult();
+			if(lane != null)
+				return true;
+			else
+				return false;
+		}catch(Exception e){
+			System.out.println(e.getMessage());
+			return false;
+		}
+	}
+
+	@Transactional
+	public void saveVehicleLane(VehicleLane newRoute) throws Exception {
+		em.persist(newRoute);
+	}
+
+	@Transactional
+	public void removeVehicleLane(VehicleLane delRoute) throws Exception{
+		VehicleLane lane = (VehicleLane) em.createQuery("SELECT q FROM VehicleLane q WHERE num=? AND detail=?")
+				.setParameter(1, delRoute.getNum().trim()).setParameter(2, delRoute.getDetail().trim()).getSingleResult();
+		em.remove(lane);
+	}
+
+	@Transactional
+	public void joinVehiclesToRoute(VehicleLane newRoute,List<String> selectedVehicles) throws Exception{
+		VehicleLane lane = (VehicleLane) em.createQuery("SELECT q FROM VehicleLane q WHERE num=? AND detail=?")
+				.setParameter(1, newRoute.getNum().trim()).setParameter(2, newRoute.getDetail().trim()).getSingleResult();
+		for(String v:selectedVehicles){
+			VehicleProfile vp = getVehicleProfileById(Integer.parseInt(v));
+			VehicleLaneMapper mapper = getVehicleLaneMapperByVpId(vp.getId());
+			if(mapper == null){
+				mapper = new VehicleLaneMapper();
+			}
+			mapper.setVehicle(vp);
+			mapper.setLane(lane);
+			if(mapper.getId() == null)
+				em.persist(mapper);
+			else
+				em.merge(mapper);
+		}
+	}
+
+	public List<VehicleLane> getAllVehicleLaneNames() throws Exception{
+		List<VehicleLane> lanes = em.createNativeQuery("SELECT id,  num, detail FROM vehiclelane",VehicleLaneMirror.class).getResultList();
+//		return new ArrayList<VehicleLane>(); 
+		return lanes;
+	}
+
+	public List<VehicleProfile> getVehiclesNoRoute() throws Exception{
+		List<VehicleProfile> members;
+		members = em.createQuery("SELECT q FROM VehicleProfile q WHERE " +
+				" NOT EXISTS (SELECT h FROM VehicleLaneMapper h WHERE q.id=h.vehicle.id) ORDER BY q.selfid")
+				.getResultList();
+		return members;
 	}
 
 }
