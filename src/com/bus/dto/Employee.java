@@ -321,7 +321,8 @@ public class Employee implements Serializable{
 	public String getWorkage() {
 		if(this.dob != null){
 			Calendar c = Calendar.getInstance();
-			c.setTime(this.firstworktime);
+			if(this.firstworktime == null)
+			c.setTime(new Date());
 			Calendar cnow = Calendar.getInstance();
 			cnow.setTime(new Date());
 			Integer yearint = cnow.get(Calendar.YEAR) - c.get(Calendar.YEAR);

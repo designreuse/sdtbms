@@ -7,6 +7,14 @@
 	
     <stripes:layout-component name="contents">
     <script type="text/javascript" src="${pageContext.request.contextPath}/js/hr.js"></script>
+    <script type="text/javascript">
+		function addRow(){
+			var str = $('#empIdCardTable tr:last').html();
+			$('#empIdCardTable tr:last').before('<tr>'+str+'<tr/>');
+			$('#empIdCardTable').removeClass('empDetail');
+			$('#empIdCardTable').addClass('empDetail');
+		}
+    </script>
 	<style type="text/css">
 		table.empDetail tr td{ 
 			border: 1px solid rgb(24, 59, 240);
@@ -154,6 +162,45 @@
 						</tr>
 					
 					</table>
+					
+					<hr/>
+					<div>
+						<label style="color: green;">合同</label>
+						<table class="empDetail">
+							<tr>
+							<td>合同类型:</td><td><stripes:select name="empContract.type"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.contracttype}" label="label" value="value"/></stripes:select></td>
+							<td>生效日期:</td><td><stripes:text name="empContract.activedate"   formatPattern="yyyy-MM-dd" class="datepickerClass"/></td>
+							</tr>
+						<tr>
+							<td>开始日期:</td><td><stripes:text name="empContract.startdate"   formatPattern="yyyy-MM-dd" class="datepickerClass"/></td>
+							<td>结束日期:</td><td><stripes:text name="empContract.enddate"   formatPattern="yyyy-MM-dd" class="datepickerClass"/></td>
+						
+						</tr>
+						<tr>
+							<td>附录:</td><td colspan=3><stripes:text style="width:70%;" name="empContract.remark"/></td>
+						</tr>
+						</table>
+					</div>
+					<hr/>
+					<div>
+						<label style="color: green;">证件</label><a href="javascript:addRow();">(更多)</a>
+						<table id="empIdCardTable" class="empDetail">
+							<tr>
+								<td>类型</td>
+								<td>号码</td>
+								<td>初次获得证件日期</td>
+								<td>有效日期</td>
+							</tr>
+							<tr>
+								<td>
+									<stripes:select name="idcardtype"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.typeoptions}" label="label" value="value"/></stripes:select>
+								</td>
+								<td><stripes:text name="idcardnumber" /></td>
+								<td><stripes:text name="idcardvalidfrom"  formatPattern="yyyy-MM-dd" class="datepickerClass"/></td>
+								<td><stripes:text name="idcardexpiredate"  formatPattern="yyyy-MM-dd" class="datepickerClass"/></td>
+							</tr>
+						</table>
+					</div>
 				</stripes:form>
 				</div>
 				</ss:secure>
@@ -163,12 +210,12 @@
 				<div  id="btn_new_contract_dialog" title="新建档案">
 					<stripes:form id="form_new_contract" beanclass="com.bus.stripes.actionbean.EmployeeActionBean" focus="">
 					<stripes:errors/>
-					<table>
+					<table >
 						<tr>
 							<td colspan=4 style="text-align:center;"><label id="contract_label_name"></label></td>
 						</tr>
 						<tr>
-							<td>合同类型:</td><td><stripes:select name="contract.type"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.contracttype}" label="label" value="value"/></stripes:select></td></td>
+							<td>合同类型:</td><td><stripes:select name="contract.type"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.contracttype}" label="label" value="value"/></stripes:select></td>
 							<td>生效日期:</td><td><stripes:text name="contract.activedate"   formatPattern="yyyy-MM-dd" class="datepickerClass"/><input id="contract_target_id" type="hidden" name="targetId" value=""/></td>
 						</tr>
 						<tr>

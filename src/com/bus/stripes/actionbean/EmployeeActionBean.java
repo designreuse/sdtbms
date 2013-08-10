@@ -15,12 +15,14 @@ import com.bus.dto.Account;
 import com.bus.dto.Contract;
 import com.bus.dto.Department;
 import com.bus.dto.Employee;
+import com.bus.dto.Idmanagement;
 import com.bus.services.CustomActionBean;
 import com.bus.services.HRBean;
 import com.bus.stripes.selector.EmployeeSelector;
 import com.bus.test.data.TestData;
 import com.bus.util.ExcelFileSaver;
 import com.bus.util.ExcelFileWriter;
+import com.bus.util.HRUtil;
 import com.bus.util.Roles;
 import com.bus.util.SelectBoxOption;
 import com.bus.util.SelectBoxOptions;
@@ -66,6 +68,14 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 	private List<SelectBoxOption> position;
 	private List<SelectBoxOption> specialPeople;
 	private List<SelectBoxOption> placebelongs;
+	private List<SelectBoxOption> typeoptions;
+	
+	private Contract empContract; //Inside new employee dialog
+	
+	private List<String> idcardtype;
+	private List<String> idcardnumber;
+	private List<String> idcardvalidfrom;
+	private List<String> idcardexpiredate;
 	
 	
 	private List<Employee> employees = new ArrayList<Employee>();
@@ -161,6 +171,8 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 		this.contracttype = SelectBoxOptions.getSelectBoxFromFixOptions(bean.getOptionListById(5));
 		this.specialPeople = SelectBoxOptions.getSelectBoxFromFixOptions(bean.getOptionListById(8));
 		this.placebelongs = SelectBoxOptions.getSelectBoxFromFixOptions(bean.getOptionListById(9));
+		
+		typeoptions = SelectBoxOptions.getSelectBoxFromFixOptions(bean.getOptionListById(7));
 	}
 	
 	
@@ -204,6 +216,25 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 		try{
 			employee.setAccount(context.getUser());
 			bean.saveEmployee(employee);
+			Employee e = bean.getEmployeeByWorkerId(employee.getWorkerid());
+			if(empContract != null){
+				empContract.setEmployee(e);
+				bean.saveContract(empContract);
+			}
+			if(idcardtype != null && idcardtype.size() > 0){
+				for(int i=0;i<idcardtype.size();i++){
+					Idmanagement idc = new Idmanagement();
+					idc.setEmployee(e);
+					idc.setType(idcardtype.get(i));
+					if(idcardnumber.get(i) != null)
+						idc.setNumber(idcardnumber.get(i));
+					if(idcardvalidfrom.get(i)!= null)
+						idc.setValidfrom(HRUtil.parseDate(idcardvalidfrom.get(i), "yyyy-MM-dd"));
+					if(idcardexpiredate.get(i) != null)
+						idc.setExpiredate(HRUtil.parseDate(idcardexpiredate.get(i), "yyyy-MM-dd"));
+					bean.saveIdcard(idc);
+				}
+			}
 			return new StreamingResolution("text;charset=utf-8", new StringReader("新建档案成功"));
 		}catch(Exception e){
 			return context.errorResolutionAjax("出错啦。", "错误报告:" + e.getMessage());
@@ -613,6 +644,42 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 	}
 	public void setPlacebelongs(List<SelectBoxOption> placebelongs) {
 		this.placebelongs = placebelongs;
+	}
+	public Contract getEmpContract() {
+		return empContract;
+	}
+	public void setEmpContract(Contract empContract) {
+		this.empContract = empContract;
+	}
+	public List<SelectBoxOption> getTypeoptions() {
+		return typeoptions;
+	}
+	public void setTypeoptions(List<SelectBoxOption> typeoptions) {
+		this.typeoptions = typeoptions;
+	}
+	public List<String> getIdcardtype() {
+		return idcardtype;
+	}
+	public void setIdcardtype(List<String> idcardtype) {
+		this.idcardtype = idcardtype;
+	}
+	public List<String> getIdcardnumber() {
+		return idcardnumber;
+	}
+	public void setIdcardnumber(List<String> idcardnumber) {
+		this.idcardnumber = idcardnumber;
+	}
+	public List<String> getIdcardvalidfrom() {
+		return idcardvalidfrom;
+	}
+	public void setIdcardvalidfrom(List<String> idcardvalidfrom) {
+		this.idcardvalidfrom = idcardvalidfrom;
+	}
+	public List<String> getIdcardexpiredate() {
+		return idcardexpiredate;
+	}
+	public void setIdcardexpiredate(List<String> idcardexpiredate) {
+		this.idcardexpiredate = idcardexpiredate;
 	}
 
 }

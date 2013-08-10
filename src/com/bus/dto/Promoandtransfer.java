@@ -34,6 +34,7 @@ public class Promoandtransfer {
 	private Date createdate;
 	private Account creator;
 	
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="id")

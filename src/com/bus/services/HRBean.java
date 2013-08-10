@@ -992,12 +992,14 @@ public class HRBean{
 	public void removeCoordination(int targetId) throws Exception{
 		Promoandtransfer pt = em.find(Promoandtransfer.class, targetId);
 		Employee e  = pt.getEmployee();
-		if(e.getDepartment().getId() == pt.getCurdepartment().getId()){
-			if(e.getPosition().getId() == pt.getCurposition().getId()){
-				e.setDepartment(pt.getPredepartment());
-				e.setPosition(pt.getPreposition());
-				em.merge(e);
-				em.flush();
+		if(pt.getType().equals("调动")){
+			if(e.getDepartment().getId() == pt.getCurdepartment().getId()){
+				if(e.getPosition().getId() == pt.getCurposition().getId()){
+					e.setDepartment(pt.getPredepartment());
+					e.setPosition(pt.getPreposition());
+					em.merge(e);
+					em.flush();
+				}
 			}
 		}
 		em.remove(pt);
