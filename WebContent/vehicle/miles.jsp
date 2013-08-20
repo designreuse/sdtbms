@@ -29,7 +29,7 @@
             	var value = $(this).val();
             	if($.trim(value) == "")
                 	return;
-            	if(!(/^[0-9]+\.{0,1}[0-9]+$/.test(value))){
+            	if(!(/^[0-9]+\.{0,1}[0-9]?$/.test(value))){
                 	alert("请输入正确的数字");
                 	$(this).focus();
                 	return;

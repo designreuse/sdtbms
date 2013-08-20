@@ -87,7 +87,9 @@
 							<td>
 								${card.id}
 							</td>
-							<td>${card.employee.fullname}</td>
+							<td>
+								<a target="_blank" href="${pageContext.request.contextPath}/actionbean/Employee.action?targetId=${card.employee.id}&detail=">${card.employee.fullname}</a>	
+							</td>
 							<td>${card.type}</td>
 							<td>${card.number}</td>
 							<td>${card.validfromstr}</td>

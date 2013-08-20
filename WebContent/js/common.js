@@ -4,7 +4,7 @@ function formValidation(formid){
 	$('#'+formid).find('input').each(function(){
 		if($(this).hasClass('required')){
 			var value = $(this).val();
-			if(value.trim() == ""){
+			if($.trim(value) == ""){
 				valid = false;
 				var name = $(this).parent().prev().html();
 				text += name + ",";
@@ -14,7 +14,7 @@ function formValidation(formid){
 	$('#'+formid).find('select').each(function(){
 		if($(this).hasClass('required')){
 			var value = $(this).val();
-			if(value.trim() == ""){
+			if($.trim(value) == ""){
 				valid = false;
 				var name = $(this).parent().prev().html();
 				text += name + ",";

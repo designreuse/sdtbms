@@ -186,7 +186,9 @@
 							<td>
 								${coor.id}
 							</td>
-							<td>${coor.employee.fullname}</td>
+							<td>
+								<a target="_blank" href="${pageContext.request.contextPath}/actionbean/Employee.action?targetId=${coor.employee.id}&detail=">${coor.employee.fullname}</a>
+							</td>
 							<td>${coor.employee.workerid}</td>
 							<td>${coor.type}</td>
 							<td>${coor.predepartment.name}</td>

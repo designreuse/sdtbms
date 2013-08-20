@@ -207,19 +207,19 @@ $(document).ready(function() {
 $(document).ready(function(){
     $(".btn_contract_view_employee").click(function(){
     	var url = $(this).val();
-    	var targetId = $(this).prev().prev().val();
+    	var targetId = $(this).parent().children().first().val();
     	url += "?targetId="+targetId +"&detail=";
-    	window.open(url, "Contract Employee Detail ID:"+targetId, ["width=650,height=400,scrollbars=yes"]);
+    	window.open(url, "", "width=650,height=400,scrollbars=yes");
     });
 	$(".btn_contract_view_all").click(function(){
 		var url = $(this).val();
-    	var targetId = $(this).prev().prev().prev().val();
+    	var targetId = $(this).parent().children().first().val();
     	url += "?employeeId="+targetId +"&viewall=";
-    	window.open(url, "Contracts For Employee Detail ID:"+targetId, ["width=1200,height=400,scrollbars=yes"]);
+    	window.open(url, ""+targetId, ["width=1200,height=400,scrollbars=yes"]);
 	});
 	$(".btn_contract_delete").click(function(){
 		var url = $(this).val();
-		var targetId = $(this).prev().prev().prev().val();
+		var targetId = $(this).parent().children().first().val();
 		var params = "targetId=" + targetId + "&delete=";
 		$.ajax({
 			url:url,
@@ -227,7 +227,7 @@ $(document).ready(function(){
 			dataType:'text',
 			data:params,
 			success:function(response){
-				console.log("ajax response = "+response);
+//				console.log("ajax response = "+response);
 				alert(response);
 				location.reload();
 			},
@@ -238,7 +238,7 @@ $(document).ready(function(){
 	});
 	$(".btn_contract_resign").click(function(){
 		var url = $(this).val();
-		var targetId = $(this).prev().prev().prev().prev().val();
+		var targetId = $(this).parent().children().first().val();
 		var params = "targetId=" + targetId + "&resignContract=";
 		$.ajax({
 			url:url,
@@ -246,7 +246,7 @@ $(document).ready(function(){
 			dataType:'text',
 			data:params,
 			success:function(response){
-				console.log("ajax response = "+response);
+//				console.log("ajax response = "+response);
 				alert(response);
 				location.reload();
 			},
@@ -378,7 +378,7 @@ function hrNewDocumentValidation(formid){
 	$('#'+formid).find('input').each(function(){
 		if($(this).hasClass('required')){
 			var value = $(this).val();
-			if(value.trim() == ""){
+			if($.trim(value) == ""){
 				valid = false;
 				var name = $(this).parent().prev().html();
 				text += name + ",";
@@ -388,7 +388,7 @@ function hrNewDocumentValidation(formid){
 	$('#'+formid).find('select').each(function(){
 		if($(this).hasClass('required')){
 			var value = $(this).val();
-			if(value.trim() == ""){
+			if($.trim(value) == ""){
 				valid = false;
 				var name = $(this).parent().prev().html();
 				text += name + ",";
