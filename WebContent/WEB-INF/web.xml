@@ -46,7 +46,6 @@
 		<init-param>
 			<param-name>Interceptor.Classes</param-name>
 				<param-value>
-						net.sourceforge.stripes.controller.BeforeAfterMethodInterceptor,
 			    	net.sourceforge.stripes.integration.spring.SpringInterceptor,
 			    	com.bus.interceptor.SecurityInterceptor,
 			    	security.controller.SecurityInterceptor

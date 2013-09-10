@@ -324,6 +324,10 @@ function buildBasicCreateDialog(formId, dialogId, width, height, extraParam){
 		},
 		buttons: {
 			'新建':function(){
+					$("#empIdCardTable input:text").each(function(){
+						if($.trim($(this).val()) == "")
+							$(this).val("0");
+					});
 					if(!hrNewDocumentValidation(formId)){
 						return;
 					}

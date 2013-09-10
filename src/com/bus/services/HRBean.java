@@ -1110,4 +1110,29 @@ public class HRBean{
 		return em.find(Contract.class, id);
 	}
 
+	/**
+	 * Get all active departments. by native query
+	 * @return
+	 */
+	public List<Department> getAllActiveDepartment() throws Exception{
+		String statement = "SELECT distinct department.id AS id, department.name AS name, department.remark AS remark" +
+				" FROM employee JOIN department ON employee.departmentid = department.id " +
+				" WHERE employee.status='A' ORDER BY department.name";
+		List<Department> departments = em.createNativeQuery(statement, Department.class).getResultList();
+		return departments;
+	}
+
+	/**
+	 * Get employee by department Id
+	 * @param id
+	 * @return
+	 */
+	public List<Employee> getEmployeeByDepartmentId(Integer id) throws Exception {
+		List<Employee> emp = em
+				.createQuery("SELECT q FROM Employee q WHERE q.department.id="+id+" AND q.status='A' ORDER BY q.fullname")
+				.getResultList();
+//		List<Employee> emp = em.createNativeQuery("SELECT * FROM employee WHERE departmentid="+id+" AND status='A' ORDER BY fullname", Employee.class).getResultList();
+		return emp;
+	}
+
 }

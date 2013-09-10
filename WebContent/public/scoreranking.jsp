@@ -141,7 +141,7 @@ $(document).ready(function(){
 											</c:choose>
 												<td class="rank">${summary.rank}</td>
 												<td>${summary.workerid}</td>
-												<td>${summary.name}</td>
+												<td><a href="/bms/actionbean/Empscore.action?memberDetail=&workerid=${summary.workerid}">${summary.name}</a></td>
 												<td>${summary.workage}</td>
 												<td>${summary.positionName}</td>
 												<c:choose>

@@ -96,6 +96,9 @@
 								<li>
 									<a href="javascript:void(0);" id="layout1600" title="Switch to 1600px layout"><b>1600px</b>宽度</a>
 								</li>
+								<li>
+									<a href="javascript:void(0);" id="layout2000" title="Switch to 2000px layout"><b>2000px</b>宽度</a>
+								</li>
 							</ul>
 						</div>
 					</div>

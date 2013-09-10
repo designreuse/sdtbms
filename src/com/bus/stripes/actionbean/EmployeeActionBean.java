@@ -226,17 +226,18 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 					Idmanagement idc = new Idmanagement();
 					idc.setEmployee(e);
 					idc.setType(idcardtype.get(i));
-					if(idcardnumber.get(i) != null)
+					if(idcardnumber != null && idcardnumber.get(i) != null && !idcardnumber.get(i).equals("0"))
 						idc.setNumber(idcardnumber.get(i));
-					if(idcardvalidfrom.get(i)!= null)
-						idc.setValidfrom(HRUtil.parseDate(idcardvalidfrom.get(i), "yyyy-MM-dd"));
-					if(idcardexpiredate.get(i) != null)
-						idc.setExpiredate(HRUtil.parseDate(idcardexpiredate.get(i), "yyyy-MM-dd"));
+					if(idcardvalidfrom != null && idcardvalidfrom.get(i)!= null && !idcardvalidfrom.get(i).equals("0"))
+							idc.setValidfrom(HRUtil.parseDate(idcardvalidfrom.get(i), "yyyy-MM-dd"));
+					if(idcardexpiredate != null && idcardexpiredate.get(i) != null && !idcardexpiredate.get(i).equals("0"))
+							idc.setExpiredate(HRUtil.parseDate(idcardexpiredate.get(i), "yyyy-MM-dd"));
 					bean.saveIdcard(idc);
 				}
 			}
 			return new StreamingResolution("text;charset=utf-8", new StringReader("新建档案成功"));
 		}catch(Exception e){
+			e.printStackTrace();
 			return context.errorResolutionAjax("出错啦。", "错误报告:" + e.getMessage());
 		}
     }

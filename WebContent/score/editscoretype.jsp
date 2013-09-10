@@ -50,10 +50,22 @@ function editScoretype(){
 									<td>类型:</td><td><stripes:select name="scoretype.type"  class="required"><stripes:option value="0">临时分</stripes:option><stripes:option value="1">固定分</stripes:option></stripes:select></td>
 								</tr>
 								<tr>
-									<td>注释:</td><td><stripes:textarea name="scoretype.description"  class="required"/></td>
+									<td>条例:</td><td><stripes:textarea name="scoretype.description"  class="required"/></td>
 								</tr>
 								<tr>	
-									<td>分值:</td><td><stripes:text name="scoretype.score"  class="required" formatType="number" formatPattern="integer"></stripes:text></td>
+									<td>分值:</td><td><stripes:text name="scoretype.score"  class="required" formatType="number"></stripes:text></td>
+								</tr>
+								<tr>	
+									<td>周期:</td><td><stripes:text name="scoretype.period"  class="required"></stripes:text></td>
+								</tr>
+								<tr>	
+									<td>考核部门:</td><td><stripes:text name="scoretype.examine"  class="required"></stripes:text></td>
+								</tr>
+								<tr>	
+									<td>评分对象:</td><td><stripes:text name="scoretype.scoreobject"  class="required"></stripes:text></td>
+								</tr>
+								<tr>	
+									<td>备注:</td><td><stripes:text name="scoretype.remark"></stripes:text></td>
 								</tr>
 						</table>
 						</div>

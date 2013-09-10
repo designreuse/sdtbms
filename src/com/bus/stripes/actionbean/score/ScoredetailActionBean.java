@@ -137,13 +137,13 @@ public class ScoredetailActionBean extends CustomActionBean{
 		this.selectedRecord = selectedRecord;
 	}
 	
-	public long getRecordsSum(){
-		long sum = 0L;
+	public float getRecordsSum(){
+		float sum = 0F;
 		if(records == null)
 			return sum;
 		else{
 			for(Scorerecord r:records){
-				sum += (long)r.getScoretype().getScore();
+				sum += r.getScoretype().getScore();
 			}
 		}
 		return sum;

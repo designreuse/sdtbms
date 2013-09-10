@@ -218,6 +218,11 @@ $(document).ready(function() {
 			$('body').attr("class","layout1600");
 			$("#page-layout, #page-header-wrapper, #sub-nav").addClass("fixed");
 	    };
+	    
+	    if (lay_cookie == 'layout2000') {
+			$('body').attr("class","layout2000");
+			$("#page-layout, #page-header-wrapper, #sub-nav").addClass("fixed");
+	    };
 
     });
 

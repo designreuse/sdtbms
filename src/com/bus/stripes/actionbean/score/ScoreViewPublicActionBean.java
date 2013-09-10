@@ -202,15 +202,15 @@ public class ScoreViewPublicActionBean extends CustomActionBean{
 		this.records = records;
 	}
 	public String getRecordsSum(){
-		long sum = 0L;
+		float sum = 0L;
 		if(records == null)
 			return sum+"";
 		else{
 			for(Scorerecord r:records){
-				sum += (long)r.getScoretype().getScore();
+				sum += r.getScoretype().getScore();
 			}
 		}
-		return HRUtil.formatNumberComma(new Long(sum).toString());
+		return HRUtil.formatFloatNumberComma(new Float(sum).toString());
 	}
 	public int getPagenum() {
 		return pagenum;

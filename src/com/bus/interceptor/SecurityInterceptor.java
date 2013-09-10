@@ -4,6 +4,7 @@ import com.bus.stripes.actionbean.ErrorActionBean;
 import com.bus.stripes.actionbean.LoginActionBean;
 import com.bus.stripes.actionbean.MyActionBeanContext;
 import com.bus.stripes.actionbean.Permission;
+import com.bus.stripes.actionbean.common.EmployeeSelectorActionBean;
 import com.bus.stripes.actionbean.score.ScoreViewPublicActionBean;
 import com.bus.stripes.actionbean.score.ScoreitemsActionBean;
 
@@ -30,6 +31,8 @@ public class SecurityInterceptor implements Interceptor{
 		}else if(ctx.getActionBean() instanceof ScoreViewPublicActionBean){
 			return resolution;
 		}else if(ctx.getActionBean() instanceof ErrorActionBean){
+			return resolution;
+		}else if(ctx.getActionBean() instanceof EmployeeSelectorActionBean){
 			return resolution;
 		}
 		

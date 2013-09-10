@@ -188,6 +188,10 @@ a.icon-only {
 	width:1600px;
 }
 
+.layout2000 .fixed {
+	width:2000px;
+}
+
 #page-header .fixed {
 	margin:0 auto!important;
 }

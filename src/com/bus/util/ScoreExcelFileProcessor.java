@@ -29,8 +29,8 @@ public class ScoreExcelFileProcessor extends ExcelFileProcessor {
 		String str = "";
 		while (hasNextLine()) {
 
-			String[] cols = strLine.split(",");
-			if (cols.length < 4) {
+			String[] cols = strLine.split("\t");
+			if (cols.length < 8) {
 				String num = "N.A.";
 				if (cols.length > 1)
 					num = cols[0];
@@ -38,26 +38,30 @@ public class ScoreExcelFileProcessor extends ExcelFileProcessor {
 				continue;
 			}
 			try {
-				String remark = "";
-				for(int i=3;i<cols.length;i++){
-					if(i == cols.length-1)
-						remark += cols[i];
-					else
-						remark += cols[i] + ",";
-				}
+//				String remark = "";
+//				for(int i=3;i<cols.length;i++){
+//					if(i == cols.length-1)
+//						remark += cols[i];
+//					else
+//						remark += cols[i] + ",";
+//				}
 				Scoretype st = new Scoretype();
 				st.setAccount(user);
 				st.setCreatedate(Calendar.getInstance().getTime());
-				st.setDescription(remark);
+				st.setDescription(cols[1]);
 				st.setReference(cols[0]);
-				st.setScore(Integer.parseInt(cols[2]));
-				if (cols[1].equals(Scoretype.SCORE_TYPE_FIX_STR))
+				st.setPeriod(cols[2]);
+				st.setScore(Float.parseFloat(cols[3]));
+				st.setExamine(cols[4]);
+				st.setScoreobject(cols[5]);
+				st.setRemark(cols[6]);
+				if (cols[7].equals(Scoretype.SCORE_TYPE_FIX_STR))
 					st.setType(Scoretype.SCORE_TYPE_FIX);
-				else if (cols[1].equals(Scoretype.SCORE_TYPE_TEMP_STR))
+				else if (cols[7].equals(Scoretype.SCORE_TYPE_TEMP_STR))
 					st.setType(Scoretype.SCORE_TYPE_TEMP);
-				else if (cols[1].equals(Scoretype.SCORE_TYPE_PERFORMENCE_STR))
+				else if (cols[7].equals(Scoretype.SCORE_TYPE_PERFORMENCE_STR))
 					st.setType(Scoretype.SCORE_TYPE_PERFORMENCE);
-				else if (cols[1].equals(Scoretype.SCORE_TYPE_PROJECT_STR))
+				else if (cols[7].equals(Scoretype.SCORE_TYPE_PROJECT_STR))
 					st.setType(Scoretype.SCORE_TYPE_PROJECT);
 				else {
 					str += "不知名的类型." + "第" + index + "行" + "录入失败,编号"+ cols[0]  + "\n<br/>";
@@ -68,7 +72,6 @@ public class ScoreExcelFileProcessor extends ExcelFileProcessor {
 				str += "转换出错." + "第" + index + "行" + "录入失败,编号" + cols[0]  + "\n<br/>";
 				continue;
 			}
-
 		}
 		return str;
 	}
@@ -76,7 +79,7 @@ public class ScoreExcelFileProcessor extends ExcelFileProcessor {
 	/**
 	 * Return "" if no errors, else will be written inside the returned string.
 	 * <br/> need 7 columns
-	 * <br/>id, scoredate, reference, nameOfSender, workeridOfSender, nameOfReceiver, workeridOfReceiver
+	 * <br/>id, scoredate, reference, nameOfSender, workeridOfSender, nameOfReceiver, workeridOfReceiver, [score]
 	 * @param hrBean
 	 * @param scoreBean
 	 * @param user
@@ -84,8 +87,9 @@ public class ScoreExcelFileProcessor extends ExcelFileProcessor {
 	 */
 	public String saveScores(HRBean hrBean, ScoreBean scoreBean, Account user) {
 		String str = "";
+		hasNextLine();
 		while (hasNextLine()) {
-			String[] cols = strLine.split(",");
+			String[] cols = strLine.split("\t");
 			if (cols.length < 7) {
 				String num = "N.A.";
 				if (cols.length > 1)
@@ -112,14 +116,14 @@ public class ScoreExcelFileProcessor extends ExcelFileProcessor {
 						scoreBean.createScoreMember(user,scorer);
 					}
 				}
-				Integer score=null;
-				if(cols.length > 7){
-					score = Integer.parseInt(cols[7]);
+				Float score=null;
+				if(cols.length > 7 && !cols[7].trim().equals("")){
+					score = Float.parseFloat(cols[7]);
 				}
 				scoreBean.assignScoreTypeToScoreMember(user, cols[4], cols[6], st, scoredate,score);
 			} catch (Exception e) {
 				e.printStackTrace();
-				str += "转换出错." + "第" + index + "行" + "录入失败,id" + cols[0]+"."+e.getMessage()  + "\n<br/>";
+				str += "转换出错." + "第" + index + "行" + "录入失败,id " + cols[0]+". "+e.getMessage()  + "\n<br/>";
 				continue;
 			}
 

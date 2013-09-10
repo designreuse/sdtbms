@@ -10,7 +10,7 @@ public class ScoreitemSelector implements BMSSelector{
 		int set = 0;
 		String query = "SELECT q FROM Scoretype q  WHERE";
 		if(reference != null){
-			query += " reference='"+reference+"'";
+			query += " reference LIKE '%"+reference+"%'";
 			set++;
 		}
 		if(type != -1){

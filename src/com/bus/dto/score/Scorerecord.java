@@ -28,7 +28,7 @@ public class Scorerecord  implements Serializable{
 	private Scoretype scoretype;
 	private Date scoredate;
 	private Date createdate;
-	private Integer score;
+	private Float score;
 	private Account creator;
 	
 	@Id
@@ -101,10 +101,10 @@ public class Scorerecord  implements Serializable{
 	}
 	
 	@Column(name="score")
-	public Integer getScore() {
+	public Float getScore() {
 		return score;
 	}
-	public void setScore(Integer score) {
+	public void setScore(Float score) {
 		this.score = score;
 	}
 }

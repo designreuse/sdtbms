@@ -22,6 +22,9 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
+
 import com.bus.util.HRUtil;
 
 @Entity
@@ -327,9 +330,10 @@ public class Employee implements Serializable{
 				c.setTime(firstworktime);
 			Calendar cnow = Calendar.getInstance();
 			cnow.setTime(new Date());
-			Integer yearint = cnow.get(Calendar.YEAR) - c.get(Calendar.YEAR);
-			Integer monthint = (cnow.get(Calendar.MONTH) - c.get(Calendar.MONTH) + 12)%12;
-			Integer dayint  = (cnow.get(Calendar.DAY_OF_MONTH) - c.get(Calendar.DAY_OF_MONTH)+30)%30;
+			Period p = new Period(c.getTimeInMillis(),cnow.getTimeInMillis(),PeriodType.yearMonthDay());
+			Integer yearint = p.getYears();
+			Integer monthint = p.getMonths();
+			Integer dayint = p.getDays();
 			return yearint.toString()+"年"+monthint.toString()+"月"+dayint.toString()+"日";
 		}else
 			return "";
@@ -448,11 +452,17 @@ public class Employee implements Serializable{
 			c.setTime(this.dob);
 			Calendar cnow = Calendar.getInstance();
 			cnow.setTime(new Date());
-			Integer yearint = cnow.get(Calendar.YEAR) - c.get(Calendar.YEAR);
-			if(cnow.get(Calendar.DAY_OF_YEAR) < c.get(Calendar.DAY_OF_YEAR))
-				yearint--;
-			Integer monthint = (cnow.get(Calendar.MONTH) - c.get(Calendar.MONTH) + 12)%12;
-			Integer dayint  = (cnow.get(Calendar.DAY_OF_MONTH) - c.get(Calendar.DAY_OF_MONTH)+30)%30;
+			
+			Period p = new Period(c.getTimeInMillis(),cnow.getTimeInMillis(),PeriodType.yearMonthDay());
+			Integer yearint = p.getYears();
+			Integer monthint = p.getMonths();
+			Integer dayint = p.getDays();
+			
+//			Integer yearint = cnow.get(Calendar.YEAR) - c.get(Calendar.YEAR);
+//			if(cnow.get(Calendar.DAY_OF_YEAR) < c.get(Calendar.DAY_OF_YEAR))
+//				yearint--;
+//			Integer monthint = (cnow.get(Calendar.MONTH) - c.get(Calendar.MONTH) + 12)%12;
+//			Integer dayint  = (cnow.get(Calendar.DAY_OF_MONTH) - c.get(Calendar.DAY_OF_MONTH)+30)%30;
 			return yearint.toString()+"岁"+monthint.toString()+"月"+dayint.toString()+"日";
 		}else
 			return "";

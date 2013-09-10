@@ -33,12 +33,12 @@
 				<div>
 				文件上传
 				<stripes:form id="file_submit_form" beanclass="com.bus.stripes.actionbean.score.ScoreFileUploadActionBean">
-					<Label>条例 文件(csv):</Label><stripes:file name="itemsfile" id="file_scoreitem" />
+					<Label>条例 文件(txt):</Label><stripes:file name="itemsfile" id="file_scoreitem" />
 									<ss:secure roles="score_fileupload_uploaditems">
 											<stripes:submit name="itemsupload" value="提交"/>
 									</ss:secure>
 					<br/>
-					<Label>给分文件(csv):</Label><stripes:file name="scorefile"  id="file_score" />
+					<Label>给分文件(txt):</Label><stripes:file name="scorefile"  id="file_score" />
 									<ss:secure roles="score_fileupload_uploadscores">
 											<stripes:submit name="scoreupload" value="提交"/>
 									</ss:secure>
@@ -49,13 +49,13 @@
 						var employee_check = $('#file_score').val().trim();
 						if(employee_csv != ""){
 							var ext = employee_csv.split('.').pop().toLowerCase();
-							if($.inArray(ext, ['csv']) == -1) {
+							if($.inArray(ext, ['txt']) == -1) {
 						    	alert('条例文件不是合法的csv文件');
 						    	return false;
 							}
 						}else if(employee_check != ""){
 							var ext = employee_check.split('.').pop().toLowerCase();
-							if($.inArray(ext, ['csv']) == -1) {
+							if($.inArray(ext, ['txt']) == -1) {
 						    	alert('得分文件不是合法的txt文件');
 						    	return false;
 							}

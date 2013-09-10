@@ -67,8 +67,8 @@ public class HRUtil {
 		return df.format(c.getTime());
 	}
 	
-	public static String formatNumberComma(String num){
-		Long amount = Long.parseLong(num);
+	public static String formatFloatNumberComma(String num){
+		Float amount = Float.parseFloat(num);
 		NumberFormat formatter = NumberFormat.getInstance();
 		return formatter.format(amount);
 	}

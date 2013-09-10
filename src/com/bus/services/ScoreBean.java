@@ -215,7 +215,7 @@ public class ScoreBean  extends EMBean{
 	 * @throws Exception
 	 */
 	@Transactional
-	public void assignScoreTypeToScoreMember(Account user, String emp,String scorer, Scoretype st, Date scoredate, Integer score) throws Exception{
+	public void assignScoreTypeToScoreMember(Account user, String emp,String scorer, Scoretype st, Date scoredate, Float score) throws Exception{
 		Scoremember scorersm = getScoreMemberByWorkerid(scorer);
 		Scoremember empsm = getScoreMemberByWorkerid(emp);
 		Date today = Calendar.getInstance().getTime();
@@ -234,7 +234,7 @@ public class ScoreBean  extends EMBean{
 		em.persist(record);
 		em.flush();
 		//Update history scores
-		scorersm.setHistorytotal((scorersm.getHistorytotal()+(long)score));
+		scorersm.setHistorytotal((scorersm.getHistorytotal()+score));
 		em.merge(scorersm);
 		//Update montyly scores
 		Scoresummary summary=this.getScoreSummary(scorersm, scoredate);
@@ -245,26 +245,26 @@ public class ScoreBean  extends EMBean{
 			summary.setEmployee(scorersm.getEmployee());
 			summary.setDate(scoredate);
 			if(st.getType() == Scoretype.SCORE_TYPE_FIX)
-				summary.setFixscore(new Long(score));
+				summary.setFixscore(new Float(score));
 			else if(st.getType() == Scoretype.SCORE_TYPE_TEMP)
-				summary.setScore(new Long(score));
+				summary.setScore(new Float(score));
 			else if(st.getType() == Scoretype.SCORE_TYPE_PERFORMENCE)
-				summary.setPerformancescore(new Long(score));
+				summary.setPerformancescore(new Float(score));
 			else if(st.getType() == Scoretype.SCORE_TYPE_PROJECT)
-				summary.setProjectscore(new Long(score));
+				summary.setProjectscore(new Float(score));
 			em.persist(summary);
 			em.flush();
 			em.persist(LoggerAction.createNewScoreSummary(user,summary));
 		}else{
 			//update
 			if(st.getType() == Scoretype.SCORE_TYPE_FIX)
-				summary.setFixscore(summary.getFixscore() + new Long(score));
+				summary.setFixscore(summary.getFixscore() + new Float(score));
 			else if(st.getType() == Scoretype.SCORE_TYPE_TEMP)
-				summary.setScore(summary.getScore() + new Long(score));
+				summary.setScore(summary.getScore() + new Float(score));
 			else if(st.getType() == Scoretype.SCORE_TYPE_PERFORMENCE)
-				summary.setPerformancescore(summary.getPerformancescore() + new Long(score));
+				summary.setPerformancescore(summary.getPerformancescore() + new Float(score));
 			else if(st.getType() == Scoretype.SCORE_TYPE_PROJECT)
-				summary.setProjectscore(summary.getProjectscore() + new Long(score));
+				summary.setProjectscore(summary.getProjectscore() + new Float(score));
 			em.merge(summary);
 			em.persist(LoggerAction.updateScoreSummary(user,summary));
 		}
@@ -281,15 +281,15 @@ public class ScoreBean  extends EMBean{
 	public void removeScoreTypeToScoreMember(Account user, String recordId) throws Exception{
 		Scorerecord record = em.find(Scorerecord.class, Integer.parseInt(recordId));
 		Scoremember member = record.getReceiver();
-		Integer score = record.getScore();
+		Float score = record.getScore();
 		Scoresummary summary  =  this.getScoreSummary(record.getReceiver(), record.getScoredate());
 		if(record.getScoretype().getType() == Scoretype.SCORE_TYPE_FIX)
-			summary.setFixscore(summary.getFixscore() - new Long(score));
+			summary.setFixscore(summary.getFixscore() - new Float(score));
 		else if(record.getScoretype().getType() == Scoretype.SCORE_TYPE_TEMP)
-			summary.setScore(summary.getScore() - new Long(score));
+			summary.setScore(summary.getScore() - new Float(score));
 		em.merge(summary);
 		em.persist(LoggerAction.updateScoreSummary(user,summary));
-		member.setHistorytotal(member.getHistorytotal() - new Long(score));
+		member.setHistorytotal(member.getHistorytotal() - new Float(score));
 		em.merge(member);
 		em.persist(LoggerAction.removeScoreRecord(user,record));
 		em.remove(record);
@@ -307,10 +307,10 @@ public class ScoreBean  extends EMBean{
 				.setParameter(2, employee.getWorkerid()).getSingleResult();
 		Scoremember member = new Scoremember();
 		member.setEmployee(e);
-		member.setHistorytotal(0L);
-		member.setMonthlyremain(0);
-		member.setMonthlyscore(0);
-		member.setMonthlytotal(0);
+		member.setHistorytotal(0F);
+		member.setMonthlyremain(0F);
+		member.setMonthlyscore(0F);
+		member.setMonthlytotal(0F);
 		member.setVoucherscore(0L);
 		em.persist(member);
 		em.flush();

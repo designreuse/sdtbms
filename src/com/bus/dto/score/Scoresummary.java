@@ -23,10 +23,10 @@ public class Scoresummary {
 	private Integer id;
 	private Employee employee;
 	private Date date;
-	private Long score = 0L;
-	private Long fixscore = 0L;
-	private Long performancescore = 0L;
-	private Long projectscore = 0L;
+	private Float score = 0F;
+	private Float fixscore = 0F;
+	private Float performancescore = 0F;
+	private Float projectscore = 0F;
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -56,34 +56,34 @@ public class Scoresummary {
 	}
 	
 	@Column(name="score")
-	public Long getScore() {
+	public Float getScore() {
 		return score;
 	}
-	public void setScore(Long score) {
+	public void setScore(Float score) {
 		this.score = score;
 	}
 	
 	@Column(name="fixscore")
-	public Long getFixscore() {
+	public Float getFixscore() {
 		return fixscore;
 	}
-	public void setFixscore(Long fixscore) {
+	public void setFixscore(Float fixscore) {
 		this.fixscore = fixscore;
 	}
 	
 	@Column(name="performancescore")
-	public Long getPerformancescore() {
+	public Float getPerformancescore() {
 		return performancescore;
 	}
-	public void setPerformancescore(Long performancescore) {
+	public void setPerformancescore(Float performancescore) {
 		this.performancescore = performancescore;
 	}
 	
 	@Column(name="projectscore")
-	public Long getProjectscore() {
+	public Float getProjectscore() {
 		return projectscore;
 	}
-	public void setProjectscore(Long projectscore) {
+	public void setProjectscore(Float projectscore) {
 		this.projectscore = projectscore;
 	}
 }

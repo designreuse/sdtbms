@@ -23,49 +23,49 @@ public class Scoremember implements Serializable{
 
 	private Integer id;
 	private Employee employee;
-	private Integer monthlytotal = 0;
-	private Integer monthlyremain = 0;
-	private Long historytotal = 0L;
-	private Integer monthlyscore = 0;
+	private Float monthlytotal = 0F;
+	private Float monthlyremain = 0F;
+	private Float historytotal = 0F;
+	private Float monthlyscore = 0F;
 	private Long voucherscore = 0L;
 	
 	@Column(name="monthlytotal")
-	public Integer getMonthlytotal() {
+	public Float getMonthlytotal() {
 		return monthlytotal;
 	}
-	public void setMonthlytotal(Integer monthlytotal) {
+	public void setMonthlytotal(Float monthlytotal) {
 		this.monthlytotal = monthlytotal;
 	}
 	
 	@Column(name="monthlyremain")
-	public Integer getMonthlyremain() {
+	public Float getMonthlyremain() {
 		return monthlyremain;
 	}
-	public void setMonthlyremain(Integer monthlyremain) {
+	public void setMonthlyremain(Float monthlyremain) {
 		this.monthlyremain = monthlyremain;
 	}
 	
 	@Column(name="historytotal")
-	public Long getHistorytotal() {
+	public Float getHistorytotal() {
 		return historytotal;
 	}
-	public void setHistorytotal(Long historytotal) {
+	public void setHistorytotal(Float historytotal) {
 		this.historytotal = historytotal;
 	}
 	
 	@Transient
 	public String getHistorytotalstr(){
 		if(historytotal != null)
-			return HRUtil.formatNumberComma(historytotal.toString());
+			return HRUtil.formatFloatNumberComma(historytotal.toString());
 		else
 			return "0";
 	}
 	
 	@Column(name="monthlyscore")
-	public Integer getMonthlyscore() {
+	public Float getMonthlyscore() {
 		return monthlyscore;
 	}
-	public void setMonthlyscore(Integer monthlyscore) {
+	public void setMonthlyscore(Float monthlyscore) {
 		this.monthlyscore = monthlyscore;
 	}
 	

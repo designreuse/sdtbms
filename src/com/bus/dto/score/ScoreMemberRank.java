@@ -9,6 +9,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
+
 /**
  * Not actually exist, use to store the ranking page data from 
  * EntityManager.createNativeQuery()
@@ -112,9 +115,10 @@ public class ScoreMemberRank implements Serializable{
 			c.setTime(this.firstworktime);
 			Calendar cnow = Calendar.getInstance();
 			cnow.setTime(new Date());
-			Integer yearint = cnow.get(Calendar.YEAR) - c.get(Calendar.YEAR);
-			Integer monthint = (cnow.get(Calendar.MONTH) - c.get(Calendar.MONTH) + 12)%12;
-			Integer dayint  = (cnow.get(Calendar.DAY_OF_MONTH) - c.get(Calendar.DAY_OF_MONTH)+30)%30;
+			Period p = new Period(c.getTimeInMillis(),cnow.getTimeInMillis(),PeriodType.yearMonthDay());
+			Integer yearint = p.getYears();
+			Integer monthint = p.getMonths();
+			Integer dayint = p.getDays();
 			return yearint.toString()+"年"+monthint.toString()+"月"+dayint.toString()+"日";
 		}else
 			return "";

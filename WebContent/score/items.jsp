@@ -8,6 +8,23 @@
     <stripes:layout-component name="contents">
     <script type="text/javascript" src="${pageContext.request.contextPath}/js/score.js"></script>
     <link href="${pageContext.request.contextPath}/css/custom_general.css" rel="stylesheet" media="all" />
+    
+    <style type="text/css">
+    	.readonly{
+    		background-color:#CCCCBB;
+    	}
+    </style>
+    <script type="text/javascript">
+    	function openSelectEmpWindow(names,workerids,extras,multi){
+    		var link="";
+        	if(multi == true)
+        		link = "${pageContext.request.contextPath}/actionbean/EmployeeSelector.action?eleIdOne="+names+"&eleIdTwo="+workerids+"&extra="+extras+"&multi="+multi;
+        	else
+        		link = "${pageContext.request.contextPath}/actionbean/EmployeeSelector.action?eleIdOne="+names+"&eleIdTwo="+workerids+"&extra="+extras;
+			window.open(link,"_blank","width=400,height=600");
+        }
+    </script>
+    
 		<div id="sub-nav"><div class="page-title">
 			<h1>积分主页</h1>
 		</div></div>
@@ -72,30 +89,46 @@
 					<thead>
 					
 						<tr>
-							<td colspan=6 style="text-align:left">
+							<td colspan=9 style="text-align:left">
 								<stripes:submit name="prevpage" value="上页"/> 页码: <stripes:text name="pagenum"/> <stripes:hidden name="totalcount"/>  <stripes:submit name="nextpage" value="下页"/>
 								显示数量:<stripes:text name="lotsize"/>
 								<stripes:submit name="filter" value="筛选"/>
 							</td>
 						</tr>
 						<tr>
-							<td colspan=6 style="text-align:left">
+							<td colspan=9 style="text-align:left">
 								<ss:secure roles="score_items_givescore">
-								<Label class='selector'>给分人:</Label>名称:<stripes:text name="employee.fullname" id="employeenamefromid1"/>工号:<stripes:text name="employee.workerid"/><a href="javascript:void;" id="checkWorkerId">(查)</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?checkworkerid="/>
-								<a href="javascript:void;" id="getNameById1">获取</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?getnamebyid="/>
-								<Label class='selector'>自拟定分值:</Label><stripes:text name="score"/>
-								<br/>
-								<Label class='selector'>受分人:</Label>名称:<stripes:text name="scorer.fullname" id="employeenamefromid2"/>工号:<stripes:text name="scorer.workerid"/><a href="javascript:void;" id="checkWorkerId">(查)</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?checkworkerid="/>
-								<a href="javascript:void;" id="getNameById2">获取</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?getnamebyid="/>
-								<Label class='selector'>日期:</Label><stripes:text name="scoredate" formatPattern="yyyy-MM-dd" class="datepickerClass"/>
-								<br/>
-								<stripes:submit name="givescores" value="赋值"/>
+								<div>
+									<Label class='selector'>给分人:</Label>
+									<br/>
+									&nbsp;&nbsp;&nbsp;&nbsp;名称:<stripes:text readonly="true" name="employee.fullname" style="background-color:#CCCCBB;"  id="employeenamefromid1"/>工号:<stripes:text name="employee.workerid" id="checkWorkerId1"/><a href="javascript:void;" id="checkWorkerId">(查)</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?checkworkerid="/>|
+									<a href="javascript:void;" id="getNameById1">获取</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?getnamebyid="/>|
+									<input type="hidden" value="" id="extra1"/><a href="javascript:void;" onclick="openSelectEmpWindow('employeenamefromid1','checkWorkerId1','extra1',false)">从列表选择</a>
+								</div>
+								<div>
+									<Label class='selector'>受分人:</Label>
+									<br/>
+									&nbsp;&nbsp;&nbsp;&nbsp;名称:<input type="text" style="background-color:#CCCCBB;width:50%;" readonly="readonly" name="receivers" id="employeenamefromid2"/>
+									<br/>
+									&nbsp;&nbsp;&nbsp;&nbsp;工号:<input type="text" name="receiverWorkerids" id="checkWorkerId2"/><a href="javascript:void;" id="checkWorkerId">(查)</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?checkworkerid="/>|
+									<a href="javascript:void;" id="getNameById2">获取</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?getnamebyid="/>|
+									<input type="hidden" value="" id="extra2"/><a href="javascript:void;" onclick="openSelectEmpWindow('employeenamefromid2','checkWorkerId2','extra2',true)">从列表选择</a>
+								</div>
+								<div>
+									<Label class='selector'>自拟定分值:</Label><stripes:text name="score"/><span style="font-size:9pt;color:#CCCCCC;">(0为默认)</span>
+								</div>
+								<div>
+									<Label class='selector'>日期:</Label><stripes:text name="scoredate" formatPattern="yyyy-MM-dd" class="datepickerClass"/>
+								</div>
+								<div>
+									<stripes:submit name="givescores" value="赋值"/>
+								</div>
 								</ss:secure>
 								
 							</td>
 						</tr>
 						<tr>
-							<td colspan=6 style="text-align:left">
+							<td colspan=9 style="text-align:left">
 								<Label class='selector'>编号:</Label><stripes:text name="selector.reference"/>
 								<Label class='selector'>类型:</Label><stripes:select name="selector.type"><stripes:option value="">不限</stripes:option><stripes:option value="0">临时分</stripes:option><stripes:option value="1">固定分</stripes:option><stripes:option value="2">绩效分</stripes:option><stripes:option value="3">项目分</stripes:option></stripes:select>
 								<Label class='selector'>条例单:</Label><stripes:select name="itemlist"><stripes:option value=""></stripes:option>不限<stripes:options-collection collection="${actionBean.sheetList}" label="name" value="id"/></stripes:select>
@@ -111,11 +144,14 @@
 						</tr>
 						<tr>
 							<th></th>
-							<th>Id</th>
 							<th>编号</th>
 							<th>类型</th>
 							<th>分值</th>
-							<th>注释</th>
+							<th style="width:300px !important;">条例</th>
+							<th>周期</th>
+							<th>奖分对象</th>
+							<th>考核单位</th>
+							<th style="width:300px !important;">备注</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -135,11 +171,14 @@
 										<a target="_blank" href="${pageContext.request.contextPath}/actionbean/Scoreitems.action?editscoretype=&targetId=${st.id}">修改</a>
 								</ss:secure>
 							</td>
-							<td>${st.id}</td>
 							<td>${st.reference}</td>
 							<td>${st.typestr}</td>
 							<td>${st.score}</td>
 							<td>${st.description}</td>
+							<td>${st.period}</td>
+							<td>${st.scoreobject}</td>
+							<td>${st.examine}</td>
+							<td>${st.remark}</td>
 						</tr>
 						<c:set var="color" value="${color + 1}" scope="page"/>
 					</c:forEach>

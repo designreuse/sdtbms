@@ -34,11 +34,15 @@ public class Scoretype  implements Serializable{
 	
 	private Integer id;
 	private Date createdate;
-	private Integer score;
+	private Float score;
 	private String description;
 	private Integer type;
 	private Account account;
 	private String reference;
+	private String period;
+	private String examine; 
+	private String scoreobject;
+	private String remark;
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -59,10 +63,10 @@ public class Scoretype  implements Serializable{
 	}
 	
 	@Column(name="score")
-	public Integer getScore() {
+	public Float getScore() {
 		return score;
 	}
-	public void setScore(Integer score) {
+	public void setScore(Float score) {
 		this.score = score;
 	}
 	
@@ -107,5 +111,36 @@ public class Scoretype  implements Serializable{
 			return Scoretype.SCORE_TYPE_PROJECT_STR;
 		}else
 			return type.toString();
+	}
+	
+	@Column(name="period")
+	public String getPeriod() {
+		return period;
+	}
+	public void setPeriod(String period) {
+		this.period = period;
+	}
+	@Column(name="examine")
+	public String getExamine() {
+		return examine;
+	}
+	public void setExamine(String examine) {
+		this.examine = examine;
+	}
+	
+	@Column(name="scoreobject")
+	public String getScoreobject() {
+		return scoreobject;
+	}
+	public void setScoreobject(String scoreobject) {
+		this.scoreobject = scoreobject;
+	}
+	
+	@Column(name="remark")
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
 	}
 }

@@ -9,10 +9,24 @@
     <script type="text/javascript" src="${pageContext.request.contextPath}/js/hr.js"></script>
     <script type="text/javascript">
 		function addRow(){
-			var str = $('#empIdCardTable tr:last').html();
-			$('#empIdCardTable tr:last').before('<tr>'+str+'<tr/>');
-			$('#empIdCardTable').removeClass('empDetail');
-			$('#empIdCardTable').addClass('empDetail');
+			var str = $('#empIdCardTable > tbody tr:last').html();
+			$('#empIdCardTable > tbody').append('<tr>'+str+'<tr/>');
+
+
+			var str2 = $('#empIdCardTable > tbody tr:last').html();
+			if(str2 == "")
+				$('#empIdCardTable > tbody tr:last').remove();
+			
+// 			$('#empIdCardTable').removeClass('empDetail');
+// 			$('#empIdCardTable').addClass('empDetail');
+
+			$('.refreshDatePicker').removeClass('datepickerClass hasDatepicker');
+			$('.refreshDatePicker').removeAttr('id');
+			$('.refreshDatePicker').datepicker({
+		    	changeMonth: true,
+				changeYear: true,
+				dateFormat: 'yy-mm-dd' 
+		    });
 		}
     </script>
 	<style type="text/css">
@@ -185,20 +199,24 @@
 					<div>
 						<label style="color: green;">证件</label><a href="javascript:addRow();">(更多)</a>
 						<table id="empIdCardTable" class="empDetail">
+							<thead>
 							<tr>
 								<td>类型</td>
 								<td>号码</td>
 								<td>初次获得证件日期</td>
 								<td>有效日期</td>
 							</tr>
+							</thead>
+							<tbody>
 							<tr>
 								<td>
 									<stripes:select name="idcardtype"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.typeoptions}" label="label" value="value"/></stripes:select>
 								</td>
-								<td><stripes:text name="idcardnumber" /></td>
-								<td><stripes:text name="idcardvalidfrom"  formatPattern="yyyy-MM-dd" class="datepickerClass"/></td>
-								<td><stripes:text name="idcardexpiredate"  formatPattern="yyyy-MM-dd" class="datepickerClass"/></td>
+								<td><stripes:text name="idcardnumber"/></td>
+								<td><stripes:text name="idcardvalidfrom"  formatPattern="yyyy-MM-dd" class="datepickerClass refreshDatePicker"/></td>
+								<td><stripes:text name="idcardexpiredate" formatPattern="yyyy-MM-dd" class="datepickerClass refreshDatePicker"/></td>
 							</tr>
+							</tbody>
 						</table>
 					</div>
 				</stripes:form>
