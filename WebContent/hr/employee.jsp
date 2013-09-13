@@ -168,6 +168,9 @@
 							<td>调入时间:</td><td><stripes:text name="employee.transfertime" formatPattern="yyyy-MM-dd" class="datepickerClass"/></td>
 						</tr>
 						<tr>
+							<td>所属车队:</td><td colspan=3><stripes:select name="employee.team.id"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.driverteams}" label="name" value="id"/></stripes:select></td>
+						</tr>
+						<tr>
 							<td>职称:</td><td colspan=3><stripes:select name="employee.workertype"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.workertype}" label="label" value="value"/></stripes:select></td>
 						</tr>
 						<tr>
@@ -272,8 +275,15 @@
 					
 					<ss:secure roles="employee_coordination_file_upload">
 					<Label>调动文件csv:</Label><stripes:file name="coordinatorfile" id="file_coordinator"/><stripes:submit name="coordinatorfileupload" value="提交"/>
+					<br/>
 					</ss:secure>					
 <%-- 					<stripes:submit name="resignemployeecoordination" value="离职"/> --%>
+
+					<ss:secure roles="administrator_system">
+					<Label>导入文件:</Label><stripes:file name="processfile"/><stripes:submit name="processfileupload" value="驾驶员分车队csv"/>
+					<br/>
+					</ss:secure>
+					
 				</stripes:form>
 				<br/>
 				<br/>
@@ -317,6 +327,7 @@
 								<Label class='selector'>籍贯:</Label><stripes:text name="employeeselector.pob"/>
 								<Label class='selector'>驾驶员:</Label><stripes:text name="employeeselector.driver"/>
 								<Label class='selector'>所属镇街:</Label><stripes:select name="employeeselector.placebelong"><stripes:option value=""></stripes:option><stripes:options-collection collection="${actionBean.placebelongs}" label="label" value="label"/></stripes:select>
+								<Label class='selector'>所属车队:</Label><stripes:select name="employeeselector.teamid"><stripes:option value=""></stripes:option><stripes:options-collection collection="${actionBean.driverteams}" label="name" value="id"/></stripes:select>
 <%-- 								年龄:<stripes:text name="employeeselector.age"/> --%>
 							</td>
 							<td rowspan=3><stripes:select name="employeeselector.ds"  multiple="multiple" style="height:200px;"><stripes:option value="">不限</stripes:option><stripes:options-collection collection="${actionBean.department}" label="label" value="value"/></stripes:select></td>

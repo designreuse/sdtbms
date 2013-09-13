@@ -240,6 +240,9 @@ label.tabSubTitle{
 							<td>调入时间:</td><td><stripes:text name="employee.transfertime" formatPattern="yyyy-MM-dd" class="datepickerClass"/></td>
 						</tr>
 						<tr>
+							<td>所属车队:</td><td colspan=3><stripes:select name="employee.team.id"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.driverteams}" label="name" value="id"/></stripes:select></td>
+						</tr>
+						<tr>
 							<td>职称:</td><td colspan=3><stripes:select name="employee.workertype"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.workertype}" label="label" value="value"/></stripes:select></td>
 						</tr>
 						<tr>

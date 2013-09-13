@@ -58,7 +58,7 @@ $nav.on("click", "li>a", function(e) {
     //if our current section is open, just return
     if ($currentLi.find(".open").is("ul")) {
         //if you want a section link to be able to collapse itself, uncomment this line:
-//         $currentLi.find("ul.open").slideUp().removeClass("open")
+        $currentLi.find("ul.open").slideUp().removeClass("open")
         return;
     }
 
@@ -159,21 +159,35 @@ $('#findPpl').change(function(){
 		</c:if>
 		<a href="#">${dept.dept}(${dept.size})</a><input type="hidden" value="${dept.deptId}"/>
 		<br/>
-		<ul>		
-		<c:forEach items="${dept.emp}" var="empy" varStatus="loop">
-<%-- 		<c:forEach items="${dept.emps}" var="empy" varStatus="loop"> --%>
+		<ul>
+		<c:if test="${dept.extras != null}">
+			<c:forEach items="${dept.extras}" var="ext" varStatus="loop">
+				<li>
+					<c:if test="${actionBean.multi}">
+						<input type="checkbox" class="selectAll"/>
+					</c:if>
+				<a href="#">${ext.dept}(${ext.size})</a><input type="hidden" value="${ext.deptId}"/>
+				<br/>
+				<ul>
+				<c:forEach items="${ext.emps}" var="extemp" varStatus="loop">
+					<li>
+						<c:if test="${actionBean.multi}">
+							<input type="checkbox"/>
+						</c:if>
+						<span class="choosable">${extemp.fullname}</span><input type="hidden" value="${extemp.workerid}"/>
+					</li>
+				</c:forEach>
+				</ul>
+				</li>
+			</c:forEach>
+		</c:if>
+		<c:forEach items="${dept.emps}" var="empy" varStatus="loop">
 			<li>
 				<c:if test="${actionBean.multi}">
 					<input type="checkbox"/>
 				</c:if>
-				<span class="choosable">${empy.name}</span><input type="hidden" value="${empy.workerId}"/>
+				<span class="choosable">${empy.fullname}</span><input type="hidden" value="${empy.workerid}"/>
 			</li>
-<!-- 			<li> -->
-<%-- 				<c:if test="${actionBean.multi}"> --%>
-<!-- 					<input type="checkbox"/> -->
-<%-- 				</c:if> --%>
-<%-- 				<span class="choosable">${empy.fullname}</span><input type="hidden" value="${empy.workerid}"/> --%>
-<!-- 			</li> -->
 		</c:forEach>
 	</ul>
 	</li>

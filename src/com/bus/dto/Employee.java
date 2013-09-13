@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
 
+import com.bus.dto.vehicleprofile.VehicleTeam;
 import com.bus.util.HRUtil;
 
 @Entity
@@ -63,6 +64,7 @@ public class Employee implements Serializable{
 	private Account account = new Account();
 	private Department department = new Department();
 	private Position position = new Position();
+	private VehicleTeam team;
 	private Hrimage image;
 	private String colleage;
 	private String major;
@@ -107,6 +109,7 @@ public class Employee implements Serializable{
 		this.colleage = e.getColleage();
 		this.major = e.getMajor();
 		this.transfertime = e.getTransfertime();
+		this.team = e.getTeam();
 	}
 	
 	@ManyToOne
@@ -523,6 +526,16 @@ public class Employee implements Serializable{
 
 	public void setTransfers(Set<Promoandtransfer> transfers) {
 		this.transfers = transfers;
+	}
+
+	@ManyToOne
+	@JoinColumn(name="teamid")
+	public VehicleTeam getTeam() {
+		return team;
+	}
+
+	public void setTeam(VehicleTeam team) {
+		this.team = team;
 	}
 	
 }

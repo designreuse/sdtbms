@@ -30,6 +30,8 @@ public class EmployeeSelector implements BMSSelector{
 	private Date workstartdate;
 	private String birthmonth;
 	
+	private Integer teamid;
+	
 	public void setWorkstartdate(Date workstartdate) {
 		this.workstartdate = workstartdate;
 	}
@@ -94,6 +96,12 @@ public class EmployeeSelector implements BMSSelector{
 				}
 				query += ")";
 			}
+			set++;
+		}
+		if(teamid != null){
+			if(set>0)
+				query += " AND";
+			query += " q.team.id="+teamid;
 			set++;
 		}
 		if(qualification != null){
@@ -181,11 +189,17 @@ public class EmployeeSelector implements BMSSelector{
 				query += " AND";
 			query += " status='"+status+"'";
 		}
-		if(workstartdate != null && workenddate != null){
+		if(workstartdate != null || workenddate != null){
 			if(set > 0)
 				query += " AND";
-			query += " firstworktime BETWEEN '"+HRUtil.parseDateToString(workstartdate)+
-					"' AND '" + HRUtil.parseDateToString(workenddate)+"'";
+			if(workenddate == null ){
+				query += " firstworktime >= '"+HRUtil.parseDateToString(workstartdate)+"'";
+			}else if(workstartdate == null){
+				query += " firstworktime <= '" + HRUtil.parseDateToString(workenddate)+"'";
+			}else{
+				query += " firstworktime BETWEEN '"+HRUtil.parseDateToString(workstartdate)+
+						"' AND '" + HRUtil.parseDateToString(workenddate)+"'";
+			}
 			set++;
 		}
 		if(date > 0){
@@ -325,6 +339,12 @@ public class EmployeeSelector implements BMSSelector{
 	}
 	public void setPs(List<Integer> ps) {
 		this.ps = ps;
+	}
+	public Integer getTeamid() {
+		return teamid;
+	}
+	public void setTeamid(Integer teamid) {
+		this.teamid = teamid;
 	}
 
 }

@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.bus.dto.Department;
 import com.bus.dto.Employee;
+import com.bus.dto.vehicleprofile.VehicleTeam;
 import com.bus.services.CustomActionBean;
 import com.bus.services.HRBean;
 import com.bus.stripes.actionbean.MyActionBeanContext;
@@ -56,25 +57,37 @@ public class EmployeeSelectorActionBean implements ActionBean{
 			
 			List<Department> depts = hrBean.getAllActiveDepartment();
 			for(Department d:depts){
-//				System.out.println("printing time for "+d.getName()+": " + Calendar.getInstance().getTimeInMillis());
 				if(departments == null){
 					departments = new ArrayList<EmpDepartments>();
 				}
 				EmpDepartments temD = new EmpDepartments();
 				temD.setDept(d.getName());
 				temD.setDeptId(d.getId()+"");
-				List<Employee> employees = hrBean.getEmployeeByDepartmentId(d.getId());
-				temD.setSize(employees.size());
-//				System.out.println("done "+ Calendar.getInstance().getTimeInMillis());
-				List<SimpleEmployee> ses = new ArrayList<SimpleEmployee>();
-				for(Employee e:employees){
-					SimpleEmployee se = new SimpleEmployee();
-					se.setName(e.getFullname());
-					se.setWorkerId(e.getWorkerid());
-					ses.add(se);
+				if(d.getName().equals("顺汽公交一分公司") || d.getName().equals("顺汽公交二分公司") ){
+					List<EmpDepartments> driverteams = new ArrayList<EmpDepartments>();
+					List<VehicleTeam> teams = hrBean.getExistingTeamsForDepartment(d.getId());
+					for(VehicleTeam t:teams){
+						EmpDepartments temD2 = new EmpDepartments();
+						temD2.setDept(t.getName());
+						temD2.setDeptId(t.getId()+"");
+						List<Employee> temD2Employee = hrBean.getEmployeeByDepartmentIdAndTeamId(d.getId(),t.getId());
+						temD2.setSize(temD2Employee.size());
+						temD2.setEmps(temD2Employee);
+						driverteams.add(temD2);
+					}
+					List<Employee> empNoTeam = hrBean.getEmployeeByDepartmentIdAndNoTeam(d.getId());
+					temD.setEmps(empNoTeam);
+					int total = empNoTeam.size();
+					for(EmpDepartments te:driverteams){
+						total += te.getEmps().size();
+					}
+					temD.setSize(total);
+					temD.setExtras(driverteams);
+				}else{
+					List<Employee> employees = hrBean.getEmployeeByDepartmentId(d.getId());
+					temD.setSize(employees.size());
+					temD.setEmps(employees);
 				}
-				temD.setEmp(ses);
-//				temD.setEmps(employees);
 				departments.add(temD);
 			}
 			return new ForwardResolution("/public/selEmp.jsp");
@@ -120,8 +133,8 @@ public class EmployeeSelectorActionBean implements ActionBean{
 		private String deptId;
 		private String dept;
 		private Integer size;
-		public List<SimpleEmployee> emp;
 		public List<Employee> emps;
+		private List<EmpDepartments> extras = null;
 		
 		public String getDeptId() {
 			return deptId;
@@ -135,12 +148,6 @@ public class EmployeeSelectorActionBean implements ActionBean{
 		public void setDept(String dept) {
 			this.dept = dept;
 		}
-		public List<SimpleEmployee> getEmp() {
-			return emp;
-		}
-		public void setEmp(List<SimpleEmployee> emp) {
-			this.emp = emp;
-		}
 		public List<Employee> getEmps() {
 			return emps;
 		}
@@ -153,25 +160,12 @@ public class EmployeeSelectorActionBean implements ActionBean{
 		public void setSize(Integer size) {
 			this.size = size;
 		}
-		
-	}
-	
-	public class SimpleEmployee{
-		private String name;
-		private String workerId;
-		public String getName() {
-			return name;
+		public List<EmpDepartments> getExtras() {
+			return extras;
 		}
-		public void setName(String name) {
-			this.name = name;
+		public void setExtras(List<EmpDepartments> extras) {
+			this.extras = extras;
 		}
-		public String getWorkerId() {
-			return workerId;
-		}
-		public void setWorkerId(String workerId) {
-			this.workerId = workerId;
-		}
-		
 		
 	}
 }

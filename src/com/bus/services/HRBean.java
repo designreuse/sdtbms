@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -21,6 +22,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceUtil;
+import javax.persistence.SqlResultSetMapping;
 import javax.persistence.spi.PersistenceProvider;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +39,7 @@ import com.bus.dto.Position;
 import com.bus.dto.Promoandtransfer;
 import com.bus.dto.Qualification;
 import com.bus.dto.Workertype;
+import com.bus.dto.vehicleprofile.VehicleTeam;
 import com.bus.util.EmployeeStatus;
 import com.bus.util.HRUtil;
 
@@ -88,6 +91,10 @@ public class HRBean{
 				.getDepartment().getId());
 		Position position = em.find(Position.class, employee.getPosition()
 				.getId());
+		if(employee.getTeam().getId() != null){
+			VehicleTeam team = em.find(VehicleTeam.class, employee.getTeam().getId());
+			employee.setTeam(team);
+		}
 		Account account = em.find(Account.class, employee.getAccount().getId());
 //		Hrimage image = em.find(Hrimage.class, employee.getHrimage().getId());
 		employee.setAccount(account);
@@ -107,11 +114,20 @@ public class HRBean{
 		return true;
 	}
 
+	/**
+	 * Cocy contains into new employee
+	 * @param e
+	 */
 	@Transactional
 	public void updateEmployee(Employee e) {
 		Employee now = getEmployeeById(e.getId() + "");
 		now.copy(e);
 		em.merge(now);
+	}
+	
+	@Transactional
+	public void updateEmployeeOriginal(Employee e) throws Exception{
+		em.merge(e);
 	}
 
 	@Transactional
@@ -1128,11 +1144,85 @@ public class HRBean{
 	 * @return
 	 */
 	public List<Employee> getEmployeeByDepartmentId(Integer id) throws Exception {
-		List<Employee> emp = em
-				.createQuery("SELECT q FROM Employee q WHERE q.department.id="+id+" AND q.status='A' ORDER BY q.fullname")
-				.getResultList();
-//		List<Employee> emp = em.createNativeQuery("SELECT * FROM employee WHERE departmentid="+id+" AND status='A' ORDER BY fullname", Employee.class).getResultList();
+//		List<Employee> emp = em
+//				.createQuery("SELECT q FROM Employee q WHERE q.department.id="+id+" AND q.status='A' ORDER BY q.fullname")
+//				.getResultList();
+		List<Employee> emp = new ArrayList<Employee>();
+		List<Object[]> results = em.createNativeQuery("SELECT fullname,workerid FROM employee WHERE departmentid="+id+" AND status='A' ORDER BY fullname").getResultList();
+		System.out.println("size is :"+results.size());
+		for(Object[] map:results){
+			Employee e = new Employee();
+			e.setFullname((String) map[0]);
+			e.setWorkerid((String)map[1]);
+			emp.add(e);
+		}
 		return emp;
+	}
+
+	/**
+	 * Get driver team by name
+	 * @param string
+	 * @return
+	 */
+	public VehicleTeam getDriverTeamByName(String name){
+		try{
+			return (VehicleTeam) em.createQuery("SELECT q FROM VehicleTeam q WHERE name=?").setParameter(1, name).getSingleResult();
+		}catch(Exception e){
+			System.out.println("No such driver team exist:"+name);
+			return null;
+		}
+	}
+
+	public List<VehicleTeam> getAllVehicleTeams() {
+		return em.createQuery("SELECT q FROM VehicleTeam q").getResultList();
+	}
+
+	/**
+	 * Get all vehicle teams for a department
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
+	public List<VehicleTeam> getExistingTeamsForDepartment(Integer id) throws Exception{
+		return em.createQuery("SELECT distinct q FROM VehicleTeam q,Employee e WHERE e.department.id=? AND e.team.id=q.id AND e.status='A'")
+				.setParameter(1, id).getResultList();
+	}
+
+	/**
+	 * Get all employees for specific department team
+	 * @param id
+	 * @param id2
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Employee> getEmployeeByDepartmentIdAndTeamId(Integer id,
+			Integer id2) throws Exception{
+		List<Object[]> results = em.createNativeQuery("SELECT distinct fullname,workerid FROM employee WHERE departmentid="+id+" AND teamid="+id2+" AND status='A'" ).getResultList();
+		List<Employee> ret = new ArrayList<Employee>();
+		for(Object[] o : results){
+			Employee e = new Employee();
+			e.setFullname((String) o[0]);
+			e.setWorkerid((String) o[1]);
+			ret.add(e);
+		}
+		return ret;
+	}
+
+	/**
+	 * Get all employees that have no team in a department
+	 * @param id
+	 * @return
+	 */
+	public List<Employee> getEmployeeByDepartmentIdAndNoTeam(Integer id) {
+		List<Object[]> results = em.createNativeQuery("SELECT distinct fullname,workerid FROM employee  WHERE departmentid='"+id+"' AND teamid IS NULL AND status='A'").getResultList();
+		List<Employee> ret = new ArrayList<Employee>();
+		for(Object[] o : results){
+			Employee e = new Employee();
+			e.setFullname((String) o[0]);
+			e.setWorkerid((String) o[1]);
+			ret.add(e);
+		}
+		return ret;
 	}
 
 }

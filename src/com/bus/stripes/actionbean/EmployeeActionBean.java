@@ -16,6 +16,7 @@ import com.bus.dto.Contract;
 import com.bus.dto.Department;
 import com.bus.dto.Employee;
 import com.bus.dto.Idmanagement;
+import com.bus.dto.vehicleprofile.VehicleTeam;
 import com.bus.services.CustomActionBean;
 import com.bus.services.HRBean;
 import com.bus.stripes.selector.EmployeeSelector;
@@ -26,6 +27,7 @@ import com.bus.util.HRUtil;
 import com.bus.util.Roles;
 import com.bus.util.SelectBoxOption;
 import com.bus.util.SelectBoxOptions;
+import com.bus.util.importfile.EmployeeImportFile;
 
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
@@ -52,12 +54,15 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 	private FileBean checkIds;
 	private FileBean drivers;
 	private FileBean coordinatorfile;
+	private FileBean processfile;
+	
 	private Employee employee;
 	private EmployeeSelector employeeselector;
 	private Contract contract;
 	private List<SelectBoxOption> contracttype;
 	private List<SelectBoxOption> domiciletypes;
 	private List<Employee> employeeList = new ArrayList<Employee>();
+	private List<VehicleTeam> driverteams;
 	private List<SelectBoxOption> marriage;
 	private List<SelectBoxOption> ethnic;
 	private List<SelectBoxOption> politicalStatus;
@@ -172,6 +177,8 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 		this.specialPeople = SelectBoxOptions.getSelectBoxFromFixOptions(bean.getOptionListById(8));
 		this.placebelongs = SelectBoxOptions.getSelectBoxFromFixOptions(bean.getOptionListById(9));
 		
+		this.setDriverteams(bean.getAllVehicleTeams());
+		
 		typeoptions = SelectBoxOptions.getSelectBoxFromFixOptions(bean.getOptionListById(7));
 	}
 	
@@ -193,7 +200,7 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 			setEmployees(bean.getEmployees(pagenum, lotsize));
 		}else{
 			String statement  = employeeselector.getSelectorStatement();
-//			System.out.println(statement);
+			System.out.println(statement);
 			Map<String, Object> map = bean.getEmployeesBySelector(pagenum,lotsize,statement);
 			setRecordsTotal(((Long)map.get("count")));
 			setEmployees((List<Employee>)map.get("list"));
@@ -683,4 +690,31 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 		this.idcardexpiredate = idcardexpiredate;
 	}
 
+	@HandlesEvent(value="processfileupload")
+	public Resolution processfileupload(){
+		try{
+			if(processfile == null)
+				return defaultAction();
+			EmployeeImportFile importFile = new EmployeeImportFile((FileInputStream)processfile.getInputStream());
+			String result = importFile.saveDriverTeams(bean, context.getUser());
+			if(!result.equals(""))
+				return context.errorResolution("导入驾驶员车队不完整", result);
+			return defaultAction();
+		}catch(Exception e){
+			e.printStackTrace();
+			return defaultAction();
+		}
+	}
+	public FileBean getProcessfile() {
+		return processfile;
+	}
+	public void setProcessfile(FileBean processfile) {
+		this.processfile = processfile;
+	}
+	public List<VehicleTeam> getDriverteams() {
+		return driverteams;
+	}
+	public void setDriverteams(List<VehicleTeam> driverteams) {
+		this.driverteams = driverteams;
+	}
 }
