@@ -47,6 +47,7 @@ public class ScoreViewPublicActionBean extends CustomActionBean{
 	private List<Scorerecord> records;
 	private List<ScoreMemberRank> summarys;
 	private List<Scoregroup> scoregroups;
+	private Integer rankGroup;
 	private Date recordDate;
 	
 	private ScoreViewPublicSelector scoreSelector;
@@ -271,5 +272,11 @@ public class ScoreViewPublicActionBean extends CustomActionBean{
 	}
 	public void setScoregroups(List<Scoregroup> scoregroups) {
 		this.scoregroups = scoregroups;
+	}
+	public Integer getRankGroup() {
+		return rankGroup;
+	}
+	public void setRankGroup(Integer rankGroup) {
+		this.rankGroup = rankGroup;
 	}
 }

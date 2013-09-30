@@ -8,6 +8,7 @@ import com.bus.dto.Employee;
 import com.bus.dto.logger.AccountLog;
 import com.bus.dto.logger.ScoreLog;
 import com.bus.dto.score.Positiongroup;
+import com.bus.dto.score.Scoreapprover;
 import com.bus.dto.score.Scoregroup;
 import com.bus.dto.score.Scoremember;
 import com.bus.dto.score.Scorerecord;
@@ -309,6 +310,16 @@ public class LoggerAction {
 		log.setCreatetime(Calendar.getInstance().getTime());
 		log.setRecordid(vl.getId()+"");
 		log.setRemark("删除了员工"+vl.getScoremember().getEmployee().getFullname() + "在"+vl.getQuantity()+"张奖券记录.");
+		log.setWho(user);
+		return log;
+	}
+	
+	public static ScoreLog addApprover(Account user, Scoreapprover approver){
+		ScoreLog log = new ScoreLog();
+		log.setAction(ScoreLog.ADD_APPROVER);
+		log.setCreatetime(Calendar.getInstance().getTime());
+		log.setRecordid(approver.getId()+"");
+		log.setRemark("添加员工"+approver.getApprover().getFullname()+"到新的车队或部门。");
 		log.setWho(user);
 		return log;
 	}

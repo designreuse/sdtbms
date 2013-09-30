@@ -65,10 +65,15 @@ public class ScoreFileUploadActionBean extends CustomActionBean{
 		try{
 			if(scorefile != null){
 				ScoreExcelFileProcessor saver  = new ScoreExcelFileProcessor(((FileInputStream)scorefile.getInputStream()));
-				String str = saver.saveScores(hrBean,scoreBean,context.getUser());
+				String str="";
+				try{
+					str = saver.saveScores(hrBean,scoreBean,context.getUser());
+				}catch(Exception e){
+					str = e.getMessage();
+				}
 				if(!str.equals("")){
 					return new ForwardResolution("/actionbean/Error.action").addParameter("error", "<span style='color:red;'>出错:某些积分导入失败</span>")
-							.addParameter("description", "这些积分没有被上传:<br/>\n" + str);
+							.addParameter("description", "分没有被上传:<br/>\n" + str);
 				}
 			}
 			

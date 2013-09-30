@@ -15,9 +15,15 @@
 						<div class="portlet-content">
 							<ul id="style-switcher" class="side-menu">
 							
-								<ss:secure roles="score_home_view">
+								<ss:secure roles="administrator_system">
 								<li>
 									<a href="${pageContext.request.contextPath}/actionbean/Scorehome.action" title="积分主页">积分主页</a>
+								</li>
+								<li>
+									<a href="${pageContext.request.contextPath}/actionbean/DepartmentScore.action" title="部门积分管理">部门积分管理</a>
+								</li>
+								<li>
+									<a href="${pageContext.request.contextPath}/actionbean/JoinScoreSystem.action" title="参加积分制度管理">参加积分制度管理</a>
 								</li>
 								</ss:secure>
 								
@@ -27,15 +33,33 @@
 								</li>
 								</ss:secure>
 								
-								<ss:secure roles="score_items_create,score_items_givescore">
+								<ss:secure roles="score_approve_items">
+									<li>
+										<a href="${pageContext.request.contextPath}/actionbean/ScoreApprove.action" title="审核页面">审核页面</a>
+									</li>
+								</ss:secure>
+								
+								<ss:secure roles="score_approve_submit_items">
+									<li>
+										<a href="${pageContext.request.contextPath}/actionbean/ScoreApprove.action?preapprove=" title="提交审核">提交审核</a>
+									</li>
+								</ss:secure>
+								
+<%-- 								<ss:secure roles="score_items_create,score_items_givescore"> --%>
 								<li>
 									<a href="${pageContext.request.contextPath}/actionbean/Scorefile.action" title="批量积分添加/删除">批量积分添加/删除</a>
 								</li>
-								</ss:secure>
+<%-- 								</ss:secure> --%>
 								
 								<ss:secure roles="score_sheet_view">
 								<li>
 									<a href="${pageContext.request.contextPath}/actionbean/Scoresheet.action" title="积分单管理">积分单管理</a>
+								</li>
+								</ss:secure>
+								
+								<ss:secure roles="scoreapprover_system">
+								<li>
+									<a href="${pageContext.request.contextPath}/actionbean/ScoreApprover.action" title="审核人管理">审核人管理</a>
 								</li>
 								</ss:secure>
 								
@@ -57,6 +81,10 @@
 								</li>
 								</ss:secure>
 
+								<li>
+									<a href="${pageContext.request.contextPath}/actionbean/DepartSum.action" title="部门总结">部门总结</a>
+								</li>
+								
 								<li>
 									<a href="${pageContext.request.contextPath}/actionbean/Empscore.action?ranking=" title="积分排名查看">积分排名查看</a>
 								</li>

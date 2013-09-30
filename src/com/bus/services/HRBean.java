@@ -39,6 +39,7 @@ import com.bus.dto.Position;
 import com.bus.dto.Promoandtransfer;
 import com.bus.dto.Qualification;
 import com.bus.dto.Workertype;
+import com.bus.dto.score.ScoreExceptionList;
 import com.bus.dto.vehicleprofile.VehicleTeam;
 import com.bus.util.EmployeeStatus;
 import com.bus.util.HRUtil;
@@ -1131,9 +1132,9 @@ public class HRBean{
 	 * @return
 	 */
 	public List<Department> getAllActiveDepartment() throws Exception{
-		String statement = "SELECT distinct department.id AS id, department.name AS name, department.remark AS remark" +
+		String statement = "SELECT distinct department.id AS id, department.name AS name, department.remark AS remark, department.pid AS pid" +
 				" FROM employee JOIN department ON employee.departmentid = department.id " +
-				" WHERE employee.status='A' ORDER BY department.name";
+				" WHERE employee.status='A' AND department.pid IS NULL ORDER BY department.name";
 		List<Department> departments = em.createNativeQuery(statement, Department.class).getResultList();
 		return departments;
 	}
@@ -1149,7 +1150,7 @@ public class HRBean{
 //				.getResultList();
 		List<Employee> emp = new ArrayList<Employee>();
 		List<Object[]> results = em.createNativeQuery("SELECT fullname,workerid FROM employee WHERE departmentid="+id+" AND status='A' ORDER BY fullname").getResultList();
-		System.out.println("size is :"+results.size());
+//		System.out.println("size is :"+results.size());
 		for(Object[] map:results){
 			Employee e = new Employee();
 			e.setFullname((String) map[0]);
@@ -1189,15 +1190,17 @@ public class HRBean{
 	}
 
 	/**
-	 * Get all employees for specific department team
+	 * Get all employees for specific department team for score system
 	 * @param id
 	 * @param id2
 	 * @return
 	 * @throws Exception
 	 */
-	public List<Employee> getEmployeeByDepartmentIdAndTeamId(Integer id,
-			Integer id2) throws Exception{
-		List<Object[]> results = em.createNativeQuery("SELECT distinct fullname,workerid FROM employee WHERE departmentid="+id+" AND teamid="+id2+" AND status='A'" ).getResultList();
+	public List<Employee> getEmployeeByDepartmentIdForScore(Integer departId) throws Exception{
+		String query  = "SELECT distinct fullname,workerid FROM employee LEFT JOIN scoreexceptionlist ON employee.positionid = scoreexceptionlist.positionid " +
+				" WHERE (scoreexceptionlist.status IS NULL OR scoreexceptionlist.status<>"+ ScoreExceptionList.NOT_JOIN_SCORE+") AND employee.departmentid="+departId+" AND employee.status='A'";
+//		System.out.println(query);
+		List<Object[]> results = em.createNativeQuery(query).getResultList();
 		List<Employee> ret = new ArrayList<Employee>();
 		for(Object[] o : results){
 			Employee e = new Employee();
@@ -1208,21 +1211,29 @@ public class HRBean{
 		return ret;
 	}
 
+
 	/**
-	 * Get all employees that have no team in a department
+	 * 获取所有正在使用的职位
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Position> getActivePositions() throws Exception{
+		String statement = "SELECT distinct position.id AS id, position.name AS name, position.remark AS remark" +
+				" FROM employee JOIN position ON employee.positionid = position.id " +
+				" WHERE employee.status='A' ORDER BY position.name";
+		List<Position> positions = em.createNativeQuery(statement, Position.class).getResultList();
+		return positions;
+	}
+
+	/**
+	 * 获取1 层下的部门
 	 * @param id
 	 * @return
+	 * @throws Exception
 	 */
-	public List<Employee> getEmployeeByDepartmentIdAndNoTeam(Integer id) {
-		List<Object[]> results = em.createNativeQuery("SELECT distinct fullname,workerid FROM employee  WHERE departmentid='"+id+"' AND teamid IS NULL AND status='A'").getResultList();
-		List<Employee> ret = new ArrayList<Employee>();
-		for(Object[] o : results){
-			Employee e = new Employee();
-			e.setFullname((String) o[0]);
-			e.setWorkerid((String) o[1]);
-			ret.add(e);
-		}
-		return ret;
+	public List<Department> getDepartmentChildren(Integer id) throws Exception{
+		return em.createQuery("SELECT q FROM Department q WHERE q.parent.id=? ORDER BY q.name")
+				.setParameter(1, id).getResultList();
 	}
 
 }

@@ -1,0 +1,94 @@
+function formValidation(formid){
+	var text = "";
+	var valid = true;
+	$('#'+formid).find('input').each(function(){
+		if($(this).hasClass('required')){
+			var value = $(this).val();
+			if($.trim(value) == ""){
+				valid = false;
+				var name = $(this).parent().prev().html();
+				text += name + ",";
+			}
+		}
+	});
+	$('#'+formid).find('select').each(function(){
+		if($(this).hasClass('required')){
+			var value = $(this).val();
+			if($.trim(value) == ""){
+				valid = false;
+				var name = $(this).parent().prev().html();
+				text += name + ",";
+			}
+		}
+	});
+	if(text != "")
+		alert("请输入 " + text);
+	return valid;
+}
+
+function callAjaxForEdit(hyperLinkClassName){
+	$('.'+hyperLinkClassName).click(function(){
+		var action = $(this).next().val();
+		$.ajax({
+			url:action,
+			type:"post",
+			dataType:'text',
+			success:function(response){
+//					alert(response);
+				location.reload();
+			},
+			error:function(response){
+				alert("errors");
+			}
+		});
+    });
+}
+
+function callAjaxForEditWithDatePicker(hyperLinkClassName){
+	$('.'+hyperLinkClassName).click(function(){
+		var action = $(this).next().val();
+		$('#opener').val(action);
+		$('#date_select_dialog').dialog('open');
+    });
+}
+
+function buildBasicDatePickDialog(dialogId, width, height){
+	$("#"+dialogId).dialog({
+		autoOpen: false,
+		bgiframe: true,
+		resizable: true,
+		height:height,
+		width:width,
+		modal: true,
+		overlay: {
+			backgroundColor: '#000',
+			opacity: 0.5
+		},
+		buttons: {
+			'确定':function(){
+    				var dateVal = $('#date_select_box').val();
+    				var action = $('#opener').val() + "&dateval="+ dateVal;
+					if(dateVal.trim() == ""){
+    					alert("选择日期");
+						return;
+					}
+					
+					$.ajax({
+						url:action,
+						type:"post",
+						dataType:'text',
+						success:function(response){
+							alert(response);
+							location.reload();
+						},
+						error:function(response){
+							alert("errors");
+						}
+					});
+			},
+			'取消': function() {
+				$(this).dialog('close');
+			}
+		}
+	});
+}

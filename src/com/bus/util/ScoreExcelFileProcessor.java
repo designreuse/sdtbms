@@ -20,7 +20,7 @@ public class ScoreExcelFileProcessor extends ExcelFileProcessor {
 
 	/**
 	 * cvs file must have these four columns in order:
-	 * reference, type, score, description
+	 * reference, description,period,score,exmine,scoreobject,remark,type,
 	 * @param scoreBean
 	 * @param user
 	 * @return
@@ -69,6 +69,7 @@ public class ScoreExcelFileProcessor extends ExcelFileProcessor {
 				}
 				scoreBean.saveScoretype(user, st);
 			} catch (Exception e) {
+				e.printStackTrace();
 				str += "转换出错." + "第" + index + "行" + "录入失败,编号" + cols[0]  + "\n<br/>";
 				continue;
 			}
@@ -85,49 +86,8 @@ public class ScoreExcelFileProcessor extends ExcelFileProcessor {
 	 * @param user
 	 * @return
 	 */
-	public String saveScores(HRBean hrBean, ScoreBean scoreBean, Account user) {
-		String str = "";
-		hasNextLine();
-		while (hasNextLine()) {
-			String[] cols = strLine.split("\t");
-			if (cols.length < 7) {
-				String num = "N.A.";
-				if (cols.length > 1)
-					num = cols[0];
-				str += "第" + index + "行" + "录入失败,id" + num;
-				continue;
-			}
-			try {
-				Date scoredate = HRUtil.parseDate(cols[1], "yyyy-MM-dd");
-				Scoretype st = scoreBean.getScoreTypeByReference(cols[2]);
-				if(st ==null){
-					str += "" + "第" + index + "行" + "录入失败,id" + cols[0]+".编号不存在."  + "\n<br/>";
-					continue;
-				}
-				if(!scoreBean.isScoreMemberExist(cols[4])){
-					if(hrBean.isEmployeeWorkerIdExist(cols[4])){
-						Employee e = hrBean.getEmployeeByWorkerId(cols[4]);
-						scoreBean.createScoreMember(user,e);
-					}
-				}
-				if(!scoreBean.isScoreMemberExist(cols[6])){
-					if(hrBean.isEmployeeWorkerIdExist(cols[6])){
-						Employee scorer = hrBean.getEmployeeByWorkerId(cols[6]);
-						scoreBean.createScoreMember(user,scorer);
-					}
-				}
-				Float score=null;
-				if(cols.length > 7 && !cols[7].trim().equals("")){
-					score = Float.parseFloat(cols[7]);
-				}
-				scoreBean.assignScoreTypeToScoreMember(user, cols[4], cols[6], st, scoredate,score);
-			} catch (Exception e) {
-				e.printStackTrace();
-				str += "转换出错." + "第" + index + "行" + "录入失败,id " + cols[0]+". "+e.getMessage()  + "\n<br/>";
-				continue;
-			}
-
-		}
+	public String saveScores(HRBean hrBean, ScoreBean scoreBean, Account user) throws Exception {
+		String str = scoreBean.saveMassScores(this,hrBean,user);
 		return str;
 	}
 

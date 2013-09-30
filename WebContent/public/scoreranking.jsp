@@ -102,7 +102,14 @@ $(document).ready(function(){
 			<div class="searchdiv">
 				部门:<stripes:select name="scoreSelector.department"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.departments}" label="label" value="value"/></stripes:select>
 				职位:<stripes:text name="scoreSelector.position"/>
-				分组:<stripes:select name="scoreSelector.selectedGroup"><stripes:option value="">不限....</stripes:option><stripes:options-collection collection="${actionBean.scoregroups}" label="name" value="id"/></stripes:select>
+<%-- 				分组:<stripes:select name="scoreSelector.selectedGroup"><stripes:option value="">不限....</stripes:option><stripes:options-collection collection="${actionBean.scoregroups}" label="name" value="id"/></stripes:select> --%>
+				分组:<stripes:select name="scoreSelector.rankGroup">
+					<stripes:option value="0">主任级</stripes:option>
+					<stripes:option value="1">管理人员</stripes:option>
+					<stripes:option value="2">维修工</stripes:option>
+					<stripes:option value="3">服务员</stripes:option>
+					<stripes:option value="4">驾驶员</stripes:option>
+				</stripes:select>
 			</div>
 			<div class="searchdiv">
 				顺序:<stripes:radio value="0" name="scoreSelector.order"/>高到底

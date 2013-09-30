@@ -40,6 +40,9 @@
  <class>com.bus.dto.score.Scoregroup</class>
  <class>com.bus.dto.score.Positiongroup</class>
  <class>com.bus.dto.score.Voucherlist</class>
+ <class>com.bus.dto.score.Scoreapprover</class>
+ <class>com.bus.dto.score.DepartmentScore</class>
+ <class>com.bus.dto.score.ScoreExceptionList</class>
  
  <class>com.bus.dto.application.ApplicationIdCards</class>
  <class>com.bus.dto.application.HRApplication</class>

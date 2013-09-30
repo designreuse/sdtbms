@@ -44,7 +44,7 @@
 					
 					<ss:secure roles="score_system">
 					<li>
-						<a href="${pageContext.request.contextPath}/actionbean/Scorehome.action" class="sf-with-ul">积分系统</a>
+						<a href="${pageContext.request.contextPath}/actionbean/Scoreitems.action" class="sf-with-ul">积分系统</a>
 					</li>
 					</ss:secure>
 					

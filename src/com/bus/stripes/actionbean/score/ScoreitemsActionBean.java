@@ -23,6 +23,7 @@ import com.bus.stripes.actionbean.MyActionBeanContext;
 import com.bus.stripes.actionbean.Permission;
 import com.bus.stripes.selector.ScoreitemSelector;
 import com.bus.util.Roles;
+import com.google.gson.JsonObject;
 
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
@@ -39,18 +40,14 @@ import net.sourceforge.stripes.integration.spring.SpringBean;
 public class ScoreitemsActionBean extends CustomActionBean {
 
 	private HRBean hrBean;
-
 	public HRBean getHrBean() {
 		return hrBean;
 	}
-
 	@SpringBean
 	public void setHrBean(HRBean bean) {
 		this.hrBean = bean;
 	}
-
 	private ScoreBean scoreBean;
-
 	public ScoreBean getScoreBean() {
 		return this.scoreBean;
 	}
@@ -63,6 +60,7 @@ public class ScoreitemsActionBean extends CustomActionBean {
 	private Scoretype scoretype;
 	private List<Scoretype> scoretypes;
 	private List<Scoretype> selectedScoreTypes;
+	private List<Float> selectedScores;
 	private List<Scoresheets> sheetList;
 	private String itemlist;
 	private ScoreitemSelector selector;
@@ -76,6 +74,10 @@ public class ScoreitemsActionBean extends CustomActionBean {
 	private Long totalcount;
 	private Long recordsTotal;
 
+	//Saving receivers
+	private String receivers;
+	private String receiverWorkerids;
+	
 	private void initData() {
 		if (pagenum <= 0 || lotsize <= 0) {
 			pagenum = 1;
@@ -128,8 +130,15 @@ public class ScoreitemsActionBean extends CustomActionBean {
 				employee = hrBean.getEmployeeByWorkerId(a.getEmployee());
 			}
 		}
-		return new ForwardResolution("/score/items.jsp").addParameter(
-				"pagenum", pagenum);
+		ForwardResolution fr = new ForwardResolution("/score/items.jsp");
+		fr.addParameter("pagenum", pagenum);
+//		String receiverWorkerids = context.getRequest().getParameter(
+//				"receiverWorkerids");
+//		String receivers = context.getRequest().getParameter(
+//				"receivers");
+//		fr.addParameter("receiverWorkerids", receiverWorkerids);
+//		fr.addParameter("receivers", receivers);
+		return fr;
 	}
 
 	@HandlesEvent(value = "createscoretype")
@@ -188,45 +197,116 @@ public class ScoreitemsActionBean extends CustomActionBean {
 	@HandlesEvent(value = "givescores")
 	@Secure(roles = Roles.SCORE_GIVE_SCORE)
 	public Resolution givescores() {
-		if (employee == null || selectedScoreTypes == null) {
-			// System.out.println("these is an null here");
-			return defaultAction();
+		JsonObject json = new JsonObject();
+		if (employee == null || selectedScoreTypes == null || receiverWorkerids == null) {
+			json.addProperty("result", "0");json.addProperty("msg", "没有选上条例或没有选择受分人");
+			return new StreamingResolution("text/charset=utf-8;",json.toString());
 		}
 		try {
-			String receiverWorkerids = context.getRequest().getParameter(
-					"receiverWorkerids");
-			String[] receivers = receiverWorkerids.split(",", -1);
-			if (receivers.length > 1)
-				score = 0F;
-
-			for (String workerid : receivers) {
-				scorer = hrBean.getEmployeeByWorkerId(workerid);
+			String[] receiversArray = receiverWorkerids.split(",", -1);
+//			if (selectedScoreTypes.size() > 1)
+//				score = 0F;
+			
+			//检查是否这个部门今周的第一条奖分，是的话重设管理人员数目*部门基础分的总分值
+			List<Employee> scorers = new ArrayList<Employee>();
+			for (String workerid : receiversArray) {
+				Employee tempScorer = hrBean.getEmployeeByWorkerId(workerid);
+				scoreBean.toResetDepartmentScores(tempScorer,Calendar.getInstance().getTime());
+				scorers.add(tempScorer);
+			}
+			
+			//检查是否所有员工都可以打分的,审核人可以直接打分
+			String nameList = "";
+			Employee curUser = hrBean.getEmployeeByWorkerId(context.getUser().getEmployee());
+			if(!scoreBean.isUserScoreApprover(curUser)){
+				for(Employee e:scorers){
+					if(!scoreBean.checkEmployeeAllowToScore(e,curUser)){
+						nameList += e.getFullname()+",";
+					}
+				}
+				if(!nameList.equals("")){
+					json.addProperty("result", "0");
+					json.addProperty("msg", "没有权限分配分值给这些员工 :"+nameList);
+					return new StreamingResolution("text/charset=utf-8;",json.toString());
+				}
+			}
+			
+			
+			
+			String isenough = isScoreEnough(receiversArray,selectedScoreTypes,score);
+			if(!isenough.equals("")){
+				throw new Exception("这些部门没有足够的分值:"+isenough);
+			}
+			for (Employee worker : scorers) {
+				scorer = worker;
 				if (!scoreBean.isScoreMemberExist(employee.getWorkerid())) {
 					if (hrBean.isWorkerExist(employee))
 						scoreBean
 								.createScoreMember(context.getUser(), employee);
 				}
-				if (!scoreBean.isScoreMemberExist(workerid)) {
-					if (hrBean.isWorkerExist(scorer))
-						scoreBean.createScoreMember(context.getUser(), scorer);
+				if (!scoreBean.isScoreMemberExist(scorer.getWorkerid())) {
+					scoreBean.createScoreMember(context.getUser(), scorer);
 				}
 				if (scoredate == null) {
 					scoredate = Calendar.getInstance().getTime();
 				}
-				for (Scoretype st : selectedScoreTypes) {
-					if (st != null && st.getId() != null) {
-							scoreBean.assignScoreTypeToScoreMember(
-									context.getUser(), employee.getWorkerid(),
-									scorer.getWorkerid(), st, scoredate, score);
+				for(int i=0; i<selectedScoreTypes.size();i++){
+					if (selectedScoreTypes.get(i) != null && selectedScoreTypes.get(i).getId() != null) {
+						scoreBean.assignScoreTypeToScoreMember(
+								context.getUser(), employee.getWorkerid(),
+								scorer.getWorkerid(), selectedScoreTypes.get(i), scoredate, selectedScores.get(i));
 					}
 				}
 				scorer = null;
 			}
+			json.addProperty("result", "1");json.addProperty("msg", "向"+receivers.length()+"位员工各给了"+selectedScoreTypes.size()+"个项目");
 		} catch (Exception e) {
 			e.printStackTrace();
-			return context.errorResolution("打分错误", "请确认输入员工信息正确再试一次，或联系管理员");
+			json.addProperty("result", "0");json.addProperty("msg", "打分错误，"+"错误信息:"+e.getMessage());
+			json.addProperty("detail", e.getMessage());
 		}
-		return defaultAction();
+		return new StreamingResolution("text/charset=utf-8;",json.toString());
+	}
+
+	/**
+	 * 检查是否有足够的分数给员工
+	 * @param receivers
+	 * @param selectedScoreTypes2
+	 * @param selfMakeScore 
+	 * @return
+	 * @throws Exception
+	 */
+	private String isScoreEnough(String[] receivers,
+			List<Scoretype> selectedScoreTypes2, Float selfMakeScore) throws Exception{
+		String enough = "";
+		Float totalscore = 0F;
+		if(selfMakeScore != 0F){
+			totalscore = selfMakeScore;
+		}else{
+		for(Scoretype st:selectedScoreTypes2){
+			if(st != null && st.getId() != null){
+				st = scoreBean.getScoreTypeById(st.getId()+"");
+				if(st.getType() == Scoretype.SCORE_TYPE_TEMP)
+					totalscore += st.getScore();
+			}
+		}
+		}
+//		System.out.println(" Need "+totalscore);
+		
+		String workerids = "";
+		for(String rece:receivers){
+			if(workerids.equals(""))
+				workerids += "'"+rece+"'";
+			else
+				workerids += ",'"+rece+"'";
+		}
+		List<List<String>> result = scoreBean.getDepartmentScores(totalscore,workerids);
+		for(List<String> res:result){
+			if(Float.parseFloat(res.get(1)) < 0){
+				enough += res.get(0)+",";
+			}
+		}
+		return enough;
 	}
 
 	@HandlesEvent(value = "assignToScoreSheet")
@@ -379,5 +459,23 @@ public class ScoreitemsActionBean extends CustomActionBean {
 
 	public void setScoredate(Date scoredate) {
 		this.scoredate = scoredate;
+	}
+	public String getReceivers() {
+		return receivers;
+	}
+	public void setReceivers(String receivers) {
+		this.receivers = receivers;
+	}
+	public String getReceiverWorkerids() {
+		return receiverWorkerids;
+	}
+	public void setReceiverWorkerids(String receiverWorkerids) {
+		this.receiverWorkerids = receiverWorkerids;
+	}
+	public List<Float> getSelectedScores() {
+		return selectedScores;
+	}
+	public void setSelectedScores(List<Float> selectedScores) {
+		this.selectedScores = selectedScores;
 	}
 }

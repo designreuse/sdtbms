@@ -33,13 +33,15 @@
 				<div>
 				文件上传
 				<stripes:form id="file_submit_form" beanclass="com.bus.stripes.actionbean.score.ScoreFileUploadActionBean">
+					<ss:secure roles="score_fileupload_uploaditems">
 					<Label>条例 文件(txt):</Label><stripes:file name="itemsfile" id="file_scoreitem" />
-									<ss:secure roles="score_fileupload_uploaditems">
+									
 											<stripes:submit name="itemsupload" value="提交"/>
-									</ss:secure>
+					</ss:secure>
 					<br/>
-					<Label>给分文件(txt):</Label><stripes:file name="scorefile"  id="file_score" />
 									<ss:secure roles="score_fileupload_uploadscores">
+					<Label>给分文件(txt):</Label><stripes:file name="scorefile"  id="file_score" />
+					
 											<stripes:submit name="scoreupload" value="提交"/>
 									</ss:secure>
 					<br/>

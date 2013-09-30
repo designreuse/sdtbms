@@ -16,6 +16,12 @@ public class ScoreViewPublicSelector implements BMSSelector{
 	private final static int TYPE_BY_TOTAL_SCORE = 3;
 	private final static int TYPE_BY_PERFORMANCESCORE =2;
 	
+	public static final int RANK_ZHU_REN_JI = 0;
+	public static final int RANK_GUAN_LI_YUAN = 1;
+	public static final int RANK_WEI_XIU_GONG = 2;
+	public static final int RANK_FU_WU_YUAN = 3;
+	public static final int RANK_JIA_SHI_YUAN = 4;
+	
 	private Date recordDate;
 	
 	private Date recordStartDate;
@@ -23,6 +29,7 @@ public class ScoreViewPublicSelector implements BMSSelector{
 	private Integer selecttype;
 	private Integer scoretype;
 	private Integer order;
+	private Integer rankGroup;
 	
 	private Integer selectedGroup;
 	
@@ -86,12 +93,12 @@ public class ScoreViewPublicSelector implements BMSSelector{
 		String query = "SELECT scoresummary.workerid AS workercode,SUM(fixscore) AS fixscore, SUM(score+projectscore) AS tempscore, SUM(fixscore+score+performancescore+projectscore) AS totalscore, SUM(performancescore) AS performancescore, RANK() OVER ("+scoretypeselection+") AS rank, COUNT(scoresummary.workerid) AS count," +
 				" employee.fullname AS name, employee.firstworktime AS firstworktime," +
 				" position.name AS positionname " +
-				" FROM scoresummary JOIN employee ON scoresummary.workerid=employee.workerid"+
-				" JOIN position ON employee.positionid = position.id";
-		if(selectedGroup != null){
-			query += 	" JOIN positiongroup ON positiongroup.scoregroupid=" +selectedGroup+ " AND positiongroup.positionid = employee.positionid";
-		}
-			
+				" FROM scoresummary LEFT JOIN employee ON scoresummary.workerid=employee.workerid"+
+				" LEFT JOIN position ON employee.positionid = position.id";
+//		if(selectedGroup != null){
+//			query += 	" JOIN positiongroup ON positiongroup.scoregroupid=" +selectedGroup+ " AND positiongroup.positionid = employee.positionid";
+//		}
+		
 		if(selecttype == null)
 			selecttype = 2;
 		if(selecttype == 0){
@@ -103,12 +110,27 @@ public class ScoreViewPublicSelector implements BMSSelector{
 			//order in month
 			query += "  WHERE EXTRACT(month FROM date)="+(c.get(Calendar.MONTH)+1);
 		}
-		if(selectedGroup == null && department != null){
-			query += " AND employee.departmentid="+department;
+		if(rankGroup != null){
+			if(rankGroup == RANK_ZHU_REN_JI){
+				query += " AND employee.joblevel='中管'";
+			}else if(rankGroup == RANK_GUAN_LI_YUAN){
+				query += " AND employee.joblevel='管'";
+			}else if(rankGroup == RANK_JIA_SHI_YUAN){
+				query += " AND position.name LIKE '%驾驶员%'";
+			}else if(rankGroup == RANK_WEI_XIU_GONG){
+//				query += " AND position.name LIKE '%驾驶员%'";
+			}else if(rankGroup == RANK_FU_WU_YUAN){
+				query += " AND position.name LIKE '%服务员%'";
+			}
+		}else{
+			if(department != null){
+				query += " AND employee.departmentid="+department;
+			}
+			if(position != null){
+				query += " AND position.name LIKE '%"+position+"%'";
+			}
 		}
-		if(selectedGroup == null && position != null){
-			query += " AND position.name LIKE '%"+position+"%'";
-		}
+		
 		query += " GROUP BY scoresummary.workerid, employee.fullname, employee.firstworktime, position.name";
 		return query;
 	}
@@ -232,4 +254,37 @@ public class ScoreViewPublicSelector implements BMSSelector{
 	public void setSelectedGroup(Integer selectedGroup) {
 		this.selectedGroup = selectedGroup;
 	}
+
+	public Integer getRankGroup() {
+		return rankGroup;
+	}
+
+	public void setRankGroup(Integer rankGroup) {
+		this.rankGroup = rankGroup;
+	}
+
+	public static int getTypeByPerformancescore() {
+		return TYPE_BY_PERFORMANCESCORE;
+	}
+
+	public static int getRankZhuRenJi() {
+		return RANK_ZHU_REN_JI;
+	}
+
+	public static int getRankGuanLiYuan() {
+		return RANK_GUAN_LI_YUAN;
+	}
+
+	public static int getRankWeiXiuGong() {
+		return RANK_WEI_XIU_GONG;
+	}
+
+	public static int getRankFuWuYuan() {
+		return RANK_FU_WU_YUAN;
+	}
+
+	public static int getRankJiaShiYuan() {
+		return RANK_JIA_SHI_YUAN;
+	}
+	
 }

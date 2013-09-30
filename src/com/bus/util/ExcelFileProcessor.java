@@ -11,8 +11,8 @@ public class ExcelFileProcessor {
 	
 	protected DataInputStream datais=null;
 	protected BufferedReader bf=null;
-	protected String strLine;
-	protected int index = 0;
+	public String strLine;
+	public int index = 0;
 	
 	public ExcelFileProcessor(){
 		

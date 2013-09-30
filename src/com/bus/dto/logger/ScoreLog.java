@@ -24,6 +24,9 @@ import com.bus.dto.Account;
 public class ScoreLog {
 
 	//Scores
+	public final static int CREATE = 1;
+	public final static int DELETE = 2;
+	public final static int UPDATE = 3;
 	public final static int CREATE_SCORE_TYPE = 10;
 	public final static int DELETE_SCORE_TYPE = 11;
 	public final static int EDIT_SCORE_TYPE= 12;
@@ -36,6 +39,8 @@ public class ScoreLog {
 	public static final int RM_SCORE_SHEET = 19;
 	public static final int RM_SCORE_SHEET_ST = 20;
 	public static final int ADD_SCORE_SHEET_ST = 21;
+	public static final int ADD_APPROVER = 29;
+	
 	public static final Integer ADD_POS_GRP = 22;
 	public static final Integer ASSIGN_POS_GRP = 23;
 	public static final Integer QUIT_POS_GRP = 24;
@@ -140,6 +145,14 @@ public class ScoreLog {
 			return "从表单移除条例";
 		case ADD_SCORE_SHEET_ST:
 			return "从表单添加条例";
+		case ADD_APPROVER:
+			return "添加审核人";
+		case CREATE:
+			return "新建";
+		case DELETE:
+			return "删除";
+		case UPDATE:
+			return "更新";
 			default:
 				return "";
 		}

@@ -30,6 +30,12 @@ public class Scorerecord  implements Serializable{
 	private Date createdate;
 	private Float score;
 	private Account creator;
+	private int status;
+	
+	public static final int APPROVED = 0;
+	public static final int WAITING = 1;
+	public static final int REJECTED = 2;
+	public static final int CREATED = 3;
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -106,5 +112,11 @@ public class Scorerecord  implements Serializable{
 	}
 	public void setScore(Float score) {
 		this.score = score;
+	}
+	public int getStatus() {
+		return status;
+	}
+	public void setStatus(int status) {
+		this.status = status;
 	}
 }

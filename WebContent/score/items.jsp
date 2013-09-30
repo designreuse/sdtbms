@@ -13,16 +13,146 @@
     	.readonly{
     		background-color:#CCCCBB;
     	}
+    	.button {
+    font: bold 11px Arial;
+    text-decoration: none;
+    background-color: #EEEEEE;
+    color: #333333;
+    padding: 2px 6px 2px 6px;
+    border-top: 1px solid #CCCCCC;
+    border-right: 1px solid #333333;
+    border-bottom: 1px solid #333333;
+    border-left: 1px solid #CCCCCC;
+   }
     </style>
     <script type="text/javascript">
     	function openSelectEmpWindow(names,workerids,extras,multi){
     		var link="";
         	if(multi == true)
-        		link = "${pageContext.request.contextPath}/actionbean/EmployeeSelector.action?eleIdOne="+names+"&eleIdTwo="+workerids+"&extra="+extras+"&multi="+multi;
+        		link = "${pageContext.request.contextPath}/actionbean/EmployeeSelector.action?score=yes&eleIdOne="+names+"&eleIdTwo="+workerids+"&extra="+extras+"&multi="+multi;
         	else
-        		link = "${pageContext.request.contextPath}/actionbean/EmployeeSelector.action?eleIdOne="+names+"&eleIdTwo="+workerids+"&extra="+extras;
+        		link = "${pageContext.request.contextPath}/actionbean/EmployeeSelector.action?score=yes&eleIdOne="+names+"&eleIdTwo="+workerids+"&extra="+extras;
 			window.open(link,"_blank","width=400,height=600");
         }
+        $(document).ready(function(){
+        	$('#selectAll').click(function(){
+				if(this.checked){
+					$('#dataForm :checkbox').each(function(){
+						this.checked = true;
+					});
+				}else{
+					$('#dataForm :checkbox').each(function(){
+						this.checked = false;
+					});
+				}
+			});
+
+			$('#givescores').click(function(){
+				if(!isSelection())
+					return;
+				var checkedBox = $('#dataForm input:checkbox:checked');
+
+				if(checkZeroScores(checkedBox)){
+					$('#setScoreDialog').dialog('open');
+				}else{
+					giveScores();
+				}
+			});
+// 			$('#itemlist').change(function(){
+// 				$('#filter').click();
+// 			});
+			function giveScores(){
+				var ele = $('#givescores');
+				$(ele).hide();					
+				var url = $(ele).children().first().val();
+				var serialize  = $('#dataForm').serialize();
+// 				alert(url);
+				
+				$.ajax({
+					url:url,
+					type:"post",
+					dataType:"text",
+					data:serialize,
+					success:function(response){
+						var jobj = $.parseJSON(response);
+						alert(jobj.msg);
+						$('#givescores').show();
+					}
+				});
+				setTimeout(function(){
+					$('#givescores').show();
+				},3000);
+			}
+			
+			$("#setScoreDialog").dialog({
+				autoOpen: false,
+				bgiframe: true,
+				resizable: true,
+// 				height:100,
+				width:400,
+				modal: true,
+				overlay: {
+					backgroundColor: '#000',
+					opacity: 0.5
+				},
+				buttons: {
+					'确定':function(){
+						var valOk = true;
+						$(this).find(":input").each(function(){
+							var temScore = $.trim($(this).val())
+							if(temScore == ""){
+								valOk = false;
+								alert("null");
+							}else if(parseFloat(temScore) <= 0 || parseFloat(temScore) >= 10000){
+								valOk = false;
+								alert("值不能小于或等于0,或值过大");
+							}
+						});
+						if(!valOk)
+							return false;
+						$(this).find("ul li>input").each(function(){
+							var score  = $(this).val();
+							var name = $(this).attr('name');
+							$('#dataForm input[name="'+name+'"]').val(score);
+						});
+						giveScores();
+						$(this).dialog('close');
+					},
+					'取消': function() {
+						$(this).dialog('close');
+					}
+				}
+			});
+        });
+        function isSelection(){
+			var count = $('#dataForm input:checkbox:checked').length;
+			if(count <= 0){
+				alert("未选上任何项目");
+				return false;
+			}
+			return true;
+		}
+		function checkZeroScores(checked){
+			var htmlstr = "";
+			$(checked).each(function(){
+				var words = $(this).parent().parent().children(":nth-child(4)").html().split("<input");
+// 				alert($(this).parent().parent().children(":nth-child(4)").html());
+// 				alert(words[0]);
+				var item = $(this).parent().parent().children(":nth-child(5)").html();
+// 				var scoreValue = $(this).parent().parent().children(":nth-child(4)").children().first().val();
+				var scoreValue = words[0];
+				var valueName = $(this).parent().parent().children(":nth-child(4)").children().first().attr('name');
+				if(parseFloat(scoreValue) == 0){
+					htmlstr += "<li>条例:"+item+"<br/>分值:<input type='text' name='"+valueName+"'/></li><br/>";
+				}
+			});
+			if(htmlstr != ""){
+				$('#setScoreDialog').html("<ul>"+htmlstr+"</ul>");
+				return true;
+			}else{
+				return false;
+			}
+		}
     </script>
     
 		<div id="sub-nav"><div class="page-title">
@@ -84,7 +214,7 @@
 						<div class="inner-page-title">
 						条例信息
 						</div>
-				<stripes:form beanclass="com.bus.stripes.actionbean.score.ScoreitemsActionBean">
+				<stripes:form id='dataForm' beanclass="com.bus.stripes.actionbean.score.ScoreitemsActionBean">
 				<table>
 					<thead>
 					
@@ -92,7 +222,7 @@
 							<td colspan=9 style="text-align:left">
 								<stripes:submit name="prevpage" value="上页"/> 页码: <stripes:text name="pagenum"/> <stripes:hidden name="totalcount"/>  <stripes:submit name="nextpage" value="下页"/>
 								显示数量:<stripes:text name="lotsize"/>
-								<stripes:submit name="filter" value="筛选"/>
+								<stripes:submit id='filter' name="filter" value="筛选"/>
 							</td>
 						</tr>
 						<tr>
@@ -108,20 +238,23 @@
 								<div>
 									<Label class='selector'>受分人:</Label>
 									<br/>
-									&nbsp;&nbsp;&nbsp;&nbsp;名称:<input type="text" style="background-color:#CCCCBB;width:50%;" readonly="readonly" name="receivers" id="employeenamefromid2"/>
+									&nbsp;&nbsp;&nbsp;&nbsp;名称:<stripes:text style="background-color:#CCCCBB;width:50%;" readonly="readonly" name="receivers" id="employeenamefromid2"/>
 									<br/>
-									&nbsp;&nbsp;&nbsp;&nbsp;工号:<input type="text" name="receiverWorkerids" id="checkWorkerId2"/><a href="javascript:void;" id="checkWorkerId">(查)</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?checkworkerid="/>|
+									&nbsp;&nbsp;&nbsp;&nbsp;工号:<stripes:text name="receiverWorkerids" id="checkWorkerId2"/><a href="javascript:void;" id="checkWorkerId">(查)</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?checkworkerid="/>|
 									<a href="javascript:void;" id="getNameById2">获取</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?getnamebyid="/>|
 									<input type="hidden" value="" id="extra2"/><a href="javascript:void;" onclick="openSelectEmpWindow('employeenamefromid2','checkWorkerId2','extra2',true)">从列表选择</a>
 								</div>
-								<div>
-									<Label class='selector'>自拟定分值:</Label><stripes:text name="score"/><span style="font-size:9pt;color:#CCCCCC;">(0为默认)</span>
-								</div>
+<!-- 								<div> -->
+<%-- 									<Label class='selector'>自拟定分值:</Label><stripes:text name="score"/><span style="font-size:9pt;color:#CCCCCC;">(0为默认)</span> --%>
+<!-- 								</div> -->
 								<div>
 									<Label class='selector'>日期:</Label><stripes:text name="scoredate" formatPattern="yyyy-MM-dd" class="datepickerClass"/>
 								</div>
 								<div>
-									<stripes:submit name="givescores" value="赋值"/>
+									<a href="javascript:void;" id="givescores" class="button">
+									打分
+									<input type="hidden" value="${pageContext.request.contextPath}/actionbean/Scoreitems.action?givescores="/>
+									</a>
 								</div>
 								</ss:secure>
 								
@@ -131,7 +264,7 @@
 							<td colspan=9 style="text-align:left">
 								<Label class='selector'>编号:</Label><stripes:text name="selector.reference"/>
 								<Label class='selector'>类型:</Label><stripes:select name="selector.type"><stripes:option value="">不限</stripes:option><stripes:option value="0">临时分</stripes:option><stripes:option value="1">固定分</stripes:option><stripes:option value="2">绩效分</stripes:option><stripes:option value="3">项目分</stripes:option></stripes:select>
-								<Label class='selector'>条例单:</Label><stripes:select name="itemlist"><stripes:option value=""></stripes:option>不限<stripes:options-collection collection="${actionBean.sheetList}" label="name" value="id"/></stripes:select>
+								<Label class='selector'>条例单:</Label><stripes:select id='itemlist' name="itemlist"><stripes:option value=""></stripes:option>不限<stripes:options-collection collection="${actionBean.sheetList}" label="name" value="id"/></stripes:select>
 								<br/>
 								<ss:secure roles="score_items_edit">
 									<stripes:submit name="deletescoretype" value="删除"/>
@@ -143,7 +276,7 @@
 							</td>
 						</tr>
 						<tr>
-							<th></th>
+							<th>全选<input type="checkbox" id="selectAll"/></th>
 							<th>编号</th>
 							<th>类型</th>
 							<th>分值</th>
@@ -173,7 +306,7 @@
 							</td>
 							<td>${st.reference}</td>
 							<td>${st.typestr}</td>
-							<td>${st.score}</td>
+							<td>${st.score}<input type="hidden" name="selectedScores[${color}]" value="${st.score}"/></td>
 							<td>${st.description}</td>
 							<td>${st.period}</td>
 							<td>${st.scoreobject}</td>
@@ -188,6 +321,10 @@
 				</div>
 			</div>
 				
+				
+				</div>
+				<div id="setScoreDialog">
+					
 				</div>
 				<!-- End of main content -->
 			</div>

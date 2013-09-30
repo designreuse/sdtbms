@@ -9,6 +9,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
@@ -23,6 +25,7 @@ public class Scoresheets  implements Serializable{
 	private String name;
 	private String remark;
 	private Set<Scoresheetmapper> scoremapper;
+	private Scoresheets parent;
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -51,12 +54,20 @@ public class Scoresheets  implements Serializable{
 	}
 	
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "sheet",targetEntity=Scoresheetmapper.class)
-//	@OrderBy(value="id ASC")
 	public Set<Scoresheetmapper> getScoremapper() {
 		return scoremapper;
 	}
 	public void setScoremapper(Set<Scoresheetmapper> scoremapper) {
 		this.scoremapper = scoremapper;
+	}
+	
+	@ManyToOne
+	@JoinColumn(name="pid",referencedColumnName="id")
+	public Scoresheets getParent() {
+		return parent;
+	}
+	public void setParent(Scoresheets parent) {
+		this.parent = parent;
 	}
 	
 	
