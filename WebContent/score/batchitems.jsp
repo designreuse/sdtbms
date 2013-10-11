@@ -7,10 +7,16 @@
 	
     <stripes:layout-component name="contents">
     <script type="text/javascript" src="${pageContext.request.contextPath}/js/hr.js"></script>
-
+	<script type="text/javascript">
+		$(document).ready(function(){
+			if(1 == ${actionBean.success}){
+				alert("上传成功");
+			}
+		});
+	</script>
 		<div id="sub-nav"><div class="page-title">
-			<h1>人事管理</h1>
-			<span><a href="#" title="Layout Options">人事</a> > <a href="#" title="Two column layout">档案管理</a> > 查看</span>
+			<h1>批量上传</h1>
+			<span><a href="#" title="Layout Options">积分系统</a> > <a href="#" title="Two column layout">批量上传</span>
 		</div></div>
 		
 		<div id="page-layout"><div id="page-content">

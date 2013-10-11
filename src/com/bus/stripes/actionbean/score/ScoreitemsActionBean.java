@@ -198,6 +198,8 @@ public class ScoreitemsActionBean extends CustomActionBean {
 	@Secure(roles = Roles.SCORE_GIVE_SCORE)
 	public Resolution givescores() {
 		JsonObject json = new JsonObject();
+		int countItems = 0;
+		int countReceivers = 0;
 		if (employee == null || selectedScoreTypes == null || receiverWorkerids == null) {
 			json.addProperty("result", "0");json.addProperty("msg", "没有选上条例或没有选择受分人");
 			return new StreamingResolution("text/charset=utf-8;",json.toString());
@@ -237,6 +239,7 @@ public class ScoreitemsActionBean extends CustomActionBean {
 			if(!isenough.equals("")){
 				throw new Exception("这些部门没有足够的分值:"+isenough);
 			}
+			countReceivers = 0;
 			for (Employee worker : scorers) {
 				scorer = worker;
 				if (!scoreBean.isScoreMemberExist(employee.getWorkerid())) {
@@ -250,16 +253,19 @@ public class ScoreitemsActionBean extends CustomActionBean {
 				if (scoredate == null) {
 					scoredate = Calendar.getInstance().getTime();
 				}
+				countItems = 0;
 				for(int i=0; i<selectedScoreTypes.size();i++){
 					if (selectedScoreTypes.get(i) != null && selectedScoreTypes.get(i).getId() != null) {
 						scoreBean.assignScoreTypeToScoreMember(
 								context.getUser(), employee.getWorkerid(),
 								scorer.getWorkerid(), selectedScoreTypes.get(i), scoredate, selectedScores.get(i));
+						countItems ++;
 					}
 				}
 				scorer = null;
+				countReceivers++;
 			}
-			json.addProperty("result", "1");json.addProperty("msg", "向"+receivers.length()+"位员工各给了"+selectedScoreTypes.size()+"个项目");
+			json.addProperty("result", "1");json.addProperty("msg", "向"+countReceivers+"位员工各给了"+countItems+"个项目");
 		} catch (Exception e) {
 			e.printStackTrace();
 			json.addProperty("result", "0");json.addProperty("msg", "打分错误，"+"错误信息:"+e.getMessage());

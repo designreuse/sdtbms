@@ -114,7 +114,7 @@ $(document).ready(function(){
 			<div class="searchdiv">
 				顺序:<stripes:radio value="0" name="scoreSelector.order"/>高到底
 				<stripes:radio value="1" name="scoreSelector.order"/>低到高
-				<stripes:submit name="getRankingRecords" value="普通提交"/><stripes:submit name="getRankingRecordsInTimeRange" value="按自选时间段提交"/>
+				<stripes:submit name="getRankingRecords" value="提交"/>&nbsp;&nbsp;<stripes:submit name="getRankingRecordsInTimeRange" value="按自选时间段提交"/>
 			</div>
 		</stripes:form>		
 	</div>

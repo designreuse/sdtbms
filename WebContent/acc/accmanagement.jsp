@@ -44,7 +44,8 @@
 					</tr>
 					<tr>
 						<td colspan=2>
-							<stripes:submit name="createaccount"/>
+							<stripes:submit name="createaccount" value="新建账号"/>
+							<stripes:submit name="createAllAccount" value="创建所有未有账号"/>
 						</td>
 					</tr>
 				</table>

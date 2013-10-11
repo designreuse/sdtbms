@@ -64,7 +64,6 @@ public class Employee implements Serializable{
 	private Account account = new Account();
 	private Department department = new Department();
 	private Position position = new Position();
-	private Department subDepartment;
 	private VehicleTeam team;
 	private Hrimage image;
 	private String colleage;
@@ -538,15 +537,4 @@ public class Employee implements Serializable{
 	public void setTeam(VehicleTeam team) {
 		this.team = team;
 	}
-
-	@ManyToOne
-	@JoinColumn(name="subdepartid",referencedColumnName="id")
-	public Department getSubDepartment() {
-		return subDepartment;
-	}
-
-	public void setSubDepartment(Department subDepartment) {
-		this.subDepartment = subDepartment;
-	}
-	
 }

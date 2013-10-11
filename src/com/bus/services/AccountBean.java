@@ -14,8 +14,10 @@ import com.bus.dto.Account;
 import com.bus.dto.Accountgroup;
 import com.bus.dto.Action;
 import com.bus.dto.Actiongroup;
+import com.bus.dto.Employee;
 import com.bus.dto.Groups;
 import com.bus.dto.logger.AccountLog;
+import com.bus.util.HRUtil;
 import com.bus.util.LoggerAction;
 
 public class AccountBean  extends EMBean{
@@ -38,11 +40,11 @@ public class AccountBean  extends EMBean{
 	}
 
 	public List<Account> getAccounts() throws Exception{
-		return em.createQuery("SELECT q FROM Account q WHERE status='A'").getResultList();
+		return em.createQuery("SELECT q FROM Account q WHERE status='A' ORDER BY q.employee").getResultList();
 	}
 	
 	public List<Groups> getGroups() throws Exception{
-		return em.createQuery("SELECT q FROM Groups q").getResultList();
+		return em.createQuery("SELECT q FROM Groups q ORDER BY q.name").getResultList();
 	}
 
 	public boolean isGroupAssigned(String groupid, String userid) throws Exception{
@@ -189,6 +191,35 @@ public class AccountBean  extends EMBean{
 		if(a !=null){
 			a.setPassword(acc2.getPassword());
 			em.merge(a);
+		}
+	}
+
+	/**
+	 * 创建没有账号的工号账号
+	 */
+	@Transactional
+	public void createAllAccountWithWorkerid() throws Exception{
+		String query = "SELECT e.* FROM employee e WHERE " +
+				" status='A' AND workerid not in (" +
+				" SELECT account.employee FROM account WHERE account.employee IS NOT NULL)";
+		List<Employee> list = em.createNativeQuery(query,Employee.class).getResultList();
+		Groups g = (Groups) em.createQuery("SELECT q FROM Groups q WHERE q.name=?").setParameter(1, "积分制普通人员").getSingleResult();
+		int count = 0;
+		for(Employee e: list){
+			Account a = new Account();
+			a.setEmployee(e.getWorkerid());
+			a.setUsername(e.getWorkerid());
+			a.setPassword(HRUtil.getStringMD5(e.getWorkerid()));
+			a.setRegisterdate(new Date());
+			a.setStatus("A");
+			em.persist(a);
+			em.flush();
+			Accountgroup ag = new Accountgroup();
+			ag.setAccount(a);
+			ag.setGroups(g);
+			em.persist(ag);
+			em.flush();
+			System.out.println(count++ + "-- One employee done:"+e.getWorkerid());
 		}
 	}
 }

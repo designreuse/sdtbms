@@ -92,7 +92,7 @@ public class HRBean{
 				.getDepartment().getId());
 		Position position = em.find(Position.class, employee.getPosition()
 				.getId());
-		if(employee.getTeam().getId() != null){
+		if(employee.getTeam() != null && employee.getTeam().getId() != null){
 			VehicleTeam team = em.find(VehicleTeam.class, employee.getTeam().getId());
 			employee.setTeam(team);
 		}
@@ -1198,7 +1198,8 @@ public class HRBean{
 	 */
 	public List<Employee> getEmployeeByDepartmentIdForScore(Integer departId) throws Exception{
 		String query  = "SELECT distinct fullname,workerid FROM employee LEFT JOIN scoreexceptionlist ON employee.positionid = scoreexceptionlist.positionid " +
-				" WHERE (scoreexceptionlist.status IS NULL OR scoreexceptionlist.status<>"+ ScoreExceptionList.NOT_JOIN_SCORE+") AND employee.departmentid="+departId+" AND employee.status='A'";
+				" WHERE (scoreexceptionlist.status IS NULL OR scoreexceptionlist.status<>"+ ScoreExceptionList.NOT_JOIN_SCORE+") AND employee.departmentid="+departId+" AND employee.status='A'" +
+						" AND (joblevel='管' OR joblevel='中管') ORDER BY fullname";
 //		System.out.println(query);
 		List<Object[]> results = em.createNativeQuery(query).getResultList();
 		List<Employee> ret = new ArrayList<Employee>();
@@ -1234,6 +1235,18 @@ public class HRBean{
 	public List<Department> getDepartmentChildren(Integer id) throws Exception{
 		return em.createQuery("SELECT q FROM Department q WHERE q.parent.id=? ORDER BY q.name")
 				.setParameter(1, id).getResultList();
+	}
+	
+	/**
+	 * Get all active departments. by native query
+	 * @return
+	 */
+	public List<Department> getAllScoreDepartment() throws Exception{
+		String statement = "SELECT distinct department.id AS id, department.name AS name, department.remark AS remark, department.pid AS pid" +
+				" FROM employee JOIN department ON employee.departmentid = department.id " +
+				" WHERE employee.status='A' ORDER BY department.id";
+		List<Department> departments = em.createNativeQuery(statement, Department.class).getResultList();
+		return departments;
 	}
 
 }

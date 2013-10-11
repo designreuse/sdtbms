@@ -23,6 +23,7 @@ public class ScoreFileUploadActionBean extends CustomActionBean{
 	
 	private FileBean itemsfile;
 	private FileBean scorefile;
+	private Integer success = 0;
 	
 	private ScoreBean scoreBean;
 	public ScoreBean getScoreBean(){return this.scoreBean;}
@@ -74,6 +75,8 @@ public class ScoreFileUploadActionBean extends CustomActionBean{
 				if(!str.equals("")){
 					return new ForwardResolution("/actionbean/Error.action").addParameter("error", "<span style='color:red;'>出错:某些积分导入失败</span>")
 							.addParameter("description", "分没有被上传:<br/>\n" + str);
+				}else{
+					success = 1;
 				}
 			}
 			
@@ -97,6 +100,12 @@ public class ScoreFileUploadActionBean extends CustomActionBean{
 
 	public void setScorefile(FileBean scorefile) {
 		this.scorefile = scorefile;
+	}
+	public Integer getSuccess() {
+		return success;
+	}
+	public void setSuccess(Integer success) {
+		this.success = success;
 	}
 	
 	

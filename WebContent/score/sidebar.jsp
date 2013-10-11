@@ -45,11 +45,11 @@
 									</li>
 								</ss:secure>
 								
-<%-- 								<ss:secure roles="score_items_create,score_items_givescore"> --%>
+								<ss:secure roles="score_items_givescore">
 								<li>
 									<a href="${pageContext.request.contextPath}/actionbean/Scorefile.action" title="批量积分添加/删除">批量积分添加/删除</a>
 								</li>
-<%-- 								</ss:secure> --%>
+								</ss:secure>
 								
 								<ss:secure roles="score_sheet_view">
 								<li>

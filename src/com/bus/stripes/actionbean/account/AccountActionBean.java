@@ -90,6 +90,18 @@ public class AccountActionBean extends CustomActionBean implements Permission{
 		}
 	}
 	
+	@HandlesEvent(value="createAllAccount")
+	@Secure(roles = Roles.ACCOUNT_ACCOUNT_CREATE)
+	public Resolution createAllAccount(){
+		try{
+			accBean.createAllAccountWithWorkerid();
+			return defaultAction();
+		}catch(Exception e){
+			e.printStackTrace();
+			return defaultAction();
+		}
+	}
+	
 	@HandlesEvent(value="creategroup")
 	@Secure(roles = Roles.ACCOUNT_GROUP_CREATE)
 	public Resolution creategroup(){

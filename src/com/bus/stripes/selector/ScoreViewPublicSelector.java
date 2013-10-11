@@ -122,13 +122,13 @@ public class ScoreViewPublicSelector implements BMSSelector{
 			}else if(rankGroup == RANK_FU_WU_YUAN){
 				query += " AND position.name LIKE '%服务员%'";
 			}
-		}else{
-			if(department != null){
-				query += " AND employee.departmentid="+department;
-			}
-			if(position != null){
-				query += " AND position.name LIKE '%"+position+"%'";
-			}
+		}
+		
+		if(department != null){
+			query += " AND employee.departmentid="+department;
+		}
+		if(position != null){
+			query += " AND position.name LIKE '%"+position+"%'";
 		}
 		
 		query += " GROUP BY scoresummary.workerid, employee.fullname, employee.firstworktime, position.name";

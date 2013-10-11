@@ -15,6 +15,7 @@ import javax.persistence.Query;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bus.dto.Account;
+import com.bus.dto.Department;
 import com.bus.dto.Employee;
 import com.bus.dto.Position;
 import com.bus.dto.logger.ScoreLog;
@@ -590,7 +591,7 @@ public class ScoreBean  extends EMBean{
 	 * @return
 	 */
 	public List<Scoresheets> getAllScoreSheets() throws Exception{
-		return em.createQuery("SELECT q FROM Scoresheets q").getResultList();
+		return em.createQuery("SELECT q FROM Scoresheets q ORDER BY q.name").getResultList();
 	}
 
 	/**
@@ -1217,6 +1218,7 @@ public class ScoreBean  extends EMBean{
 	public void reSubmitScoreRecords(List<String> selected, Account user) throws Exception{
 		for(String cur:selected){
 			Scorerecord se = em.find(Scorerecord.class, Integer.parseInt(cur));
+			se.setCreatedate(Calendar.getInstance().getTime());
 			se.setStatus(Scorerecord.WAITING);
 			em.merge(se);
 		}
@@ -1276,7 +1278,7 @@ public class ScoreBean  extends EMBean{
 	 * @return
 	 * @throws Exception
 	 */
-	@Transactional
+	@Transactional(rollbackFor=Exception.class)
 	public String saveMassScores(ScoreExcelFileProcessor saver, HRBean hrBean,
 			Account user) throws Exception{
 		String str = "";
@@ -1284,11 +1286,12 @@ public class ScoreBean  extends EMBean{
 		while (saver.hasNextLine()) {
 			String[] cols = saver.strLine.split("\t");
 			if (cols.length < 7) {
-				String num = "N.A.";
-				if (cols.length > 1)
-					num = cols[0];
-				str += "第" + saver.index + "行" + "录入失败,id " + num;
-				throw new Exception(str);
+//				String num = "N.A.";
+//				if (cols.length > 1)
+//					num = cols[0];
+//				str += "第" + saver.index + "行" + "录入失败,id " + num;
+//				throw new Exception(str);
+				continue;
 			}
 				Date scoredate = HRUtil.parseDate(cols[1], "yyyy-MM-dd");
 				Scoretype st = getScoreTypeByReference(cols[2]);
@@ -1296,6 +1299,7 @@ public class ScoreBean  extends EMBean{
 					str += "" + "第" + saver.index + "行" + "录入失败,id " + cols[0]+".编号不存在."  + "\n<br/>";
 					throw new Exception(str);
 				}
+				
 				if(!isScoreMemberExist(cols[4])){
 					if(hrBean.isEmployeeWorkerIdExist(cols[4])){
 						Employee e = hrBean.getEmployeeByWorkerId(cols[4]);
@@ -1323,6 +1327,16 @@ public class ScoreBean  extends EMBean{
 				
 				Employee scorer = (Employee) em.createQuery("SELECT q FROM Employee q WHERE workerid=?")
 						.setParameter(1, cols[6]).getSingleResult();
+				
+				//检查是否员工可以打分的,审核人可以直接打分
+				Employee curUser = (Employee) em.createQuery("SELECT q FROM Employee q WHERE q.workerid=?").setParameter(1, user.getEmployee()).getSingleResult();
+				if(!isUserScoreApprover(curUser)){
+					if(!checkEmployeeAllowToScore(scorer, curUser)){
+						str += "" + "第" + saver.index + "行" + "录入失败,id " + cols[0]+".用户"+ curUser.getFullname()+ "没有权限打分给用户"+ scorer.getFullname()+ "\n<br/>";
+						throw new Exception(str);
+					}
+				}
+				
 				//检查是否这个部门今周的第一条奖分，是的话重设管理人员数目*部门基础分的总分值
 				toResetDepartmentScores(scorer,Calendar.getInstance().getTime());
 				
@@ -1371,9 +1385,10 @@ public class ScoreBean  extends EMBean{
 	public List<Scorerecord> getApprovedListByTime(Account user,String selectPeriod, Date startDate, Date endDate) throws Exception {
 		Calendar cal = Calendar.getInstance();
 		Calendar cal2 = Calendar.getInstance();
-		if(selectPeriod == null){
-			return em.createQuery("SELECT q FROM Scorerecord q WHERE q.creator.id=? AND q.status=? AND q.createdate='"+ HRUtil.parseDateToString(cal.getTime())+"'")
-					.setParameter(1, user.getId()).setParameter(2, Scorerecord.APPROVED).getResultList();
+		Employee e = (Employee) em.createQuery("SELECT q FROM Employee q WHERE q.workerid=?").setParameter(1, user.getEmployee()).getSingleResult();
+		if(selectPeriod == null || selectPeriod.equals("")){
+			return em.createQuery("SELECT q FROM Scorerecord q, Scoreapprover d WHERE q.receiver.employee.department.id=d.department.id AND d.approver.id=? AND q.status=? AND q.createdate='"+ HRUtil.parseDateToString(cal.getTime())+"'")
+					.setParameter(1, e.getId()).setParameter(2, Scorerecord.APPROVED).getResultList();
 		}else{
 			if(selectPeriod.equals("w")){
 				cal.set(Calendar.DAY_OF_WEEK,cal.getFirstDayOfWeek());
@@ -1389,12 +1404,12 @@ public class ScoreBean  extends EMBean{
 				if(endDate != null)
 					cal2.setTime(endDate);
 			}
-			return em.createQuery("SELECT re FROM Scorerecord re" +
-						" WHERE re.creator.id=? "+
+			return em.createQuery("SELECT re FROM Scorerecord re , Scoreapprover d" +
+						" WHERE ((re.receiver.employee.department.id=d.department.id AND d.approver.id=?) OR re.creator.id=? )"+
 								" AND re.createdate>='" + HRUtil.parseDateToString(cal.getTime())+"' AND re.createdate<'" +  HRUtil.parseDateToString(cal2.getTime()) + "' " +
 								" AND re.status=? " +
 								" ORDER BY createdate DESC")
-								.setParameter(1, user.getId()).setParameter(2, Scorerecord.APPROVED).getResultList();
+								.setParameter(1, e.getId()).setParameter(2, Scorerecord.APPROVED).setParameter(3, user.getId()).getResultList();
 		}
 	}
 
@@ -1499,5 +1514,16 @@ public class ScoreBean  extends EMBean{
 			return true;
 		else
 			return false;
+	}
+
+	/**
+	 * 获取用户所在 和所管核的部门
+	 * @param user
+	 * @return
+	 */
+	public List<Department> getAllManageDeparmentsByUser(Account user) throws Exception{
+		String query = "select distinct d.* from employee e,department d, scoreapprover s where e.id=s.approver AND e.workerid='"+ user.getEmployee()
+					+"' AND (d.id=s.departmentid OR d.id=e.departmentid);";
+		return em.createNativeQuery(query, Department.class).getResultList();
 	}
 }

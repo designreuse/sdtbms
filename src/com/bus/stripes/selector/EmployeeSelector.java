@@ -86,11 +86,11 @@ public class EmployeeSelector implements BMSSelector{
 			if(set>0)
 				query += " AND";
 			if(ds.size() == 1)
-				query += " q.department.id="+ds.get(0);
+				query += " (q.department.id="+ds.get(0) + " OR q.department.parent.id="+ds.get(0)+")";
 			else{
 				query += " (";
 				for(int i=0; i<ds.size();i++){
-					query += "q.department.id="+ds.get(i);
+					query += "q.department.id="+ds.get(i) + " OR q.department.parent.id="+ds.get(i);
 					if(i < ds.size()-1)
 						query += " OR ";
 				}
