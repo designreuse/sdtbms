@@ -25,6 +25,7 @@ import com.bus.stripes.selector.CoordinationSelector;
 import com.bus.util.Roles;
 import com.bus.util.SelectBoxOption;
 import com.bus.util.SelectBoxOptions;
+import com.google.gson.JsonObject;
 
 @UrlBinding("/actionbean/HRCoordinator.action")
 public class HRCoordinatorActionBean extends CustomActionBean implements Permission{
@@ -86,9 +87,17 @@ public class HRCoordinatorActionBean extends CustomActionBean implements Permiss
 	@HandlesEvent(value="create")
 	@Secure(roles=Roles.EMPLOYEE_COOR_ADD)
 	public Resolution create(){
-		coordinate.setCreator(context.getUser());
-		String ret = bean.saveCoordination(coordinate);
-		return new StreamingResolution("text;charset=utf-8",ret);
+		JsonObject json = new JsonObject();
+		try{
+			coordinate.setCreator(context.getUser());
+			bean.saveCoordination(coordinate);
+			json.addProperty("result", "1");
+			json.addProperty("msg", "创建成功");
+		}catch(Exception e){
+			json.addProperty("result", "0");
+			json.addProperty("msg", "创建失败");
+		}
+		return new StreamingResolution("text;charset=utf-8",json.toString());
 	}
 	
 	@HandlesEvent(value="delete")

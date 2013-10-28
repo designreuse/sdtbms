@@ -93,8 +93,8 @@ $(document).ready(function(){
 			<div>名字:${actionBean.member.employee.fullname} &nbsp;&nbsp;&nbsp; 工龄:${actionBean.member.employee.workage}</div>
 			<br/><div>总分:${actionBean.member.historytotalstr }</div>
 			<br/><div>当月得分:${actionBean.recordsSum}</div>
-			<br/><div>月可分配分:${actionBean.member.monthlytotal }</div>
-			<br/><div>月剩下可分配分:${actionBean.member.monthlyremain }</div>
+<%-- 			<br/><div>月可分配分:${actionBean.member.monthlytotal }</div> --%>
+<%-- 			<br/><div>月剩下可分配分:${actionBean.member.monthlyremain }</div> --%>
 			</div>
 			<hr/>
 			<stripes:form beanclass="com.bus.stripes.actionbean.score.ScoreViewPublicActionBean">
@@ -109,6 +109,7 @@ $(document).ready(function(){
 							<tr>
 								<th>ID</th>
 								<th>得分日期</th>
+								<th>打分人</th>
 								<th>条例编号</th>
 								<th>分值</th>
 								<th>类型</th>
@@ -128,8 +129,9 @@ $(document).ready(function(){
 								</c:choose>
 								<td>${record.id}</td>
 								<td>${record.scoredatestr}</td>
+								<td>${record.sender.employee.fullname}</td>
 								<td>${record.scoretype.reference }</td>
-								<td>${record.scoretype.score }</td>
+								<td>${record.score }</td>
 								<td>${record.scoretype.typestr }</td>
 								<td>${record.scoretype.description }</td>
 								</tr>

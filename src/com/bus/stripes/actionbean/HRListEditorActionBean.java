@@ -7,6 +7,7 @@ import security.action.Secure;
 
 import com.bus.dto.Account;
 import com.bus.dto.Fixoptions;
+import com.bus.dto.Qualification;
 import com.bus.dto.Workertype;
 import com.bus.services.CustomActionBean;
 import com.bus.services.HRBean;
@@ -33,11 +34,13 @@ public class HRListEditorActionBean extends CustomActionBean implements Permissi
 	private String optionlistnewdata;
 	private String optionlistselectedvalue;
 	private List<SelectBoxOption> workertypes;
+	private List<Qualification> qualifications;
 	
 	private void loadOptionLists(){
 		try{
 			setFixoptions(bean.getAllFixOptions());
 			setWorkertypes(SelectBoxOptions.getWorkerType(bean.getWorkertypeList()));
+			setQualifications(bean.getQualificationList());
 		}catch(Exception e){
 			setFixoptions(new ArrayList<Fixoptions>());
 		}
@@ -114,6 +117,35 @@ public class HRListEditorActionBean extends CustomActionBean implements Permissi
 		}
 	}
 	
+	@HandlesEvent(value="createQualification")
+	@Secure(roles=Roles.EMPLOYEE_PROPERTY_LIST_ADD)
+	public Resolution createQualification(){
+		try{
+			if(optionlistnewdata == null || optionlistnewdata.equals("") || optionlistnewdata.indexOf(",")!= -1)
+				return defaultAction();
+			Qualification q = new Qualification();
+			q.setName(optionlistnewdata);
+			bean.saveQualification(q);
+			setOptionlistnewdata("");
+			return defaultAction();
+		}catch(Exception e){
+			System.out.println(e.getMessage());
+			return defaultAction();
+		}
+	}
+	
+	@HandlesEvent(value="deleteQualification")
+	@Secure(roles=Roles.EMPLOYEE_PROPERTY_LIST_RM)
+	public Resolution deleteQualification(){
+		try{
+			bean.deleteQualification(optionlistselectedvalue);
+			return defaultAction();
+		}catch(Exception e){
+			System.out.println(e.getMessage());
+			return defaultAction();
+		}
+	}
+	
 	public int getOptionlistid() {
 		return optionlistid;
 	}
@@ -143,5 +175,11 @@ public class HRListEditorActionBean extends CustomActionBean implements Permissi
 	}
 	public void setWorkertypes(List<SelectBoxOption> workertypes) {
 		this.workertypes = workertypes;
+	}
+	public List<Qualification> getQualifications() {
+		return qualifications;
+	}
+	public void setQualifications(List<Qualification> qualifications) {
+		this.qualifications = qualifications;
 	}
 }

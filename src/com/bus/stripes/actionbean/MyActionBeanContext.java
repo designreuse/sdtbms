@@ -21,7 +21,6 @@ public class MyActionBeanContext extends ActionBeanContext {
 	}
 	
 	public String getHrhostidfile(){
-//		return "http://172.168.1.8/bms-id-files/";
 		return "http://172.168.4.200/bms-id-files/";
 //		return "http://172.168.4.95/bms-id-files/";
 	}

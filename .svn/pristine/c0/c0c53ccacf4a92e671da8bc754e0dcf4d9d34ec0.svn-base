@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
+   http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+    version="2.0">
+ 
+<persistence-unit name="shundebuspersistenceunit" transaction-type="RESOURCE_LOCAL">
+	<!--     <exclude-unlisted-classes>false</exclude-unlisted-classes> -->
+	 <provider>org.hibernate.ejb.HibernatePersistence</provider>
+<!-- 	<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider> -->
+
+<!--  <jta-data-source>sdbms</jta-data-source>     -->
+ <class>com.bus.dto.Employee</class>
+ <class>com.bus.dto.Account</class>
+ <class>com.bus.dto.Accountgroup</class>
+ <class>com.bus.dto.Action</class>
+ <class>com.bus.dto.Actiongroup</class>
+ <class>com.bus.dto.Bankaccount</class>
+ <class>com.bus.dto.Contract</class>
+ <class>com.bus.dto.Department</class>
+ <class>com.bus.dto.Groups</class>
+ <class>com.bus.dto.Hrimage</class>
+ <class>com.bus.dto.Idmanagement</class>
+ <class>com.bus.dto.Position</class>
+ <class>com.bus.dto.Promoandtransfer</class>
+ <class>com.bus.dto.Socialrelation</class>
+ <class>com.bus.dto.Qualification</class>
+ <class>com.bus.dto.Workertype</class>
+ <class>com.bus.dto.Ethnic</class>
+ <class>com.bus.dto.Fixoptions</class>
+ 
+ <class>com.bus.dto.score.Scoremember</class>
+ <class>com.bus.dto.score.Scorerecord</class>
+ <class>com.bus.dto.score.Scoresheetmapper</class>
+ <class>com.bus.dto.score.Scoresheets</class>
+ <class>com.bus.dto.score.Scoretype</class>
+ <class>com.bus.dto.score.Scoresummary</class>
+ <class>com.bus.dto.score.ScoreMemberRank</class>
+ <class>com.bus.dto.score.Scoregroup</class>
+ <class>com.bus.dto.score.Positiongroup</class>
+ <class>com.bus.dto.score.Voucherlist</class>
+ <class>com.bus.dto.score.Scoreapprover</class>
+ <class>com.bus.dto.score.DepartmentScore</class>
+ <class>com.bus.dto.score.ScoreExceptionList</class>
+ 
+ <class>com.bus.dto.application.ApplicationIdCards</class>
+ <class>com.bus.dto.application.HRApplication</class>
+ <class>com.bus.dto.application.IdCardsMapper</class>
+ <class>com.bus.dto.application.Training</class>
+ <class>com.bus.dto.application.WorkArrangement</class>
+ <class>com.bus.dto.application.EmployeeRequest</class>
+ <class>com.bus.dto.application.DrivingExam</class>
+ 
+ <class>com.bus.dto.logger.ScoreLog</class>
+ <class>com.bus.dto.logger.AccountLog</class>
+ 
+ <class>com.bus.dto.vehicleprofile.VehicleProfile</class>
+<!--  <class>com.bus.dto.vehicleprofile.VehicleMiles</class> -->
+<!--  <class>com.bus.dto.vehicleprofile.VehicleCheck</class> -->
+ <class>com.bus.dto.vehicleprofile.VehicleFiles</class>
+ <class>com.bus.dto.vehicleprofile.VehicleLane</class>
+ <class>com.bus.dto.vehicleprofile.VehicleLaneMirror</class>
+ <class>com.bus.dto.vehicleprofile.VehicleTeam</class>
+ <class>com.bus.dto.vehicleprofile.VehicleTeamLeader</class>
+ <class>com.bus.dto.vehicleprofile.VehicleLaneMapper</class>
+<!--  <class>com.bus.dto.vehicleprofile.VehicleDriver</class> -->
+ <class>com.bus.dto.vehicleprofile.VehicleTeamMember</class>
+<class>com.bus.dto.vehicleprofile.VehicleAccident</class>
+<class>com.bus.dto.vehicleprofile.VehicleUseRecord</class>
+<class>com.bus.dto.vehicleprofile.VehicleChange</class>
+<class>com.bus.dto.vehicleprofile.VehicleBasicInfo</class>
+<class>com.bus.dto.vehicleprofile.VehicleTechnicalDetail</class>
+<class>com.bus.dto.vehicleprofile.VehicleRepairRecord</class>
+<class>com.bus.dto.vehicleprofile.VehiclePartsRepair</class>
+<class>com.bus.dto.vehicleprofile.VehicleLevel</class>
+<class>com.bus.dto.logger.VehicleLog</class>
+
+ 
+ <class>com.bus.dto.common.ContractImg</class>
+
+ <properties>
+  <property name="hibernate.show_sql" value="false" />
+  <property name="hibernate.format_sql" value="true" />
+  <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+  <property name="hibernate.connection.url" value="jdbc:postgresql://localhost/sdbms"/>
+  <property name="hibernate.connection.username" value="postgres"/>
+  <property name="hibernate.connection.password" value="root"/>
+  <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
+<!--   <property name="hibernate.hbm2ddl.auto" value="create" /> -->
+<!--   <property name="hibernate…flush_before_completion" value="true"/> -->
+  <property name="hibernate.c3p0.min_size" value="5" />
+  <property name="hibernate.c3p0.max_size" value="20" />
+  <property name="hibernate.c3p0.timeout" value="300" />
+  <property name="hibernate.c3p0.max_statements" value="50" />
+  <property name="hibernate.c3p0.idle_test_period" value="3000" />
+</properties>
+
+</persistence-unit>
+ 
+</persistence>

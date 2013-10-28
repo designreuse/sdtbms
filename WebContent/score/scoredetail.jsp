@@ -53,8 +53,8 @@
 							<div>名字:${actionBean.member.employee.fullname} &nbsp;&nbsp;&nbsp; 工龄:${actionBean.member.employee.workage}</div>
 							<br/><div>总分:${actionBean.member.historytotal }</div>
 							<br/><div>月得分:${actionBean.member.monthlyscore }</div>
-							<br/><div>月可分配分:${actionBean.member.monthlytotal }</div>
-							<br/><div>月剩下可分配分:${actionBean.member.monthlyremain }</div>
+<%-- 							<br/><div>月可分配分:${actionBean.member.monthlytotal }</div> --%>
+<%-- 							<br/><div>月剩下可分配分:${actionBean.member.monthlyremain }</div> --%>
 							<hr/>
 							<stripes:form beanclass="com.bus.stripes.actionbean.score.ScoredetailActionBean">
 								<input name="workerid" value="${actionBean.member.employee.workerid}" type="hidden"/>

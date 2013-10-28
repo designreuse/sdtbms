@@ -1,0 +1,182 @@
+package com.bus.dto.vehicleprofile;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import com.bus.dto.Account;
+
+@Entity
+@XmlRootElement
+@Table(name="vehicle_basic_info")
+public class VehicleBasicInfo  implements Serializable{
+
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Column(name="id")
+	private Integer id;
+	
+	@ManyToOne
+	@JoinColumn(name="vid",referencedColumnName="id")
+	private VehicleProfile vid;
+	
+	@ManyToOne
+	@JoinColumn(name="oldid",referencedColumnName="id")
+	private VehicleProfile oldid;
+	
+	@Column(name="master")
+	private String master;
+	
+	@Column(name="operatenumber")
+	private String operatenumber;
+	
+	@Column(name="companytype")
+	private String companytype;
+	
+	@Column(name="operatemode")
+	private String operatemode;
+	
+	@Column(name="operatelevel")
+	private String operatelevel;
+	
+	@Column(name="operaterange")
+	private String operaterange;
+	
+	@Column(name="transportnumber")
+	private String transportnumber;
+	
+	@Column(name="operateroute")
+	private String operateroute;
+	
+	@Column(name="source")
+	private String source;
+	
+	@Column(name="maintenancemile")
+	private Integer maintenancemile;
+	
+	@ManyToOne
+	@JoinColumn(name="creator",referencedColumnName="id")
+	private Account creator;
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public VehicleProfile getVid() {
+		return vid;
+	}
+
+	public void setVid(VehicleProfile vid) {
+		this.vid = vid;
+	}
+
+	public VehicleProfile getOldid() {
+		return oldid;
+	}
+
+	public void setOldid(VehicleProfile oldid) {
+		this.oldid = oldid;
+	}
+
+	public String getMaster() {
+		return master;
+	}
+
+	public void setMaster(String master) {
+		this.master = master;
+	}
+
+	public String getOperatenumber() {
+		return operatenumber;
+	}
+
+	public void setOperatenumber(String operatenumber) {
+		this.operatenumber = operatenumber;
+	}
+
+	public String getCompanytype() {
+		return companytype;
+	}
+
+	public void setCompanytype(String companytype) {
+		this.companytype = companytype;
+	}
+
+	public String getOperatemode() {
+		return operatemode;
+	}
+
+	public void setOperatemode(String operatemode) {
+		this.operatemode = operatemode;
+	}
+
+	public String getOperatelevel() {
+		return operatelevel;
+	}
+
+	public void setOperatelevel(String operatelevel) {
+		this.operatelevel = operatelevel;
+	}
+
+	public String getOperaterange() {
+		return operaterange;
+	}
+
+	public void setOperaterange(String operaterange) {
+		this.operaterange = operaterange;
+	}
+
+	public String getTransportnumber() {
+		return transportnumber;
+	}
+
+	public void setTransportnumber(String transportnumber) {
+		this.transportnumber = transportnumber;
+	}
+
+	public String getOperateroute() {
+		return operateroute;
+	}
+
+	public void setOperateroute(String operateroute) {
+		this.operateroute = operateroute;
+	}
+
+	public String getSource() {
+		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
+	}
+
+	public Integer getMaintenancemile() {
+		return maintenancemile;
+	}
+
+	public void setMaintenancemile(Integer maintenancemile) {
+		this.maintenancemile = maintenancemile;
+	}
+
+	public Account getCreator() {
+		return creator;
+	}
+
+	public void setCreator(Account creator) {
+		this.creator = creator;
+	}
+
+	
+}

@@ -17,6 +17,7 @@ import com.bus.stripes.selector.EmployeeSelector;
 import com.bus.util.Roles;
 import com.bus.util.SelectBoxOption;
 import com.bus.util.SelectBoxOptions;
+import com.google.gson.JsonObject;
 
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
@@ -132,9 +133,17 @@ public class ContractActionBean extends CustomActionBean implements Permission{
 	@HandlesEvent(value="delete")
 	@Secure(roles=Roles.EMPLOYEE_RM_CONTRACT)
 	public Resolution delete(){
-		String id = context.getRequest().getParameter("targetId");
-		bean.removeContract(Integer.parseInt(id));
-		return new StreamingResolution("text;charset=utf-8","合同已经删除");
+		JsonObject json = new JsonObject();
+		try{
+			String id = context.getRequest().getParameter("targetId");
+			bean.removeContract(Integer.parseInt(id));
+			json.addProperty("result", "1");
+			json.addProperty("msg", "删除成功");
+		}catch(Exception e){
+			json.addProperty("result", "0");
+			json.addProperty("msg", "删除失败，"+e.getMessage());
+		}
+		return new StreamingResolution("text;charset=utf-8",json.toString());
 	}
 	
 	@HandlesEvent(value="resignContract")

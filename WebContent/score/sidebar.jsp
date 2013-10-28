@@ -17,7 +17,7 @@
 							
 								<ss:secure roles="administrator_system">
 								<li>
-									<a href="${pageContext.request.contextPath}/actionbean/Scorehome.action" title="积分主页">积分主页</a>
+									<a href="${pageContext.request.contextPath}/actionbean/Scorehome.action" title="积分主页">积分Log</a>
 								</li>
 								<li>
 									<a href="${pageContext.request.contextPath}/actionbean/DepartmentScore.action" title="部门积分管理">部门积分管理</a>
@@ -57,7 +57,7 @@
 								</li>
 								</ss:secure>
 								
-								<ss:secure roles="scoreapprover_system">
+								<ss:secure roles="score_scoreapprover">
 								<li>
 									<a href="${pageContext.request.contextPath}/actionbean/ScoreApprover.action" title="审核人管理">审核人管理</a>
 								</li>

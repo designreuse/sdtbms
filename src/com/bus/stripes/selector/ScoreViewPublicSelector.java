@@ -101,9 +101,10 @@ public class ScoreViewPublicSelector implements BMSSelector{
 		
 		if(selecttype == null)
 			selecttype = 2;
-		if(selecttype == 0){
+		if(selecttype == TYPE_BY_HISTORY){
 			//order in history
-		}else if(selecttype == 1){
+			query += " WHERE position.name IS NOT NULL ";
+		}else if(selecttype == TYPE_BY_YEAR){
 			//order in year
 			query += "  WHERE EXTRACT(year FROM date)="+c.get(Calendar.YEAR); 
 		}else{

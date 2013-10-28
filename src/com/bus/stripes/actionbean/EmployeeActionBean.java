@@ -28,6 +28,7 @@ import com.bus.util.Roles;
 import com.bus.util.SelectBoxOption;
 import com.bus.util.SelectBoxOptions;
 import com.bus.util.importfile.EmployeeImportFile;
+import com.google.gson.JsonObject;
 
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
@@ -220,6 +221,7 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 	@HandlesEvent(value = "create")
 	@Secure(roles=Roles.EMPLOYEE_EDIT)
 	public Resolution create() {
+		JsonObject json = new JsonObject();
 		try{
 			employee.setAccount(context.getUser());
 			bean.saveEmployee(employee);
@@ -242,10 +244,14 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 					bean.saveIdcard(idc);
 				}
 			}
-			return new StreamingResolution("text;charset=utf-8", new StringReader("新建档案成功"));
+			json.addProperty("result", "1");
+			json.addProperty("msg", "新建档案成功");
+			return new StreamingResolution("text;charset=utf-8", json.toString());
 		}catch(Exception e){
 			e.printStackTrace();
-			return context.errorResolutionAjax("出错啦。", "错误报告:" + e.getMessage());
+			json.addProperty("result", "0");
+			json.addProperty("msg", "错误报告:"+e.getMessage());
+			return new StreamingResolution("text;charset=utf-8", json.toString());
 		}
     }
 	

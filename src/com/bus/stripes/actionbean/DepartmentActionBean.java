@@ -13,6 +13,7 @@ import com.bus.services.HRBean;
 import com.bus.test.data.TestData;
 import com.bus.util.Roles;
 import com.bus.util.SelectBoxOptions;
+import com.google.gson.JsonObject;
 
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
@@ -72,12 +73,16 @@ public class DepartmentActionBean extends CustomActionBean implements Permission
 	@HandlesEvent(value="create")
 	@Secure(roles = Roles.EMPLOYEE_DEPT_ADD)
 	public Resolution create(){
+		JsonObject json = new JsonObject();
 		try{
 			bean.saveDepartment(department);
-			return new StreamingResolution("text;charset=utf-8", new StringReader("创建成功"));
+			json.addProperty("result", "1");
+			json.addProperty("msg", "创建成功");
 		}catch(Exception e){
-			return new ForwardResolution("/actionbean/Error.action").addParameter("error", "创建部门失败").addParameter("description", "部门创建失败."+e.getMessage());
+			json.addProperty("result", "0");
+			json.addProperty("msg", "创建失败."+e.getMessage());
 		}
+		return new StreamingResolution("text;charset=utf-8", json.toString());
 	}
 	
 	@HandlesEvent(value="delete")

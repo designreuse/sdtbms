@@ -56,7 +56,7 @@
  <class>com.bus.dto.logger.AccountLog</class>
  
  <class>com.bus.dto.vehicleprofile.VehicleProfile</class>
- <class>com.bus.dto.vehicleprofile.VehicleMiles</class>
+<!--  <class>com.bus.dto.vehicleprofile.VehicleMiles</class> -->
  <class>com.bus.dto.vehicleprofile.VehicleCheck</class>
  <class>com.bus.dto.vehicleprofile.VehicleFiles</class>
  <class>com.bus.dto.vehicleprofile.VehicleLane</class>
@@ -64,9 +64,18 @@
  <class>com.bus.dto.vehicleprofile.VehicleTeam</class>
  <class>com.bus.dto.vehicleprofile.VehicleTeamLeader</class>
  <class>com.bus.dto.vehicleprofile.VehicleLaneMapper</class>
- <class>com.bus.dto.vehicleprofile.VehicleDriver</class>
+<!--  <class>com.bus.dto.vehicleprofile.VehicleDriver</class> -->
  <class>com.bus.dto.vehicleprofile.VehicleTeamMember</class>
- 
+<class>com.bus.dto.vehicleprofile.VehicleAccident</class>
+<class>com.bus.dto.vehicleprofile.VehicleUseRecord</class>
+<class>com.bus.dto.vehicleprofile.VehicleChange</class>
+<class>com.bus.dto.vehicleprofile.VehicleBasicInfo</class>
+<class>com.bus.dto.vehicleprofile.VehicleTechnicalDetail</class>
+<class>com.bus.dto.vehicleprofile.VehicleRepairRecord</class>
+<class>com.bus.dto.vehicleprofile.VehiclePartsRepair</class>
+<class>com.bus.dto.vehicleprofile.VehicleLevel</class>
+<class>com.bus.dto.logger.VehicleLog</class>
+
  
  <class>com.bus.dto.common.ContractImg</class>
 

@@ -1,0 +1,412 @@
+package com.bus.dto.vehicleprofile;
+
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import com.bus.dto.Account;
+
+@Entity
+@XmlRootElement
+@Table(name="vehicle_technical_detail")
+public class VehicleTechnicalDetail {
+	
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Column(name="id")
+	private Integer id;
+	
+	@ManyToOne
+	@JoinColumn(name="vid",referencedColumnName="id")
+	private VehicleProfile vid;
+	
+	@Column(name="vtype")
+	private String vtype;
+
+	@Column(name="factorycode")
+	private String factorycode;
+	
+	@Column(name="factorydate")
+	private Date factorydate;
+	
+	@Column(name="madein")
+	private String madein;
+	
+	@Column(name="vincode")
+	private String vincode;
+	
+	@Column(name="basecode")
+	private String basecode;
+	
+	@Column(name="vlevel")
+	private String vlevel;
+	
+	@Column(name="vlength")
+	private Integer vlength;
+	
+	@Column(name="vwidth")
+	private Integer vwidth;
+	
+	@Column(name="vheight")
+	private Integer vheight;
+	
+	@Column(name="weight")
+	private Integer weight;
+	
+	@Column(name="sitarrange")
+	private String sitarrange;
+	
+	@Column(name="sits")
+	private Integer sits;
+	
+	@Column(name="dragweight")
+	private Integer dragweight;
+	
+	@Column(name="vaxis")
+	private String vaxis;
+	
+	@Column(name="enginemodel")
+	private String enginemodel;
+	
+	@Column(name="enginecode")
+	private String enginecode;
+	
+	@Column(name="fueltype")
+	private String fueltype;
+	
+	@Column(name="enginepower")
+	private String enginepower;
+	
+	@Column(name="enginehorse")
+	private String enginehorse;
+	
+	@Column(name="releasestandard")
+	private String releasestandard;
+	
+	@Column(name="drivermode")
+	private String drivermode;
+	
+	@Column(name="tyre")
+	private String tyre;
+	
+	@Column(name="frontlight")
+	private String frontlight;
+	
+	@Column(name="variatormode")
+	private String variatormode;
+	
+	@Column(name="retarder")
+	private String retarder;
+	
+	@Column(name="turner")
+	private String turner;
+	
+	@Column(name="breakmode")
+	private String breakmode;
+	
+	@Column(name="frontbreak")
+	private String frontbreak;
+	
+	@Column(name="backbreak")
+	private String backbreak;
+	
+	@Column(name="hangmode")
+	private String hangmode;
+	
+	@Column(name="other")
+	private String other;
+	
+	@ManyToOne
+	@JoinColumn(name="creator",referencedColumnName="id")
+	private Account creator;
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public VehicleProfile getVid() {
+		return vid;
+	}
+
+	public void setVid(VehicleProfile vid) {
+		this.vid = vid;
+	}
+
+	public String getVtype() {
+		return vtype;
+	}
+
+	public void setVtype(String vtype) {
+		this.vtype = vtype;
+	}
+
+	public String getFactorycode() {
+		return factorycode;
+	}
+
+	public void setFactorycode(String factorycode) {
+		this.factorycode = factorycode;
+	}
+
+	public Date getFactorydate() {
+		return factorydate;
+	}
+
+	public void setFactorydate(Date factorydate) {
+		this.factorydate = factorydate;
+	}
+
+	public String getMadein() {
+		return madein;
+	}
+
+	public void setMadein(String madein) {
+		this.madein = madein;
+	}
+
+	public String getVincode() {
+		return vincode;
+	}
+
+	public void setVincode(String vincode) {
+		this.vincode = vincode;
+	}
+
+	public String getBasecode() {
+		return basecode;
+	}
+
+	public void setBasecode(String basecode) {
+		this.basecode = basecode;
+	}
+
+	public String getVlevel() {
+		return vlevel;
+	}
+
+	public void setVlevel(String vlevel) {
+		this.vlevel = vlevel;
+	}
+
+	public Integer getVlength() {
+		return vlength;
+	}
+
+	public void setVlength(Integer vlength) {
+		this.vlength = vlength;
+	}
+
+	public Integer getVwidth() {
+		return vwidth;
+	}
+
+	public void setVwidth(Integer vwidth) {
+		this.vwidth = vwidth;
+	}
+
+	public Integer getVheight() {
+		return vheight;
+	}
+
+	public void setVheight(Integer vheight) {
+		this.vheight = vheight;
+	}
+
+	public Integer getWeight() {
+		return weight;
+	}
+
+	public void setWeight(Integer weight) {
+		this.weight = weight;
+	}
+
+	public String getSitarrange() {
+		return sitarrange;
+	}
+
+	public void setSitarrange(String sitarrange) {
+		this.sitarrange = sitarrange;
+	}
+
+	public Integer getSits() {
+		return sits;
+	}
+
+	public void setSits(Integer sits) {
+		this.sits = sits;
+	}
+
+	public Integer getDragweight() {
+		return dragweight;
+	}
+
+	public void setDragweight(Integer dragweight) {
+		this.dragweight = dragweight;
+	}
+
+	public String getVaxis() {
+		return vaxis;
+	}
+
+	public void setVaxis(String vaxis) {
+		this.vaxis = vaxis;
+	}
+
+	public String getEnginemodel() {
+		return enginemodel;
+	}
+
+	public void setEnginemodel(String enginemodel) {
+		this.enginemodel = enginemodel;
+	}
+
+	public String getEnginecode() {
+		return enginecode;
+	}
+
+	public void setEnginecode(String enginecode) {
+		this.enginecode = enginecode;
+	}
+
+	public String getFueltype() {
+		return fueltype;
+	}
+
+	public void setFueltype(String fueltype) {
+		this.fueltype = fueltype;
+	}
+
+	public String getEnginepower() {
+		return enginepower;
+	}
+
+	public void setEnginepower(String enginepower) {
+		this.enginepower = enginepower;
+	}
+
+	public String getEnginehorse() {
+		return enginehorse;
+	}
+
+	public void setEnginehorse(String enginehorse) {
+		this.enginehorse = enginehorse;
+	}
+
+	public String getReleasestandard() {
+		return releasestandard;
+	}
+
+	public void setReleasestandard(String releasestandard) {
+		this.releasestandard = releasestandard;
+	}
+
+	public String getDrivermode() {
+		return drivermode;
+	}
+
+	public void setDrivermode(String drivermode) {
+		this.drivermode = drivermode;
+	}
+
+	public String getTyre() {
+		return tyre;
+	}
+
+	public void setTyre(String tyre) {
+		this.tyre = tyre;
+	}
+
+	public String getFrontlight() {
+		return frontlight;
+	}
+
+	public void setFrontlight(String frontlight) {
+		this.frontlight = frontlight;
+	}
+
+	public String getVariatormode() {
+		return variatormode;
+	}
+
+	public void setVariatormode(String variatormode) {
+		this.variatormode = variatormode;
+	}
+
+	public String getRetarder() {
+		return retarder;
+	}
+
+	public void setRetarder(String retarder) {
+		this.retarder = retarder;
+	}
+
+	public String getTurner() {
+		return turner;
+	}
+
+	public void setTurner(String turner) {
+		this.turner = turner;
+	}
+
+	public String getBreakmode() {
+		return breakmode;
+	}
+
+	public void setBreakmode(String breakmode) {
+		this.breakmode = breakmode;
+	}
+
+	public String getFrontbreak() {
+		return frontbreak;
+	}
+
+	public void setFrontbreak(String frontbreak) {
+		this.frontbreak = frontbreak;
+	}
+
+	public String getBackbreak() {
+		return backbreak;
+	}
+
+	public void setBackbreak(String backbreak) {
+		this.backbreak = backbreak;
+	}
+
+	public String getHangmode() {
+		return hangmode;
+	}
+
+	public void setHangmode(String hangmode) {
+		this.hangmode = hangmode;
+	}
+
+	public String getOther() {
+		return other;
+	}
+
+	public void setOther(String other) {
+		this.other = other;
+	}
+
+	public Account getCreator() {
+		return creator;
+	}
+
+	public void setCreator(Account creator) {
+		this.creator = creator;
+	}
+	
+	
+}

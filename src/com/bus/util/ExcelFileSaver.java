@@ -30,6 +30,7 @@ import com.bus.dto.Position;
 import com.bus.dto.Promoandtransfer;
 import com.bus.dto.vehicleprofile.VehicleProfile;
 import com.bus.services.HRBean;
+//import com.bus.services.VehicleBean;
 import com.bus.services.VehicleBean;
 
 public class ExcelFileSaver {
@@ -595,29 +596,29 @@ public class ExcelFileSaver {
 		return str;
 	}
 	
-	/**
-	 * Save vehicle repaire dates from files 第一公交分公司
-	 * @param vBean
-	 * @param user
-	 * @return
-	 */
-	public String insertRepaireDatesToVehicles(VehicleBean vBean, Account user) throws Exception{
-		String str="";
-		str = vBean.saveVehicleRepaireDatesFromFile(this);
-		return str;
-	}
+//	/**
+//	 * Save vehicle repaire dates from files 第一公交分公司
+//	 * @param vBean
+//	 * @param user
+//	 * @return
+//	 */
+//	public String insertRepaireDatesToVehicles(VehicleBean vBean, Account user) throws Exception{
+//		String str="";
+//		str = vBean.saveVehicleRepaireDatesFromFile(this);
+//		return str;
+//	}
 	
-	/**
-	 * Save team name and leader
-	 * @param vBean
-	 * @param user
-	 * @return
-	 */
-	public String saveTeamNameAndLeader(VehicleBean vBean, Account user) throws Exception{
-		String str="";
-		str = vBean.saveTeamNameAndLeaderFromFile(this);
-		return str;
-	}
+//	/**
+//	 * Save team name and leader
+//	 * @param vBean
+//	 * @param user
+//	 * @return
+//	 */
+//	public String saveTeamNameAndLeader(VehicleBean vBean, Account user) throws Exception{
+//		String str="";
+//		str = vBean.saveTeamNameAndLeaderFromFile(this);
+//		return str;
+//	}
 	
 	public String getValueFromName(String str, String name){
 		int indexName = str.indexOf(name);
@@ -679,18 +680,18 @@ public class ExcelFileSaver {
 		str = vBean.saveRecordIdsFromFile(this);
 		return str;
 	}
-
-	public String assignVehiclesToCompanyOne(VehicleBean vBean, Account user) throws Exception{
-		String str="";
-		str = vBean.assignVehiclesToCompanyOneFromFile(this);
-		return str;
-	}
-
-	public String saveMilesToEachMonth(VehicleBean vBean, Account user) throws Exception{
-		String str="";
-		str = vBean.saveMilesFromFile(this);
-		return str;
-	}
+//
+//	public String assignVehiclesToCompanyOne(VehicleBean vBean, Account user) throws Exception{
+//		String str="";
+//		str = vBean.assignVehiclesToCompanyOneFromFile(this);
+//		return str;
+//	}
+//
+//	public String saveMilesToEachMonth(VehicleBean vBean, Account user) throws Exception{
+//		String str="";
+//		str = vBean.saveMilesFromFile(this);
+//		return str;
+//	}
 
 
 }

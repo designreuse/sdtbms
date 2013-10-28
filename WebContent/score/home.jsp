@@ -29,6 +29,9 @@
 					<stripes:form beanclass="com.bus.stripes.actionbean.score.ScorehomeActionBean">
 						日期:<stripes:text name="logdate"  formatPattern="yyyy-MM-dd" class="datepickerClass"/>
 						<stripes:submit name="filter"/>
+						<ss:secure roles="administrator_system">
+							<stripes:submit name="resetScores" value="重置部门总分"/>
+						</ss:secure>
 					</stripes:form>
 					</div>
 					<div class="hastable">

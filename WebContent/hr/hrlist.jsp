@@ -91,6 +91,22 @@
 							</td>
 					</tr>
 					</stripes:form>
+					<stripes:form beanclass="com.bus.stripes.actionbean.HRListEditorActionBean">
+					<tr>
+						<td>文化程度(学历)</td>
+							<td><stripes:select name="optionlistselectedvalue"><stripes:options-collection collection="${actionBean.qualifications}" label="name" value="id"/></stripes:select></td>
+							<td><stripes:text name="optionlistnewdata"/></td>
+							<td>
+								<ss:secure roles="employee_property_list_rm">
+								<stripes:submit name="deleteQualification" value="删除"/>
+								</ss:secure>
+								
+								<ss:secure roles="employee_property_list_add">
+								<stripes:submit name="createQualification" value="添加"/>
+								</ss:secure>
+							</td>
+					</tr>
+					</stripes:form>
 					</tbody>
 				</table>
 				</div>

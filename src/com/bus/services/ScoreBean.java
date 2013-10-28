@@ -103,10 +103,10 @@ public class ScoreBean  extends EMBean{
 	public Map getScoretypeByStatement(int pagenum, int lotsize,String statement) throws Exception{
 		List<Scoretype> list=null;
 		if(pagenum == -1 || lotsize == -1)
-			pagenum =1;lotsize = 20;
+			pagenum =1;lotsize = 60;
 		list = em.createQuery(statement)
 				.setFirstResult(pagenum * lotsize - lotsize).setMaxResults(lotsize).getResultList();
-		String countstatement = "SELECT count(q) " + statement.substring(statement.indexOf("FROM"));
+		String countstatement = "SELECT count(q) " + statement.substring(statement.indexOf("FROM"),statement.indexOf("ORDER BY"));
 		Long count = (Long) em.createQuery(countstatement).getSingleResult();
 		Map<String,Object> map = new HashMap<String,Object>();
 		map.put("list", list);
@@ -279,7 +279,7 @@ public class ScoreBean  extends EMBean{
 			cal.set(Calendar.DAY_OF_WEEK,cal.getFirstDayOfWeek());
 			cal2.setTime(cal.getTime());
 			cal2.add(Calendar.WEEK_OF_YEAR, 1); 
-			Long countRecords = (Long) em.createQuery("SELECT count(q) FROM Scorerecord q WHERE q.receiver.employee.id='" + scorer.getId()+"' " +
+			Long countRecords = (Long) em.createQuery("SELECT count(q) FROM Scorerecord q WHERE q.receiver.employee.department.id='" + scorer.getDepartment().getId()+"' " +
 					" AND q.createdate >= '"+HRUtil.parseDateToString(cal.getTime())+"' AND q.createdate < '"+ HRUtil.parseDateToString(cal2.getTime())+"'")
 					.getSingleResult();
 //			System.out.println(countRecords + " Exists.");
@@ -294,6 +294,19 @@ public class ScoreBean  extends EMBean{
 			em.merge(ds);
 			em.flush();
 		}
+	}
+	
+	/**
+	 * Count department scoring employee number
+	 * @param departmentid
+	 * @return
+	 * @throws Exception
+	 */
+	public Integer getScoreEmployeeCount(int departmentid) throws Exception{
+		String query = "SELECT count(q) FROM employee q LEFT JOIN scoreexceptionlist s ON q.positionid = s.positionid WHERE (s.status IS NULL OR (s.status IS NOT NULL AND s.status<>0)) AND q.departmentid="+ departmentid+" AND "
+				+ "(q.joblevel='中管' OR q.joblevel='管') AND q.status='A'";
+		BigInteger count = (BigInteger) em.createNativeQuery(query).getSingleResult();
+		return count.intValue();
 	}
 
 	/**
@@ -508,8 +521,8 @@ public class ScoreBean  extends EMBean{
 		Calendar c = Calendar.getInstance();
 		c.setTime(recordDate);
 		List<Scorerecord> records  = em.createQuery("SELECT q FROM Scorerecord q WHERE" +
-				" receiverid=? AND EXTRACT(month FROM scoredate)=?").setParameter(1, member.getEmployee().getWorkerid())
-				.setParameter(2, c.get(Calendar.MONTH)+1).getResultList();
+				" receiverid=? AND EXTRACT(month FROM scoredate)=? AND q.status=?").setParameter(1, member.getEmployee().getWorkerid())
+				.setParameter(2, c.get(Calendar.MONTH)+1).setParameter(3, Scorerecord.APPROVED).getResultList();
 		return records;
 	}
 
@@ -562,12 +575,12 @@ public class ScoreBean  extends EMBean{
 	public Map getSummaryByStatement(int pagenum, int lotsize, String statement) throws Exception{
 		Map ret = new HashMap<String,Object>();
 		List<ScoreMemberRank> list = null;
-		if(pagenum == -1 || lotsize == -1){
+//		if(pagenum == -1 || lotsize == -1){
 			list = em.createNativeQuery(statement,ScoreMemberRank.class).getResultList();
-		}else{
-			list = em.createNativeQuery(statement,ScoreMemberRank.class)
-				.setFirstResult(pagenum*lotsize -lotsize).setMaxResults(lotsize).getResultList();
-		}
+//		}else{
+//			list = em.createNativeQuery(statement,ScoreMemberRank.class)
+//				.setFirstResult(pagenum*lotsize -lotsize).setMaxResults(lotsize).getResultList();
+//		}
 		ret.put("list", list);
 		ret.put("count", list.get(0).getCount());
 		return ret;
@@ -1003,6 +1016,8 @@ public class ScoreBean  extends EMBean{
 		List<Scorerecord> departs = new ArrayList<Scorerecord>();
 		Calendar cal = Calendar.getInstance();
 		Calendar cal2 = Calendar.getInstance();
+		if(selectPeriod == null)
+			selectPeriod = "w"; //Default display week records
 		if(selectPeriod == null){
 			departs = em.createQuery("SELECT re FROM Scorerecord re" +
 					" WHERE re.receiver.employee.department.id " +
@@ -1296,7 +1311,7 @@ public class ScoreBean  extends EMBean{
 				Date scoredate = HRUtil.parseDate(cols[1], "yyyy-MM-dd");
 				Scoretype st = getScoreTypeByReference(cols[2]);
 				if(st ==null){
-					str += "" + "第" + saver.index + "行" + "录入失败,id " + cols[0]+".编号不存在."  + "\n<br/>";
+					str += "" + "第" + saver.index + "行" + "录入失败,序号 " + cols[0]+".条例编号不存在."  + "\n<br/>";
 					throw new Exception(str);
 				}
 				
@@ -1305,7 +1320,7 @@ public class ScoreBean  extends EMBean{
 						Employee e = hrBean.getEmployeeByWorkerId(cols[4]);
 						createScoreMember(user,e);
 					}else{
-						str += "" + "第" + saver.index + "行" + "录入失败,id " + cols[0]+".工号不存在."  + "\n<br/>";
+						str += "" + "第" + saver.index + "行" + "录入失败,序号 " + cols[0]+".工号不存在"+cols[4]+"."  + "\n<br/>";
 						throw new Exception(str);
 					}
 				}
@@ -1314,15 +1329,24 @@ public class ScoreBean  extends EMBean{
 						Employee scorer = hrBean.getEmployeeByWorkerId(cols[6]);
 						createScoreMember(user,scorer);
 					}else{
-						str += "" + "第" + saver.index + "行" + "录入失败,id " + cols[0]+".工号不存在."  + "\n<br/>";
+						str += "" + "第" + saver.index + "行" + "录入失败,序号 " + cols[0]+".工号不存在"+cols[6]+"."  + "\n<br/>";
 						throw new Exception(str);
 					}
 				}
 				Float score= 0F;
 				if(cols.length > 7 && !cols[7].trim().equals("")){
-					score = Float.parseFloat(cols[7]);
+					System.out.println(st.getDescription() + " 分值:"+st.getScore());
+					if(st.getScore() == 0){
+						score = Float.parseFloat(cols[7]);
+					}else{
+						score = st.getScore();
+					}
 				}else{
 					score = st.getScore();
+				}
+				if(score <= 0 || score > 1000){
+					str += "" + "第" + saver.index + "行" + "录入失败,序号 " + cols[0]+".分值不能为0 或 过大.\n<br/>";
+					throw new Exception(str);
 				}
 				
 				Employee scorer = (Employee) em.createQuery("SELECT q FROM Employee q WHERE workerid=?")
@@ -1332,7 +1356,7 @@ public class ScoreBean  extends EMBean{
 				Employee curUser = (Employee) em.createQuery("SELECT q FROM Employee q WHERE q.workerid=?").setParameter(1, user.getEmployee()).getSingleResult();
 				if(!isUserScoreApprover(curUser)){
 					if(!checkEmployeeAllowToScore(scorer, curUser)){
-						str += "" + "第" + saver.index + "行" + "录入失败,id " + cols[0]+".用户"+ curUser.getFullname()+ "没有权限打分给用户"+ scorer.getFullname()+ "\n<br/>";
+						str += "" + "第" + saver.index + "行" + "录入失败,序号 " + cols[0]+".用户"+ curUser.getFullname()+ "没有权限打分给用户"+ scorer.getFullname()+ "\n<br/>";
 						throw new Exception(str);
 					}
 				}
@@ -1341,8 +1365,8 @@ public class ScoreBean  extends EMBean{
 				toResetDepartmentScores(scorer,Calendar.getInstance().getTime());
 				
 				//这里需要检查部门够不够分值打分，不够的话出错
-				if(!isDepartmentScoreEnoughForEmployee(scorer,score)){
-					str += "" + "第" + saver.index + "行" + "录入失败,id " + cols[0]+".部门分值不够."  + "\n<br/>";
+				if(st.getType() == Scoretype.SCORE_TYPE_TEMP && !isDepartmentScoreEnoughForEmployee(scorer,score)){
+					str += "" + "第" + saver.index + "行" + "录入失败,序号 " + cols[0]+".部门分值不够."  + "\n<br/>";
 					throw new Exception(str);
 				}
 				assignScoreTypeToScoreMember(user, cols[4], cols[6], st, scoredate,score);
@@ -1385,10 +1409,14 @@ public class ScoreBean  extends EMBean{
 	public List<Scorerecord> getApprovedListByTime(Account user,String selectPeriod, Date startDate, Date endDate) throws Exception {
 		Calendar cal = Calendar.getInstance();
 		Calendar cal2 = Calendar.getInstance();
-		Employee e = (Employee) em.createQuery("SELECT q FROM Employee q WHERE q.workerid=?").setParameter(1, user.getEmployee()).getSingleResult();
+		Employee e = (Employee) em.createQuery("SELECT distinct q FROM Employee q WHERE q.workerid=?").setParameter(1, user.getEmployee()).getSingleResult();
+		
+		if(selectPeriod == null || selectPeriod.equals(""))
+			selectPeriod = "w"; // 设置默认获取本周的记录
+		
 		if(selectPeriod == null || selectPeriod.equals("")){
-			return em.createQuery("SELECT q FROM Scorerecord q, Scoreapprover d WHERE q.receiver.employee.department.id=d.department.id AND d.approver.id=? AND q.status=? AND q.createdate='"+ HRUtil.parseDateToString(cal.getTime())+"'")
-					.setParameter(1, e.getId()).setParameter(2, Scorerecord.APPROVED).getResultList();
+			return em.createQuery("SELECT distinct q FROM Scorerecord q, Scoreapprover d WHERE ((q.receiver.employee.department.id=d.department.id AND d.approver.id=?) OR q.creator.id=?) AND q.status=? AND q.createdate='"+ HRUtil.parseDateToString(cal.getTime())+"'")
+					.setParameter(1, e.getId()).setParameter(2, user.getId()).setParameter(3, Scorerecord.APPROVED).getResultList();
 		}else{
 			if(selectPeriod.equals("w")){
 				cal.set(Calendar.DAY_OF_WEEK,cal.getFirstDayOfWeek());
@@ -1404,17 +1432,17 @@ public class ScoreBean  extends EMBean{
 				if(endDate != null)
 					cal2.setTime(endDate);
 			}
-			return em.createQuery("SELECT re FROM Scorerecord re , Scoreapprover d" +
+			return em.createQuery("SELECT distinct re FROM Scorerecord re , Scoreapprover d" +
 						" WHERE ((re.receiver.employee.department.id=d.department.id AND d.approver.id=?) OR re.creator.id=? )"+
 								" AND re.createdate>='" + HRUtil.parseDateToString(cal.getTime())+"' AND re.createdate<'" +  HRUtil.parseDateToString(cal2.getTime()) + "' " +
 								" AND re.status=? " +
-								" ORDER BY createdate DESC")
-								.setParameter(1, e.getId()).setParameter(2, Scorerecord.APPROVED).setParameter(3, user.getId()).getResultList();
+								" ORDER BY re.createdate DESC")
+								.setParameter(1, e.getId()).setParameter(3, Scorerecord.APPROVED).setParameter(2, user.getId()).getResultList();
 		}
 	}
 
 	/**
-	 * 或许当月月供得分详情
+	 * 获取当月月供得分详情
 	 * @param user
 	 * @param month
 	 * @return
@@ -1525,5 +1553,65 @@ public class ScoreBean  extends EMBean{
 		String query = "select distinct d.* from employee e,department d, scoreapprover s where e.id=s.approver AND e.workerid='"+ user.getEmployee()
 					+"' AND (d.id=s.departmentid OR d.id=e.departmentid);";
 		return em.createNativeQuery(query, Department.class).getResultList();
+	}
+
+	public List<DepartmentScore> getAllDepartmentScores() throws Exception{
+		return em.createQuery("SELECT q FROM DepartmentScore q ORDER BY q.id").getResultList();
+	}
+
+	/**
+	 * 更新部门可用总分
+	 * @param depS
+	 * @throws Exception
+	 */
+	@Transactional(rollbackFor=Exception.class)
+	public void updateDepartmentScores(List<DepartmentScore> depS) throws Exception{
+		for(DepartmentScore ds:depS){
+			DepartmentScore d = em.find(DepartmentScore.class, ds.getId());
+			d.setAvailable(ds.getAvailable());
+			em.merge(d);
+		}
+	}
+
+	/**
+	 * 获取部门等待审核的积分总和
+	 * @param id
+	 * @param time
+	 * @param time2
+	 * @return
+	 */
+	public Float getDepartmentWaittingScores(Integer id, Date time, Date time2) throws Exception{
+		Float bint = (Float) em.createNativeQuery("SELECT SUM(q.score) FROM scorerecord q LEFT JOIN employee e ON q.receiverid=e.workerid " +
+				" WHERE e.departmentid="+id+ " AND q.status="+Scorerecord.WAITING+
+				" AND q.createdate >='"+HRUtil.parseDateToString(time)+"' AND q.createdate < '"+HRUtil.parseDateToString(time2)+"' ").getSingleResult();
+		return bint;
+	}
+
+	/**
+	 * 获取部门被拒绝的条例总分
+	 * @param id
+	 * @param time
+	 * @param time2
+	 * @return
+	 */
+	public Float getDepartmentRejectedScores(Integer id, Date time, Date time2) throws Exception{
+		Float bint = (Float) em.createNativeQuery("SELECT SUM(q.score) FROM scorerecord q LEFT JOIN employee e ON q.receiverid=e.workerid " +
+				" WHERE e.departmentid="+id+ " AND q.status="+Scorerecord.REJECTED+
+				" AND q.createdate >='"+HRUtil.parseDateToString(time)+"' AND q.createdate < '"+HRUtil.parseDateToString(time2)+"' ").getSingleResult();
+		return bint;
+	}
+	
+	/**
+	 * 获取部门未提交的条例总分
+	 * @param id
+	 * @param time
+	 * @param time2
+	 * @return
+	 */
+	public Float getDepartmentNotSubmitScores(Integer id, Date time, Date time2) throws Exception{
+		Float bint = (Float) em.createNativeQuery("SELECT SUM(q.score) FROM scorerecord q LEFT JOIN employee e ON q.receiverid=e.workerid " +
+				" WHERE e.departmentid="+id+ " AND q.status="+Scorerecord.CREATED+
+				" AND q.createdate >='"+HRUtil.parseDateToString(time)+"' AND q.createdate < '"+HRUtil.parseDateToString(time2)+"' ").getSingleResult();
+		return bint;
 	}
 }

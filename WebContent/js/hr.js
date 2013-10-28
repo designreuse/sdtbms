@@ -219,7 +219,7 @@ $(document).ready(function(){
 	});
 	$(".btn_contract_delete").click(function(){
 		var url = $(this).val();
-		var targetId = $(this).parent().children().first().val();
+		var targetId = $(this).parent().children().first().next().val();
 		var params = "targetId=" + targetId + "&delete=";
 		$.ajax({
 			url:url,
@@ -227,9 +227,10 @@ $(document).ready(function(){
 			dataType:'text',
 			data:params,
 			success:function(response){
-//				console.log("ajax response = "+response);
-				alert(response);
-				location.reload();
+				var json = $.parseJSON(response);
+				alert(json.msg);
+				if(json.result=="1")
+					location.reload();
 			},
 			error:function(response){
 				alert("删除合同失败");
@@ -238,7 +239,9 @@ $(document).ready(function(){
 	});
 	$(".btn_contract_resign").click(function(){
 		var url = $(this).val();
-		var targetId = $(this).parent().children().first().val();
+		
+		var targetId = $(this).parent().children().first().next().val();
+		alert("sending :"+targetId);
 		var params = "targetId=" + targetId + "&resignContract=";
 		$.ajax({
 			url:url,
@@ -339,11 +342,15 @@ function buildBasicCreateDialog(formId, dialogId, width, height, extraParam){
 						dataType:'text',
 						data:params,
 						success:function(response){
-							console.log("ajax response = "+response);
-							$("#"+dialogId).dialog('close');
-							alert(response);
-							clearFormTextBox(formId);
-							location.reload();
+							var json = $.parseJSON(response);
+							if(json != null && json != undefined){
+								alert(json.msg);
+								if(json.result == "1"){
+									$("#"+dialogId).dialog('close');
+									clearFormTextBox(formId);
+									location.reload();
+								}
+							}
 						},
 						error:function(response){
 							alert("errors");
@@ -389,6 +396,7 @@ function hrNewDocumentValidation(formid){
 			}
 		}
 	});
+	
 	$('#'+formid).find('select').each(function(){
 		if($(this).hasClass('required')){
 			var value = $(this).val();
@@ -399,7 +407,57 @@ function hrNewDocumentValidation(formid){
 			}
 		}
 	});
+	
 	if(text != "")
 		alert("请输入 " + text);
 	return valid;
+	
+	var ifblur = true;
+	if(ifblur = validate('job',0,'6','请输入正确的员工工号')){
+		if(ifblur = validate('idcode',1,'','请输入15或者18位的身份证号')){
+			if(ifblur = validate('email',2,'','请输入有效的邮箱地址')){
+				if(ifblur = validate('postcode',3,'6','请输入6位邮政编码')){
+					
+				}
+			}	
+		}
+	}
+	if(!ifblur)
+		return false;
+}
+
+
+//验证工号、身份证、邮箱、邮编
+function validate(inputId,checkType,check,errorMsg){
+	var ele = $('#'+inputId);
+	if(ele == null || ele == undefined)
+		return true;
+	if(checkType == 0){
+		if($(ele).val() != "" && $(ele).val().length != check){
+			alert(errorMsg);
+			return false;
+		}
+	}
+	else if(checkType == 1){
+		if($(ele).val().length != 15 && $(ele).val().length != 18){
+			alert(errorMsg);
+			return false;
+		}
+	}else if(checkType == 2){
+		var myreg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
+		if($(ele).val() != "" && !myreg.test($(ele).val())){ //检查邮箱是否按照表达式的格式填写
+				alert(errorMsg);
+			return false;
+		}
+	}else if(checkType == 3){
+		if($(ele).val() != "" && $(ele).val().length != check){
+			alert(errorMsg);
+			return false;
+		}
+	}else if(checkType > 3 || checkType < 0){
+		if(showDialog)
+			alert(checkType + ' 不是有效的检查类型');
+	return false;
+}
+return true;
 }

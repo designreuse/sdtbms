@@ -13,6 +13,7 @@ import com.bus.services.CustomActionBean;
 import com.bus.services.HRBean;
 import com.bus.test.data.TestData;
 import com.bus.util.Roles;
+import com.google.gson.JsonObject;
 
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
@@ -70,12 +71,16 @@ public class PositionActionBean  extends CustomActionBean implements Permission{
 	@HandlesEvent(value="create")
 	@Secure(roles=Roles.EMPLOYEE_POS_ADD)
 	public Resolution create(){
+		JsonObject json = new JsonObject();
 		try{
 			bean.savePosition(position);
-			return new StreamingResolution("text;charset=utf-8", new StringReader("创建成功"));
+			json.addProperty("result", "1");
+			json.addProperty("msg", "创建成功");
 		}catch(Exception e){
-			return new StreamingResolution("text;charset=utf-8", new StringReader("创建失败 "));
+			json.addProperty("result", "0");
+			json.addProperty("msg", "创建失败。"+e.getMessage());
 		}
+		return new StreamingResolution("text;charset=utf-8", json.toString());
 	}
 
 	@HandlesEvent(value="delete")

@@ -610,10 +610,8 @@ public class HRBean{
 		}
 	}
 
-	@Transactional
-	public String saveCoordination(Promoandtransfer coordinate) {
-		String str = "";
-		try {
+	@Transactional(rollbackFor=Exception.class)
+	public void saveCoordination(Promoandtransfer coordinate) throws Exception{
 			Employee e = (Employee) em
 					.createQuery(
 							"SELECT q FROM Employee q WHERE fullname=? AND workerid=?")
@@ -650,14 +648,6 @@ public class HRBean{
 				em.flush();
 				em.persist(coordinate);
 			}
-			
-			str = "创建成功";
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			str = "创建失败，可能员工不存在." + e.getMessage();
-		}
-		return str;
 	}
 
 	private Promoandtransfer isCoordinatorExist(Promoandtransfer c) {
@@ -1247,6 +1237,22 @@ public class HRBean{
 				" WHERE employee.status='A' ORDER BY department.id";
 		List<Department> departments = em.createNativeQuery(statement, Department.class).getResultList();
 		return departments;
+	}
+
+	/**
+	 * 添加学历，文化程度
+	 * @param q
+	 * @throws Exception
+	 */
+	@Transactional(rollbackFor=Exception.class)
+	public void saveQualification(Qualification q) throws Exception{
+		em.persist(q);
+	}
+
+	@Transactional(rollbackFor=Exception.class)
+	public void deleteQualification(String optionlistselectedvalue) throws Exception {
+		Qualification q  = em.find(Qualification.class,Integer.parseInt(optionlistselectedvalue));
+		em.remove(q);
 	}
 
 }

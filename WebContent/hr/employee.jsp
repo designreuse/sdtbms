@@ -120,27 +120,27 @@
 							</td>
 						</tr>
 						<tr><td>籍贯:</td><td><stripes:text class="required"  name="employee.pob"/></td></tr>
-						<tr><td>编号<a href="javascript:void;" id="getNewWorkerId">(工)</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?getnewworkerid="/>:</td><td><stripes:text name="employee.documentkey"/></td></tr>
-						<tr><td>工号:</td><td><stripes:text class="required" name="employee.workerid"/><a href="javascript:void;" id="checkWorkerId">(查)</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?checkworkerid="/></td></tr>
+						<tr><td>编号<a href="javascript:void;" id="getNewWorkerId">(工)</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?getnewworkerid="/>:</td><td><stripes:text name="employee.documentkey" maxlength="6"/></td></tr>
+						<tr><td>工号:</td><td><stripes:text class="required" name="employee.workerid" id="job"/><a href="javascript:void;" id="checkWorkerId">(查)</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?checkworkerid="/></td></tr>
 						<tr><td>性别:</td><td><stripes:radio name="employee.sex" value="男"/>男 &nbsp; &nbsp; <stripes:radio name="employee.sex" value="女"/>女</td></tr>
 						<tr><td>出生年月:</td><td><stripes:text name="employee.dob"  formatPattern="yyyy-MM-dd" class="datepickerClass"/></td></tr>
-						<tr><td>身份证:</td><td><stripes:text class="required" name="employee.identitycode"/></td></tr>
+						<tr><td>身份证:</td><td><stripes:text class="required" name="employee.identitycode" id="idcode"/></td></tr>
 						<tr><td>婚姻状况:</td><td><stripes:select class="required" name="employee.marriage"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.marriage}" label="label" value="value"/></stripes:select></td></tr>
-						<tr><td>手机号码:</td><td><stripes:text class="required" name="employee.mobilenumber"/></td></tr>
+						<tr><td>手机号码:</td><td><stripes:text class="required" name="employee.mobilenumber" maxlength="64"/></td></tr>
 						<tr>
 							<td>民族:</td><td><stripes:select class="required" name="employee.ethnic"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.ethnic}" label="label" value="value"/></stripes:select></td>
 							<td>政治面貌:</td><td><stripes:select name="employee.politicalstatus"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.politicalStatus}" label="label" value="value"/></stripes:select></td>
 						</tr>
 						<tr>
-							<td>住宅电话:</td><td><stripes:text name="employee.homenumber"/></td>
-							<td>电子邮箱:</td><td><stripes:text name="employee.email"/></td>
+							<td>住宅电话:</td><td><stripes:text name="employee.homenumber" maxlength="64"/></td>
+							<td>电子邮箱:</td><td><stripes:text name="employee.email" id="email"/></td>
 						</tr>
 						<tr>
 							<td>其它联系方式:</td><td><stripes:text name="employee.othercontact"/></td>
-							<td>邮编:</td><td><stripes:text name="employee.postcode"/></td>
+							<td>邮编:</td><td><stripes:text name="employee.postcode" id="postcode"/></td>
 						</tr>
 						<tr>
-							<td>家庭地址:</td><td colspan=3><stripes:text style="width:80%;" class="required" name="employee.homeaddress"/></td>
+							<td>家庭地址:</td><td colspan=3><stripes:text style="width:80%;" class="required" name="employee.homeaddress" maxlength="256"/></td>
 						</tr>
 						<tr>
 							<td>入党时间:</td><td><stripes:text name="employee.timeofjoinrpc" formatPattern="yyyy-MM-dd" class="datepickerClass"/></td>
@@ -155,7 +155,7 @@
 							<td>文化程度:</td><td><stripes:select class="required" name="employee.qualification"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.qualification}" label="label" value="value"/></stripes:select></td>
 						</tr>
 						<tr>
-							<td>最后毕业学校:</td><td><stripes:text name="employee.colleage"></stripes:text></td>
+							<td>最后毕业学校:</td><td><stripes:text name="employee.colleage" maxlength="256"></stripes:text></td>
 							<td>专业:</td><td colspan=3><stripes:text name="employee.major"/></td>
 						</tr>
 						<tr>

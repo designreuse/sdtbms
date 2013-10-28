@@ -208,7 +208,7 @@ public class ScoreViewPublicActionBean extends CustomActionBean{
 			return sum+"";
 		else{
 			for(Scorerecord r:records){
-				sum += r.getScoretype().getScore();
+				sum += r.getScore();
 			}
 		}
 		return HRUtil.formatFloatNumberComma(new Float(sum).toString());

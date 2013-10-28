@@ -1,0 +1,103 @@
+package com.bus.stripes.actionbean;
+
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+
+import security.action.Secure;
+
+import com.bus.dto.Account;
+import com.bus.dto.Department;
+import com.bus.services.CustomActionBean;
+import com.bus.services.HRBean;
+import com.bus.test.data.TestData;
+import com.bus.util.Roles;
+import com.bus.util.SelectBoxOptions;
+import com.google.gson.JsonObject;
+
+import net.sourceforge.stripes.action.ActionBean;
+import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.HandlesEvent;
+import net.sourceforge.stripes.action.RedirectResolution;
+import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.StreamingResolution;
+import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.integration.spring.SpringBean;
+
+@UrlBinding("/actionbean/Department.action")
+public class DepartmentActionBean extends CustomActionBean implements Permission{
+	
+	private Department department;
+	private HRBean bean;
+	
+	private List<Department> departments = new ArrayList<Department>();
+	
+	
+	
+	@SpringBean
+	protected void setBean(HRBean bean){
+		this.bean = bean;
+	}
+	protected HRBean getBean(){
+		return this.bean;
+	}
+	
+	public Department getDepartment() {
+		return department;
+	}
+	public void setDepartment(Department department) {
+		this.department = department;
+	}
+
+	public List<Department> getDepartments() {
+		return departments;
+	}
+	public void setDepartments(List<Department> departments) {
+		this.departments = departments;
+	}
+	
+	public void initData(){
+		setDepartments(bean.getAllDepartment());
+	}
+	
+	@DefaultHandler
+	@Secure(roles = Roles.EMPLOYEE_DEPT_VIEW)
+	public Resolution defaultAction(){
+		initData();
+//		department = TestData.getDepartmentData();
+		return new ForwardResolution("/hr/department.jsp");
+	}
+	
+	@HandlesEvent(value="create")
+	@Secure(roles = Roles.EMPLOYEE_DEPT_ADD)
+	public Resolution create(){
+		JsonObject json = new JsonObject();
+		try{
+			bean.saveDepartment(department);
+			json.addProperty("result", "1");
+			json.addProperty("msg", "创建成功");
+		}catch(Exception e){
+			json.addProperty("result", "0");
+			json.addProperty("msg", "创建失败."+e.getMessage());
+		}
+		return new StreamingResolution("text;charset=utf-8", json.toString());
+	}
+	
+	@HandlesEvent(value="delete")
+	@Secure(roles = Roles.EMPLOYEE_DEPT_RM)
+	public Resolution delete(){
+		Department d = new Department();
+		String targetId = context.getRequest().getParameter("targetId");
+		d.setId(Integer.parseInt(targetId));
+		if(d.getId() == null){
+			return new ForwardResolution("/actionbean/Error.action").addParameter("error", "Delete Fail").addParameter("description", "This department may have already assigned to some employees or there is server error during deletion. Please contact administrator for further operation.");
+		}else if(bean.deleteDepartment(d)){
+			return defaultAction();
+		}else{
+			return new ForwardResolution("/actionbean/Error.action").addParameter("error", "Delete Fail").addParameter("description", "This department may have already assigned to some employees or there is server error during deletion. Please contact administrator for further operation.");
+		}
+	}
+
+}

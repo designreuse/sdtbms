@@ -81,7 +81,7 @@ public class ScoreitemsActionBean extends CustomActionBean {
 	private void initData() {
 		if (pagenum <= 0 || lotsize <= 0) {
 			pagenum = 1;
-			lotsize = 20;
+			lotsize = 60;
 		}
 		try {
 			sheetList = scoreBean.getAllScoreSheets();
@@ -95,21 +95,18 @@ public class ScoreitemsActionBean extends CustomActionBean {
 
 	private void getFromSelector() {
 		try {
-			if (selector == null && itemlist == null) {
+			if (selector == null) {
 				Map map = scoreBean.getAllScoreTypes(pagenum, lotsize);
 				scoretypes = (List<Scoretype>) map.get("list");
 				setRecordsTotal((Long) map.get("count"));
-			} else {
-				if (itemlist != null) {
-					scoretypes = scoreBean.getScoretypesFromSheet(itemlist);
-					setRecordsTotal(new Long(scoretypes.size()));
-				} else if (selector != null) {
+			} else if (selector != null) {
 					String statement = selector.getSelectorStatement();
+					System.out.println(statement);
 					Map map = scoreBean.getScoretypeByStatement(pagenum,
 							lotsize, statement);
 					scoretypes = (List<Scoretype>) map.get("list");
 					setRecordsTotal((Long) map.get("count"));
-				}
+//				}
 			}
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
@@ -132,6 +129,7 @@ public class ScoreitemsActionBean extends CustomActionBean {
 		}
 		ForwardResolution fr = new ForwardResolution("/score/items.jsp");
 		fr.addParameter("pagenum", pagenum);
+		fr.addParameter("lotsize", lotsize);
 //		String receiverWorkerids = context.getRequest().getParameter(
 //				"receiverWorkerids");
 //		String receivers = context.getRequest().getParameter(
@@ -234,8 +232,8 @@ public class ScoreitemsActionBean extends CustomActionBean {
 			}
 			
 			
-			
-			String isenough = isScoreEnough(receiversArray,selectedScoreTypes,score);
+			//检查是否有足够的分值打分
+			String isenough = isScoreEnough(receiversArray,selectedScoreTypes,selectedScores);
 			if(!isenough.equals("")){
 				throw new Exception("这些部门没有足够的分值:"+isenough);
 			}
@@ -283,21 +281,22 @@ public class ScoreitemsActionBean extends CustomActionBean {
 	 * @throws Exception
 	 */
 	private String isScoreEnough(String[] receivers,
-			List<Scoretype> selectedScoreTypes2, Float selfMakeScore) throws Exception{
+			List<Scoretype> selectedScoreTypes2, List<Float> scores) throws Exception{
 		String enough = "";
 		Float totalscore = 0F;
-		if(selfMakeScore != 0F){
-			totalscore = selfMakeScore;
-		}else{
-		for(Scoretype st:selectedScoreTypes2){
+		
+		for(int i=0;i<selectedScoreTypes2.size(); i++){
+			Scoretype st = selectedScoreTypes2.get(i);
 			if(st != null && st.getId() != null){
 				st = scoreBean.getScoreTypeById(st.getId()+"");
-				if(st.getType() == Scoretype.SCORE_TYPE_TEMP)
-					totalscore += st.getScore();
+				if(st.getType() == Scoretype.SCORE_TYPE_TEMP){
+					if(st.getScore() == 0)
+						totalscore += scores.get(i);
+					else
+						totalscore += st.getScore();
+				}
 			}
 		}
-		}
-//		System.out.println(" Need "+totalscore);
 		
 		String workerids = "";
 		for(String rece:receivers){
@@ -318,20 +317,21 @@ public class ScoreitemsActionBean extends CustomActionBean {
 	@HandlesEvent(value = "assignToScoreSheet")
 	@Secure(roles = Roles.SCORE_SHEET_ADD_ST)
 	public Resolution assignToScoreSheet() {
-		if (selectedScoreTypes == null || itemlist == null) {
+		if (selectedScoreTypes == null || selector.getItemlist() == null) {
 			return defaultAction();
 		}
 		try {
 			for (Scoretype st : selectedScoreTypes) {
 				if (st != null && st.getId() != null) {
 					if (!scoreBean.isScoretypeExistForSheet(st.getId(),
-							Integer.parseInt(itemlist))) {
+							selector.getItemlist() )) {
 						scoreBean.assignScoreTypeToSheet(context.getUser(),
-								st.getId(), Integer.parseInt(itemlist));
+								st.getId(), selector.getItemlist() );
 					}
 				}
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			return context.errorResolution("添加出错", "请确认选择了正确的积分表单和条例，或联系管理员."
 					+ e.getMessage());
 		}

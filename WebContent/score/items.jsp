@@ -77,7 +77,9 @@
 					data:serialize,
 					success:function(response){
 						var jobj = $.parseJSON(response);
-						clearCheckBoxesAndReceivers();
+						if(jobj.result == "1"){
+							clearCheckBoxesAndReceivers();
+						}
 						alert(jobj.msg);
 						$('#givescores').show();
 					}
@@ -110,7 +112,7 @@
 								valOk = false;
 								alert("值不能小于或等于0,或值过大");
 							}else if($(this).next().val() == "绩效"){
-								alert("绩效分");
+// 								alert("绩效分");
 								var s = parseFloat(temScore);
 								if(s > 100.0){
 									valOk = false;
@@ -258,7 +260,7 @@
 								<div>
 									<Label class='selector'>给分人:</Label>
 									<br/>
-									&nbsp;&nbsp;&nbsp;&nbsp;名称:<stripes:text readonly="true" name="employee.fullname" style="background-color:#CCCCBB;"  id="employeenamefromid1"/>工号:<stripes:text name="employee.workerid" readonly="true" id="checkWorkerId1"/>
+									&nbsp;&nbsp;&nbsp;&nbsp;名称:<stripes:text readonly="true" name="employee.fullname" style="background-color:#CCCCBB;"  id="employeenamefromid1"/>工号:<stripes:text name="employee.workerid" readonly="true" id="checkWorkerId1" style="background-color:#CCCCBB;"/>
 <%-- 									<a href="javascript:void;" id="checkWorkerId">(查)</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?checkworkerid="/>| --%>
 <%-- 									<a href="javascript:void;" id="getNameById1">获取</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?getnamebyid="/>| --%>
 									<input type="hidden" value="" id="extra1"/>
@@ -269,8 +271,9 @@
 									<br/>
 									&nbsp;&nbsp;&nbsp;&nbsp;名称:<stripes:text style="background-color:#CCCCBB;width:50%;" readonly="readonly" name="receivers" id="employeenamefromid2"/>
 									<br/>
-									&nbsp;&nbsp;&nbsp;&nbsp;工号:<stripes:text name="receiverWorkerids" id="checkWorkerId2"/><a href="javascript:void;" id="checkWorkerId">(查)</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?checkworkerid="/>|
-									<a href="javascript:void;" id="getNameById2">获取</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?getnamebyid="/>|
+									&nbsp;&nbsp;&nbsp;&nbsp;工号:<stripes:text name="receiverWorkerids" id="checkWorkerId2"/>
+<%-- 									<a href="javascript:void;" id="checkWorkerId">(查)</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?checkworkerid="/>| --%>
+<%-- 									<a href="javascript:void;" id="getNameById2">获取</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?getnamebyid="/>| --%>
 									<input type="hidden" value="" id="extra2"/><a href="javascript:void;" onclick="openSelectEmpWindow('employeenamefromid2','checkWorkerId2','extra2',true)">从列表选择</a>
 								</div>
 <!-- 								<div> -->
@@ -291,9 +294,11 @@
 						</tr>
 						<tr>
 							<td colspan=9 style="text-align:left">
+								<Label class='selector'>关键词:</Label><stripes:text name="selector.itemWords"/>
+								<br/>
 								<Label class='selector'>编号:</Label><stripes:text name="selector.reference"/>
 								<Label class='selector'>类型:</Label><stripes:select name="selector.type"><stripes:option value="">不限</stripes:option><stripes:option value="0">临时分</stripes:option><stripes:option value="1">固定分</stripes:option><stripes:option value="2">绩效分</stripes:option><stripes:option value="3">项目分</stripes:option></stripes:select>
-								<Label class='selector'>条例单:</Label><stripes:select id='itemlist' name="itemlist"><stripes:option value=""></stripes:option>不限<stripes:options-collection collection="${actionBean.sheetList}" label="name" value="id"/></stripes:select>
+								<Label class='selector'>条例单:</Label><stripes:select id='itemlist' name="selector.itemlist"><stripes:option value=""></stripes:option>不限<stripes:options-collection collection="${actionBean.sheetList}" label="name" value="id"/></stripes:select>
 								<stripes:submit id='filter' name="filter" value="筛选"/>
 								<br/>
 								<ss:secure roles="score_items_edit">
