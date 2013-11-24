@@ -90,6 +90,8 @@ public class ScoreApproverActionBean  extends CustomActionBean{
 				Employee e = hrBean.getEmployeeByWorkerId(workerid);
 				approvers = scoreBean.getApproverSections(e);
 				json.addProperty("result", "1");
+//				System.out.println("approver size:"+approvers.size());
+//				System.out.println("approver id:"+e.getId());
 				JsonArray jarray = new JsonArray();
 				for(Scoreapprover app:approvers){
 					JsonObject jo = new JsonObject();
@@ -97,6 +99,7 @@ public class ScoreApproverActionBean  extends CustomActionBean{
 					if(app.getVehicleteam() != null){
 						jo.addProperty("name", app.getVehicleteam().getName());
 					}else{
+//						System.out.println("Department "+ app.getDepartment());
 						jo.addProperty("name", app.getDepartment().getName());
 					}
 					jo.addProperty("isapprover", app.getIsapprover());
@@ -109,6 +112,7 @@ public class ScoreApproverActionBean  extends CustomActionBean{
 			}
 			return new StreamingResolution("text/charset=utf8;",json.toString());
 		}catch(Exception e){
+			e.printStackTrace();
 			json.addProperty("result", "0");
 			json.addProperty("msg","服务器搜索出错，错误信息:"+e.getMessage());
 			return new StreamingResolution("text/charset=utf8;",json.toString());

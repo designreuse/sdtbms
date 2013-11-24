@@ -229,6 +229,21 @@
 								<tr>	
 									<td>分值:</td><td><stripes:text name="scoretype.score"  class="required" formatType="number" formatPattern="integer"></stripes:text></td>
 								</tr>
+								<tr>	
+									<td>周期:</td><td><stripes:text name="scoretype.period"  class="required"></stripes:text></td>
+								</tr>
+								<tr>	
+									<td>考核部门:</td><td><stripes:text name="scoretype.examine"  class="required"></stripes:text></td>
+								</tr>
+								<tr>	
+									<td>评分对象:</td><td><stripes:text name="scoretype.scoreobject"  class="required"></stripes:text></td>
+								</tr>
+								<tr>	
+									<td>备注:</td>
+									<td>
+										<stripes:textarea name="scoretype.remark" cols="40" rows="7"/>
+									</td>
+								</tr>
 						</table>
 						</div>
 					</stripes:form>
@@ -249,7 +264,7 @@
 					
 						<tr>
 							<td colspan=9 style="text-align:left">
-								<stripes:submit name="prevpage" value="上页"/> 页码: <stripes:text name="pagenum"/> <stripes:hidden name="totalcount"/>  <stripes:submit name="nextpage" value="下页"/>
+								<stripes:submit name="prevpage" value="上页"/> 页码: <stripes:text name="pagenum"/> /<stripes:label name="${actionBean.totalcount}"/>  <stripes:submit name="nextpage" value="下页"/>
 								显示数量:<stripes:text name="lotsize"/>
 								<stripes:submit id='filter' name="filter" value="筛选"/>
 							</td>

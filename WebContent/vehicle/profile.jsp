@@ -212,10 +212,10 @@
 							<br/>
 							车辆分队以及路线导入:<stripes:file name="teamLaneFile"/><stripes:submit name="vehicleTeamAndLaneUpload"/>
 							<br/>
-							登记证号:<stripes:file name="recordIdFile"/><stripes:submit name="vehicleRecordIdUpload"/>
+							车辆登记证号:<stripes:file name="recordIdFile"/><stripes:submit name="vehicleRecordIdUpload"/>
 							<br/>
-<%-- 							公交一公司车辆:<stripes:file name="subCompanyOneFile"/><stripes:submit name="vehicleSubCompanyOneListUpload"/> --%>
-<!-- 							<br/> -->
+							车辆档案.xlsx文件上传:<stripes:file name="documentXSSFUpload"/><stripes:submit name="vehicleXSSFUpload"/>
+							<br/>
 <%-- 							总公里数上传:<stripes:file name="totlMilesFile"/><stripes:submit name="vehicleMilesUpload"/> --%>
 						</stripes:form>
 					</ss:secure>
@@ -229,7 +229,7 @@
 					<stripes:form beanclass="com.bus.stripes.actionbean.vehicle.VehicleProfileActionBean">
 						<tr>
 							<td colspan=13 style="text-align:left">
-								<stripes:submit name="prevpage" value="上页"/> 页码: <stripes:text name="pagenum"/>/<stripes:label name="${actionBean.totalcount}"/>  <stripes:submit name="nextpage" value="下页"/>
+								<stripes:submit name="prevpage" value="上页"/> 页码: <input type="text" name="pagenum" value="${actionBean.pagenum}"/>/<stripes:label name="${actionBean.totalcount}"/>  <stripes:submit name="nextpage" value="下页"/>
 							显示数量:<stripes:text name="lotsize"/>
 							<label>总数:${actionBean.recordsTotal} 行</label>
 							</td>

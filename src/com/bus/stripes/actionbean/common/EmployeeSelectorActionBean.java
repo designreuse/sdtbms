@@ -11,12 +11,19 @@ import com.bus.dto.vehicleprofile.VehicleTeam;
 import com.bus.services.CustomActionBean;
 import com.bus.services.HRBean;
 import com.bus.stripes.actionbean.MyActionBeanContext;
+import com.bus.util.EmpDepartments;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.HandlesEvent;
 import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 
@@ -108,6 +115,90 @@ public class EmployeeSelectorActionBean implements ActionBean{
 			return hrBean.getEmployeeByDepartmentId(departId);
 	}
 	
+	@HandlesEvent(value="getEmployeeSelectionList")
+	public Resolution getEmployeeSelectionList(){
+		JsonObject json = new JsonObject();
+		try{
+			List<Department> depts = hrBean.getAllActiveDepartment();
+			for(Department d:depts){
+				if(departments == null){
+					departments = new ArrayList<EmpDepartments>();
+				}
+				EmpDepartments temD = new EmpDepartments();
+				temD.setDept(d.getName());
+				temD.setDeptId(d.getId()+"");
+				
+				List<Department> children = hrBean.getDepartmentChildren(d.getId());
+				if(children != null){
+					List<EmpDepartments> subDept = new ArrayList<EmpDepartments>();
+					for(Department cd:children){
+						EmpDepartments temD2 = new EmpDepartments();
+						temD2.setDept(cd.getName());
+						temD2.setDeptId(cd.getId()+"");
+						List<Employee> temD2Employee = hrBean.getEmployeeByDepartmentId(cd.getId());
+						temD2.setSize(temD2Employee.size());
+						temD2.setEmps(temD2Employee);
+						subDept.add(temD2);
+					}
+					List<Employee> empNoTeam = hrBean.getEmployeeByDepartmentId(d.getId());
+					temD.setEmps(empNoTeam);
+					int total = empNoTeam.size();
+					for(EmpDepartments te:subDept){
+						total += te.getEmps().size();
+					}
+					temD.setSize(total);
+					temD.setExtras(subDept);
+				}else{
+					List<Employee> employees = hrBean.getEmployeeByDepartmentId(d.getId());
+					temD.setSize(employees.size());
+					temD.setEmps(employees);
+				}
+				departments.add(temD);
+			}
+			JsonArray jArray = new JsonArray();
+			jArray = getJsonObjectForEmployeeSelection(departments,jArray);
+			json.addProperty("result", "1");
+			json.add("data", jArray);
+			json.addProperty("name", "员工名单");
+			json.addProperty("id", "0");
+		}catch(Exception e){
+			e.printStackTrace();
+			json.addProperty("result", "0");
+			json.addProperty("msg","获取失败."+e.getMessage());
+		}
+		return new StreamingResolution("text/charset=utf-8;",json.toString());
+	}
+	
+	/**
+	 * 把EmpDepartments转为jsonString返回
+	 * @param departments
+	 * @param json
+	 * @return
+	 * @throws Exception
+	 */
+	private JsonArray getJsonObjectForEmployeeSelection(
+			List<EmpDepartments> departments,JsonArray jArray) throws Exception{
+		if(departments == null || departments.size() <= 0) return jArray;
+		for(EmpDepartments d:departments){
+			JsonObject jGroup = new JsonObject();
+			jGroup.addProperty("name", d.getDept());
+			jGroup.addProperty("id", d.getDeptId());
+			if(d.getEmps() != null && d.getEmps().size() > 0){
+				JsonArray ja = new JsonArray();
+				for(Employee e:d.getEmps()){
+					ja.add(new JsonPrimitive(e.getWorkerid()+","+e.getFullname()));
+				}
+				jGroup.add("emps", ja);
+			}
+			if(d.getExtras() != null){
+				JsonArray ja = new JsonArray();
+				ja = getJsonObjectForEmployeeSelection(d.getExtras(),ja);
+				jGroup.add("data", ja);
+			}
+			jArray.add(jGroup);
+		}
+		return jArray;
+	}
 	public String getEleIdOne() {
 		return eleIdOne;
 	}
@@ -147,43 +238,4 @@ public class EmployeeSelectorActionBean implements ActionBean{
 		this.score = score;
 	}
 
-	public class EmpDepartments {
-		private String deptId;
-		private String dept;
-		private Integer size;
-		public List<Employee> emps;
-		private List<EmpDepartments> extras = null;
-		
-		public String getDeptId() {
-			return deptId;
-		}
-		public void setDeptId(String deptId) {
-			this.deptId = deptId;
-		}
-		public String getDept() {
-			return dept;
-		}
-		public void setDept(String dept) {
-			this.dept = dept;
-		}
-		public List<Employee> getEmps() {
-			return emps;
-		}
-		public void setEmps(List<Employee> emps) {
-			this.emps = emps;
-		}
-		public Integer getSize() {
-			return size;
-		}
-		public void setSize(Integer size) {
-			this.size = size;
-		}
-		public List<EmpDepartments> getExtras() {
-			return extras;
-		}
-		public void setExtras(List<EmpDepartments> extras) {
-			this.extras = extras;
-		}
-		
-	}
 }

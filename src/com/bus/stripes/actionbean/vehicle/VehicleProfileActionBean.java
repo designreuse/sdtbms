@@ -5,8 +5,14 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import security.action.Secure;
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -39,6 +45,7 @@ import com.bus.stripes.selector.VehicleSelector;
 import com.bus.util.ExcelFileSaver;
 import com.bus.util.HRUtil;
 import com.bus.util.Roles;
+import com.bus.util.VehicleProfileExcelFile;
 import com.google.gson.JsonObject;
 
 @UrlBinding(value="/actionbean/VehicleProfile.action")
@@ -49,8 +56,17 @@ public class VehicleProfileActionBean extends CustomActionBean{
 	private FileBean recordIdFile;
 	private FileBean teamLaneFile;
 	private FileBean profilePicFile;
+	private FileBean documentXSSFUpload;
 	
 	
+	public FileBean getDocumentXSSFUpload() {
+		return documentXSSFUpload;
+	}
+
+	public void setDocumentXSSFUpload(FileBean documentXSSFUpload) {
+		this.documentXSSFUpload = documentXSSFUpload;
+	}
+
 	public FileBean getProfilePicFile() {
 		return profilePicFile;
 	}
@@ -91,44 +107,64 @@ public class VehicleProfileActionBean extends CustomActionBean{
 		this.newVehicleFile = newVehicleFile;
 	}
 
-	@HandlesEvent(value="addProfilePicture")
-	@Secure(roles=Roles.VEHICLE_PROFILE_EDIT)
-	public Resolution addProfilePicture(){
+	@HandlesEvent(value="vehicleXSSFUpload")
+	@Secure(roles= Roles.ADMINISTRATOR)
+	public Resolution vehicleXSSFUpload(){
 		try{
-			System.out.println("正在添加");
-			String targetId = context.getRequest().getParameter("targetId");
-			String link = context.getRequest().getParameter("returnLink");
-			if(link == null) link = "/actionbean/VehicleProfile.action";
-			if(targetId == null)
-				return context.errorResolution("ID 没有上传", "上传数据出错.");
-			VehicleProfile vptemp = vBean.getVehicleProfileById(Integer.parseInt(targetId));
-			check.setVehicle(vptemp);
-			check.setCreator(context.getUser());
-			VehicleFiles vf = null;
-			if(checkFile != null){
-				System.out.println("Check file is not null . saving");
-				String filename = "车辆_" + check.getCtype() + "_" +vptemp.getId() + HRUtil.getFileExtension(checkFile.getFileName());
-				String ipath = context.getLocalFileLocation() + "车辆/"+check.getCtype() + "/"+filename;
-				File file = new File(ipath);
-				checkFile.save(file);
-				System.out.println("Save file to "+ file.getAbsolutePath());
-				
-				vf = new VehicleFiles();
-				vf.setCreator(context.getUser());
-				vf.setUdate(new Date());
-				vf.setFilename(filename);
-				vf.setIpath(ipath);
-				vBean.saveVehicleFile(vf);
-			}
-			if(vf != null)
-				check.setImage(vf);
-			vBean.saveVehicleCheck(check);
-			return new RedirectResolution(link);
+			if(documentXSSFUpload == null)
+				throw new Exception("文档没有上传成功");
+			boolean isExcel2007 = false;
+			if(documentXSSFUpload.getFileName().contains(".xlsx"))
+				isExcel2007 = true;
+			else
+				throw new Exception("文件不是Excel2007文件");
+			VehicleProfileExcelFile saver = new VehicleProfileExcelFile((FileInputStream)documentXSSFUpload.getInputStream());
+			saver.saveVehicleProfileFromExcel(vBean, context.getUser());
+			return defaultAction();
 		}catch(Exception e){
 			e.printStackTrace();
-			return context.errorResolution("服务器保存出错", "请联系管理员.错误:"+e.getMessage());
+			return context.errorResolution("服务器出错", HRUtil.getStringFromStackTrace(e));
 		}
 	}
+	
+//	@HandlesEvent(value="addProfilePicture")
+//	@Secure(roles=Roles.VEHICLE_PROFILE_EDIT)
+//	public Resolution addProfilePicture(){
+//		try{
+//			System.out.println("正在添加");
+//			String targetId = context.getRequest().getParameter("targetId");
+//			String link = context.getRequest().getParameter("returnLink");
+//			if(link == null) link = "/actionbean/VehicleProfile.action";
+//			if(targetId == null)
+//				return context.errorResolution("ID 没有上传", "上传数据出错.");
+//			VehicleProfile vptemp = vBean.getVehicleProfileById(Integer.parseInt(targetId));
+//			check.setVehicle(vptemp);
+//			check.setCreator(context.getUser());
+//			VehicleFiles vf = null;
+//			if(checkFile != null){
+//				System.out.println("Check file is not null . saving");
+//				String filename = "车辆_" + check.getCtype() + "_" +vptemp.getId() + HRUtil.getFileExtension(checkFile.getFileName());
+//				String ipath = context.getLocalFileLocation() + "车辆/"+check.getCtype() + "/"+filename;
+//				File file = new File(ipath);
+//				checkFile.save(file);
+//				System.out.println("Save file to "+ file.getAbsolutePath());
+//				
+//				vf = new VehicleFiles();
+//				vf.setCreator(context.getUser());
+//				vf.setUdate(new Date());
+//				vf.setFilename(filename);
+//				vf.setIpath(ipath);
+//				vBean.saveVehicleFile(vf);
+//			}
+//			if(vf != null)
+//				check.setImage(vf);
+//			vBean.saveVehicleCheck(check);
+//			return new RedirectResolution(link);
+//		}catch(Exception e){
+//			e.printStackTrace();
+//			return context.errorResolution("服务器保存出错", "请联系管理员.错误:"+e.getMessage());
+//		}
+//	}
 	
 	@HandlesEvent(value="vehicleDetailFileUpload")
 	@Secure(roles = Roles.ADMINISTRATOR)
@@ -231,41 +267,6 @@ public class VehicleProfileActionBean extends CustomActionBean{
 		}
 		return defaultAction();
 	}
-//	
-//	@HandlesEvent(value="vehicleSubCompanyOneListUpload")
-//	@Secure(roles = Roles.ADMINISTRATOR)
-//	public Resolution vehicleSubCompanyOneListUpload(){
-//		try{
-//			if(subCompanyOneFile != null){
-//				ExcelFileSaver saver = new ExcelFileSaver((FileInputStream)subCompanyOneFile.getInputStream());
-//				String result = saver.assignVehiclesToCompanyOne(vBean,context.getUser());
-//				if(!result.equals("")){
-//					return  context.errorResolution("上传车辆档案出错", result);
-//				}
-//			}
-//		}catch(Exception e){
-//			e.printStackTrace();
-//		}
-//		return defaultAction();
-//	}
-//	
-//	@HandlesEvent(value="vehicleMilesUpload")
-//	@Secure(roles = Roles.ADMINISTRATOR)
-//	public Resolution vehicleMilesUpload(){
-//		try{
-//			if(totlMilesFile != null){
-//				ExcelFileSaver saver = new ExcelFileSaver((FileInputStream)totlMilesFile.getInputStream());
-//				String result = saver.saveMilesToEachMonth(vBean,context.getUser());
-//				if(!result.equals("")){
-//					return  context.errorResolution("上传车辆档案出错", result);
-//				}
-//			}
-//		}catch(Exception e){
-//			e.printStackTrace();
-//		}
-//		return defaultAction();
-//	}
-//	
 
 	
 	private VehicleBean vBean;
@@ -343,6 +344,7 @@ public class VehicleProfileActionBean extends CustomActionBean{
 				System.out.println(statement);
 				map = vBean.getVehicleProfilesBySelector(pagenum,lotsize,statement);
 			}
+			System.out.println("In VProfileAB defaultAction pagenum:"+pagenum);
 			teams = vBean.getAllVehicleTeams();
 			lanes = (List<VehicleLane>) vBean.getAllVehicleLaneNames();
 			profiles = (List<VehicleProfile>) map.get("list");
@@ -358,11 +360,14 @@ public class VehicleProfileActionBean extends CustomActionBean{
 				teams = new ArrayList<VehicleTeam>();
 			if(lanes == null)
 				lanes = new ArrayList<VehicleLane>();
-			setRecordsTotal(0L);
-			setTotalcount(1L);
-			setPagenum(1);
+//			setRecordsTotal(0L);
+//			setTotalcount(1L);
+//			setPagenum(1);
 		}
-		return new ForwardResolution("/vehicle/profile.jsp").addParameter("pagenum", pagenum);
+		ForwardResolution fr = new ForwardResolution("/vehicle/profile.jsp");
+		fr.addParameter("pagenum", pagenum);
+		fr.addParameter("lotsize", lotsize);
+		return fr;
 	}
 
 	@HandlesEvent(value="addVehicle")

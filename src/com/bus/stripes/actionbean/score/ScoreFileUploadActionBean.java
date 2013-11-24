@@ -7,14 +7,18 @@ import security.action.Secure;
 import com.bus.services.CustomActionBean;
 import com.bus.services.HRBean;
 import com.bus.services.ScoreBean;
+import com.bus.util.ExcelScoreUpload;
+import com.bus.util.HRUtil;
 import com.bus.util.Roles;
 import com.bus.util.ScoreExcelFileProcessor;
+import com.google.gson.JsonObject;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.HandlesEvent;
 import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 
@@ -24,6 +28,7 @@ public class ScoreFileUploadActionBean extends CustomActionBean{
 	private FileBean itemsfile;
 	private FileBean scorefile;
 	private Integer success = 0;
+	private String msg = "";
 	
 	private ScoreBean scoreBean;
 	public ScoreBean getScoreBean(){return this.scoreBean;}
@@ -63,25 +68,45 @@ public class ScoreFileUploadActionBean extends CustomActionBean{
 	@HandlesEvent(value="scoreupload")
 	@Secure(roles=Roles.SCORE_SCORES_FILE_UPLOAD)
 	public Resolution scoreupload(){
+		JsonObject json = new JsonObject();
 		try{
+			//old txt format upload
+//			if(scorefile != null){
+//				ScoreExcelFileProcessor saver  = new ScoreExcelFileProcessor(((FileInputStream)scorefile.getInputStream()));
+//				String str="";
+//				try{
+//					str = saver.saveScores(hrBean,scoreBean,context.getUser());
+//				}catch(Exception e){
+//					str = e.getMessage();
+//				}
+//				if(!str.equals("")){
+//					return new ForwardResolution("/actionbean/Error.action").addParameter("error", "<span style='color:red;'>出错:某些积分导入失败</span>")
+//							.addParameter("description", "分没有被上传:<br/>\n" + str);
+//				}else{
+//					success = 1;
+//				}
+//			}
+			
+			//New excel Format upload
 			if(scorefile != null){
-				ScoreExcelFileProcessor saver  = new ScoreExcelFileProcessor(((FileInputStream)scorefile.getInputStream()));
-				String str="";
-				try{
-					str = saver.saveScores(hrBean,scoreBean,context.getUser());
-				}catch(Exception e){
-					str = e.getMessage();
-				}
-				if(!str.equals("")){
-					return new ForwardResolution("/actionbean/Error.action").addParameter("error", "<span style='color:red;'>出错:某些积分导入失败</span>")
-							.addParameter("description", "分没有被上传:<br/>\n" + str);
+				ExcelScoreUpload saver  = new ExcelScoreUpload();
+				if(saver.isExcelFile2007(scorefile.getFileName())){
+					System.out.println("Is excel 2007 file");
+					saver.init(((FileInputStream)scorefile.getInputStream()),true);
+					saver.saveScore2007(hrBean,scoreBean,context.getUser());
+				}else if(saver.isExcelFile2003(scorefile.getFileName())){
+					System.out.println("Is excel 2003 file");
+					saver.init(((FileInputStream)scorefile.getInputStream()),false);
+					saver.saveScore2003(hrBean,scoreBean,context.getUser());
 				}else{
-					success = 1;
+					System.out.println("Not excel file");
 				}
 			}
-			
+			success = 1;
+			msg = "上传成功";
 		}catch(Exception e){
 			e.printStackTrace();
+			return context.errorResolution("上传出错", e.getMessage());
 		}
 		return defaultAction();
 	}
@@ -106,6 +131,12 @@ public class ScoreFileUploadActionBean extends CustomActionBean{
 	}
 	public void setSuccess(Integer success) {
 		this.success = success;
+	}
+	public String getMsg() {
+		return msg;
+	}
+	public void setMsg(String msg) {
+		this.msg = msg;
 	}
 	
 	

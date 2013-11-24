@@ -281,16 +281,16 @@ form li{
     	</tr>
     	<tr>
     		<td>经营范围:</td>
-    		<td><stripes:text name="vBasic.operaterange" maxlength="10"/></td>
-    		<td>购买日期:</td>
-    		<td><stripes:text name="vBasic.vid.purchaseDate"  formatPattern="yyyy-MM-dd" class="datepickerClass"/></td>
+    		<td colspan=3><stripes:text name="vBasic.operaterange" maxlength="10"/></td>
+<!--     		<td>购买日期:</td> -->
+<%--     		<td><stripes:text name="vBasic.vid.purchaseDate"  formatPattern="yyyy-MM-dd" class="datepickerClass"/></td> --%>
     	
     	</tr>
     	<tr>
     		<td>道路运输证号:<br/>/公共汽车登记证号</td>
-    		<td><stripes:text name="vBasic.transportnumber" maxlength="20"/></td>
-    		<td>购买收据号:</td>
-    		<td><stripes:text name="vBasic.vid.purchaseCode"/></td>
+    		<td colspan=3><stripes:text name="vBasic.transportnumber" maxlength="20"/></td>
+<!--     		<td>购买收据号:</td> -->
+<%--     		<td><stripes:text name="vBasic.vid.purchaseCode"/></td> --%>
     	</tr>
     	<tr>
     		<td>经营线路:</td>

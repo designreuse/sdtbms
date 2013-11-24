@@ -26,7 +26,7 @@
 			<td>${dep.id }<input type="hidden" name="depS[${color}].id" value="${dep.id }"/></td>
 			<td>${dep.department.id }</td>
 			<td>${dep.department.name }</td>
-			<td>${dep.basescore }</td>
+			<td>${dep.basescore }<input type="hidden" name="depS[${color}].basescore" value="${dep.basescore }"/></td>
 			<td><input type="text" name="depS[${color}].available" value="${dep.available }"/></td>
 		</tr>
 		<c:set var="color" value="${color + 1}" scope="page"/>

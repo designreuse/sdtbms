@@ -31,6 +31,9 @@
 						<stripes:submit name="filter"/>
 						<ss:secure roles="administrator_system">
 							<stripes:submit name="resetScores" value="重置部门总分"/>
+							<stripes:text name="addScore"/>
+							<stripes:submit name="addScoresToDepartment" value="添加部门分"/>
+							<stripes:submit name="setBaseScore" value="重置部门基础分"/>
 						</ss:secure>
 					</stripes:form>
 					</div>

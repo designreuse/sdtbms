@@ -223,7 +223,7 @@
 							</table>
 							</stripes:form>
 							<div>
-								<c:if test="${actionBean.mode == null }">
+								<c:if test="${actionBean.mode == null || actionBean.mode == 0 }">
 									<button id="approved">通过</button>
 									<button id="deny">拒绝</button>
 								</c:if>

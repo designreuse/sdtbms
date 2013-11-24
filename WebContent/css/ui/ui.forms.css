@@ -16,12 +16,14 @@ form ul{
 	list-style-type:none;
 /*	width:100%;*/
 }
+/*
 form li{
 	display:block;
 	margin:0;
 	padding:6px 0 9px;
 	clear:both;
 }
+
 form li:after, form li div:after{
 	content:"."; 
 	display:block;
@@ -29,6 +31,7 @@ form li:after, form li div:after{
 	clear:both; 
 	visibility:hidden;
 }
+
 * html form li{height: 1%;}
 * html form li div{display:inline-block;}
 *+html form li div{display:inline-block;}
@@ -41,7 +44,7 @@ form li div, form li span{
 form li span{
 	float:left;
 }
-
+*/
 	/* Inputs */
 
 input.text, input.file, textarea.textarea, select.select {

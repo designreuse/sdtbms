@@ -218,7 +218,9 @@ public class ScoreitemsActionBean extends CustomActionBean {
 			//检查是否所有员工都可以打分的,审核人可以直接打分
 			String nameList = "";
 			Employee curUser = hrBean.getEmployeeByWorkerId(context.getUser().getEmployee());
+			//如果员工不是审核人，应该检查是否有权限打分给其它员工
 			if(!scoreBean.isUserScoreApprover(curUser)){
+//				System.out.println("非审核人");
 				for(Employee e:scorers){
 					if(!scoreBean.checkEmployeeAllowToScore(e,curUser)){
 						nameList += e.getFullname()+",";
@@ -229,6 +231,8 @@ public class ScoreitemsActionBean extends CustomActionBean {
 					json.addProperty("msg", "没有权限分配分值给这些员工 :"+nameList);
 					return new StreamingResolution("text/charset=utf-8;",json.toString());
 				}
+			}else{
+//				System.out.println("审核人");
 			}
 			
 			
@@ -238,6 +242,7 @@ public class ScoreitemsActionBean extends CustomActionBean {
 				throw new Exception("这些部门没有足够的分值:"+isenough);
 			}
 			countReceivers = 0;
+			
 			for (Employee worker : scorers) {
 				scorer = worker;
 				if (!scoreBean.isScoreMemberExist(employee.getWorkerid())) {

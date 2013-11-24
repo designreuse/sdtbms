@@ -8,11 +8,11 @@
     <stripes:layout-component name="contents">
     <script type="text/javascript" src="${pageContext.request.contextPath}/js/hr.js"></script>
 	<script type="text/javascript">
-		$(document).ready(function(){
-			if(1 == ${actionBean.success}){
-				alert("上传成功");
-			}
-		});
+	$(document).ready(function(){
+		if(1 == ${actionBean.success}){
+			alert("${actionBean.msg}");
+		}
+	});
 	</script>
 		<div id="sub-nav"><div class="page-title">
 			<h1>批量上传</h1>
@@ -46,7 +46,7 @@
 					</ss:secure>
 					<br/>
 									<ss:secure roles="score_fileupload_uploadscores">
-					<Label>给分文件(txt):</Label><stripes:file name="scorefile"  id="file_score" />
+					<Label>给分文件(excel文件):</Label><stripes:file name="scorefile"  id="file_score" />
 					
 											<stripes:submit name="scoreupload" value="提交"/>
 									</ss:secure>
@@ -63,8 +63,8 @@
 							}
 						}else if(employee_check != ""){
 							var ext = employee_check.split('.').pop().toLowerCase();
-							if($.inArray(ext, ['txt']) == -1) {
-						    	alert('得分文件不是合法的txt文件');
+							if($.inArray(ext, ['xls']) == -1 && $.inArray(ext, ['xlsx']) == -1) {
+						    	alert('得分文件不是合法的excel文件,请确保后缀为xls或xlsx');
 						    	return false;
 							}
 						}

@@ -21,6 +21,8 @@ import com.bus.dto.Position;
 import com.bus.dto.logger.ScoreLog;
 import com.bus.dto.score.DepartmentScore;
 import com.bus.dto.score.Positiongroup;
+import com.bus.dto.score.ScoreDivGroup;
+//import com.bus.dto.score.ScoreDivGroup;
 import com.bus.dto.score.ScoreExceptionList;
 import com.bus.dto.score.ScoreMemberRank;
 import com.bus.dto.score.Scoreapprover;
@@ -32,6 +34,7 @@ import com.bus.dto.score.Scoresheets;
 import com.bus.dto.score.Scoresummary;
 import com.bus.dto.score.Scoretype;
 import com.bus.dto.score.Voucherlist;
+import com.bus.util.EmpDepartments;
 import com.bus.util.HRUtil;
 import com.bus.util.LoggerAction;
 import com.bus.util.ScoreExcelFileProcessor;
@@ -138,6 +141,14 @@ public class ScoreBean  extends EMBean{
 	@Transactional
 	public void removeScoreType(Account user, Scoretype st) throws Exception{
 		st = em.find(Scoretype.class, st.getId());
+		try{
+			List<Scoresheetmapper> mappers = (List<Scoresheetmapper>) em.createQuery("SELECT q FROM Scoresheetmapper q WHERE scoretypeid=:st")
+					.setParameter("st", st).getResultList();
+			for(Scoresheetmapper s:mappers)
+				em.remove(s);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 		em.persist(LoggerAction.removeScoreType(user, st));
 		em.remove(st);
 	}
@@ -235,7 +246,7 @@ public class ScoreBean  extends EMBean{
 		Date today = Calendar.getInstance().getTime();
 		Scorerecord record = new Scorerecord();
 		st = getScoreTypeById(st.getId()+"");
-		if(score == null || score == 0){ //如果分值为0，侧采用默认的条例分值
+		if(Scoretype.SCORE_TYPE_TEMP == st.getType() && (score == null || score == 0)){ //如果分值为0，侧采用默认的条例分值
 			score = st.getScore();
 			if(score == 0){
 				throw new Exception("项目分值不能为0，请独立对0分值的条例打分。");
@@ -258,6 +269,7 @@ public class ScoreBean  extends EMBean{
 		takeAwayScore(record);
 		
 		if(isUserApprover(user.getEmployee())){//如果新建用户为审核人，侧直接通过审核，直接相加积分
+			System.out.println("设为已审核");
 			record.setStatus(Scorerecord.APPROVED);
 			em.merge(record);
 			em.flush();
@@ -303,7 +315,7 @@ public class ScoreBean  extends EMBean{
 	 * @throws Exception
 	 */
 	public Integer getScoreEmployeeCount(int departmentid) throws Exception{
-		String query = "SELECT count(q) FROM employee q LEFT JOIN scoreexceptionlist s ON q.positionid = s.positionid WHERE (s.status IS NULL OR (s.status IS NOT NULL AND s.status<>0)) AND q.departmentid="+ departmentid+" AND "
+		String query = "SELECT count(q) FROM employee q LEFT JOIN scoreexceptionlist s ON q.positionid = s.positionid WHERE (s.status IS NULL OR (s.status IS NOT NULL AND s.status="+ScoreExceptionList.HAS_UPPER_SCORE_LIMIT+")) AND q.departmentid="+ departmentid+" AND "
 				+ "(q.joblevel='中管' OR q.joblevel='管') AND q.status='A'";
 		BigInteger count = (BigInteger) em.createNativeQuery(query).getSingleResult();
 		return count.intValue();
@@ -339,9 +351,11 @@ public class ScoreBean  extends EMBean{
 			try{
 				ScoreExceptionList excep = null;
 				try{
-					excep = (ScoreExceptionList) em.createQuery("SELECT q FROM Scoreexceptionlist q WHERE q.position.id=?")
+					excep = (ScoreExceptionList) em.createQuery("SELECT q FROM ScoreExceptionList q WHERE q.position.id=?")
 						.setParameter(1, record.getReceiver().getEmployee().getPosition().getId()).getSingleResult();
+					System.out.println("excep found."+excep.getPosition().getName());
 				}catch(Exception e){
+					System.out.println("Exception not found for position."+e.getMessage());
 					excep = null;
 				}
 				if(excep != null && excep.getStatus() == ScoreExceptionList.NO_UPPER_SCORE_LIMIT){
@@ -413,7 +427,8 @@ public class ScoreBean  extends EMBean{
 		try{
 			Long approvers = (Long) em.createQuery("SELECT count(q) FROM Scoreapprover q WHERE q.approver=:emp AND q.isapprover='"+Scoreapprover.APPROVER+"'")
 					.setParameter("emp", ep).getSingleResult();
-			if(approvers.intValue() > 0)
+			System.out.println("approver rights size:"+approvers);
+			if(approvers > 0)
 				return true;
 			else
 				return false;
@@ -475,9 +490,10 @@ public class ScoreBean  extends EMBean{
 	private void addBackDepartmentScores(Scorerecord record) throws Exception{
 		ScoreExceptionList excep = null;
 		try{
-			excep = (ScoreExceptionList) em.createQuery("SELECT q FROM Scoreexceptionlist q WHERE q.position.id=?")
+			excep = (ScoreExceptionList) em.createQuery("SELECT q FROM ScoreExceptionList q WHERE q.position.id=?")
 				.setParameter(1, record.getReceiver().getEmployee().getPosition().getId()).getSingleResult();
 		}catch(Exception e){
+			System.out.println("Exception not found for position."+e.getMessage());
 			excep = null;
 		}
 		if(excep != null && excep.getStatus() == ScoreExceptionList.NO_UPPER_SCORE_LIMIT){
@@ -1024,7 +1040,7 @@ public class ScoreBean  extends EMBean{
 					" IN (SELECT q.department.id FROM Scoreapprover q WHERE q.approver.id = " + e.getId() +") " +
 							" AND re.createdate='"+HRUtil.parseDateToString(new Date())+"' " +
 							" AND re.status=1 " +
-									" ORDER BY re.receiver.employee.fullname")
+									" ORDER BY re.id DESC")
 					.getResultList();
 		}else if(selectPeriod.equals("w".toLowerCase())){
 			cal.set(Calendar.DAY_OF_WEEK,cal.getFirstDayOfWeek());
@@ -1035,7 +1051,7 @@ public class ScoreBean  extends EMBean{
 					" IN (SELECT q.department.id FROM Scoreapprover q WHERE q.approver.id = " + e.getId() +") " +
 							" AND re.createdate>='" + HRUtil.parseDateToString(cal.getTime())+"' AND re.createdate<'" +  HRUtil.parseDateToString(cal2.getTime()) + "' " +
 							" AND re.status=1 " +
-							" ORDER BY re.receiver.employee.fullname").getResultList();
+							" ORDER BY re.id DESC").getResultList();
 		}else if(selectPeriod.equals("m".toLowerCase())){
 			cal.set(Calendar.DAY_OF_MONTH, 1);
 			cal2.setTime(cal.getTime());
@@ -1045,13 +1061,13 @@ public class ScoreBean  extends EMBean{
 					" IN (SELECT q.department.id FROM Scoreapprover q WHERE q.approver.id = " + e.getId() +") " +
 							" AND re.createdate>='" + HRUtil.parseDateToString(cal.getTime())+"' AND re.createdate<'" +  HRUtil.parseDateToString(cal2.getTime()) + "' " +
 							" AND re.status=1 " +
-							" ORDER BY re.receiver.employee.fullname").getResultList();
+							" ORDER BY re.id DESC").getResultList();
 		}else if(selectPeriod.equals("a".toLowerCase())){
 			departs = em.createQuery("SELECT re FROM Scorerecord re" +
 					" WHERE re.receiver.employee.department.id " +
 					" IN (SELECT q.department.id FROM Scoreapprover q WHERE q.approver.id = " + e.getId() +") " +
 					" AND re.status=1 " +
-							" ORDER BY re.receiver.employee.fullname").getResultList();
+							" ORDER BY re.id DESC").getResultList();
 		}
 		return departs;
 	}
@@ -1375,6 +1391,81 @@ public class ScoreBean  extends EMBean{
 	}
 
 	/**
+	 * 
+	 * @param records
+	 * @param user
+	 */
+	@Transactional(rollbackFor=Exception.class)
+	public void saveMassScoresFromList(List<Scorerecord> records, Account user,HRBean hrBean) throws Exception{
+		for(Scorerecord sr:records){
+			//检查打分人是否存在
+			if(!isScoreMemberExist(sr.getSender().getEmployee().getWorkerid())){
+				if(hrBean.isEmployeeWorkerIdExist(sr.getSender().getEmployee().getWorkerid())){
+					Employee e = hrBean.getEmployeeByWorkerId(sr.getSender().getEmployee().getWorkerid());
+					createScoreMember(user,e);
+				}else{
+					throw new Exception("工号不存在:"+sr.getSender().getEmployee().getWorkerid());
+				}
+			}
+			//检查受分人是否存在
+			if(!isScoreMemberExist(sr.getReceiver().getEmployee().getWorkerid())){
+				if(hrBean.isEmployeeWorkerIdExist(sr.getReceiver().getEmployee().getWorkerid())){
+					Employee scorer = hrBean.getEmployeeByWorkerId(sr.getReceiver().getEmployee().getWorkerid());
+					createScoreMember(user,scorer);
+				}else{
+					throw new Exception("工号不存在:"+sr.getReceiver().getEmployee().getWorkerid());
+				}
+			}
+			
+			//查找条例
+			Scoretype st = getScoreTypeByReference(sr.getScoretype().getReference());
+			if(st == null)
+				throw new Exception("条例编号不存在:"+sr.getScoretype().getReference());
+			
+			//设置分值
+			Float score= 0F;
+			if(st.getType() == Scoretype.SCORE_TYPE_TEMP){
+				if(sr.getScore() != null && sr.getScore() == 0)
+					continue;
+			}
+			if(st.getScore() == 0){
+				score = sr.getScore();
+			}else{
+				score = st.getScore();
+			}
+			if(score == null)
+				score = 0F;
+			if(st.getType() == Scoretype.SCORE_TYPE_TEMP && score == 0){
+				continue;
+			}
+			if(st.getType() == Scoretype.SCORE_TYPE_TEMP && (score < 0 || score > 1000)){
+				throw new Exception("分值不能为0 或 过大");
+			}
+
+			Employee scorer = (Employee) em.createQuery("SELECT q FROM Employee q WHERE workerid=?")
+					.setParameter(1, sr.getReceiver().getEmployee().getWorkerid()).getSingleResult();
+			
+			//检查是否员工可以打分的,审核人可以直接打分
+			Employee curUser = (Employee) em.createQuery("SELECT q FROM Employee q WHERE q.workerid=?").setParameter(1, user.getEmployee()).getSingleResult();
+			if(!isUserScoreApprover(curUser)){
+				if(!checkEmployeeAllowToScore(scorer, curUser)){
+					throw new Exception("用户"+ curUser.getFullname()+ "没有权限打分给用户"+ scorer.getFullname());
+				}
+			}
+			
+			//检查是否这个部门今周的第一条奖分，是的话重设管理人员数目*部门基础分的总分值
+			toResetDepartmentScores(scorer,Calendar.getInstance().getTime());
+			
+			//这里需要检查部门够不够分值打分，不够的话出错
+			if(st.getType() == Scoretype.SCORE_TYPE_TEMP && !isDepartmentScoreEnoughForEmployee(scorer,score)){
+				throw new Exception("部门分值不够."+scorer.getDepartment().getName());
+			}
+			assignScoreTypeToScoreMember(user, curUser.getWorkerid(), 
+					sr.getReceiver().getEmployee().getWorkerid(), st, sr.getScoredate(),score);
+		}
+	}
+	
+	/**
 	 * 检查员工部门是否有足够的分值飞给该员工
 	 * @param scorer
 	 * @param score
@@ -1383,11 +1474,30 @@ public class ScoreBean  extends EMBean{
 	 */
 	private boolean isDepartmentScoreEnoughForEmployee(Employee scorer,
 			Float score) throws Exception{
+		if(isScorerUnlimited(scorer))
+			return true;
 		DepartmentScore ds = getDepartmentScore(scorer);
 		Float result = ds.getAvailable() - score;
 		if(result < 0)
 			return false;
 		return true;
+	}
+
+	/**
+	 * 检查受分人是否没上限
+	 * @param scorer
+	 * @return
+	 */
+	public boolean isScorerUnlimited(Employee scorer){
+		try{
+			ScoreExceptionList se = (ScoreExceptionList) em.createQuery("SELECT q FROM ScoreExceptionList q WHERE q.position.id="+scorer.getPosition().getId()+" AND q.status="+ScoreExceptionList.NO_UPPER_SCORE_LIMIT).getSingleResult();
+			if(se != null)
+				return true;
+			else
+				return false;
+		}catch(Exception e){
+			return false;
+		}
 	}
 
 	/**
@@ -1436,7 +1546,7 @@ public class ScoreBean  extends EMBean{
 						" WHERE ((re.receiver.employee.department.id=d.department.id AND d.approver.id=?) OR re.creator.id=? )"+
 								" AND re.createdate>='" + HRUtil.parseDateToString(cal.getTime())+"' AND re.createdate<'" +  HRUtil.parseDateToString(cal2.getTime()) + "' " +
 								" AND re.status=? " +
-								" ORDER BY re.createdate DESC")
+								" ORDER BY re.id DESC DESC")
 								.setParameter(1, e.getId()).setParameter(3, Scorerecord.APPROVED).setParameter(2, user.getId()).getResultList();
 		}
 	}
@@ -1536,8 +1646,9 @@ public class ScoreBean  extends EMBean{
 	 * @throws Exception
 	 */
 	public boolean isUserScoreApprover(Employee curUser) throws Exception{
-		Long count  = (Long) em.createQuery("SELECT count(q) FROM Scoreapprover q WHERE q.approver.id=? AND q.isapprover=?")
-				.setParameter(1,curUser.getId()).setParameter(2, Scoreapprover.APPROVER).getSingleResult();
+		String query = "SELECT count(q) FROM Scoreapprover q WHERE q.approver.id="+curUser.getId()+" AND q.isapprover='"+Scoreapprover.APPROVER+"'";
+		Long count  = (Long) em.createQuery(query).getSingleResult();
+//		System.out.println("is user score approver count size:"+count + " Query:"+query);
 		if(count >=1)
 			return true;
 		else
@@ -1568,6 +1679,7 @@ public class ScoreBean  extends EMBean{
 	public void updateDepartmentScores(List<DepartmentScore> depS) throws Exception{
 		for(DepartmentScore ds:depS){
 			DepartmentScore d = em.find(DepartmentScore.class, ds.getId());
+			d.setBasescore(ds.getBasescore());
 			d.setAvailable(ds.getAvailable());
 			em.merge(d);
 		}
@@ -1581,9 +1693,12 @@ public class ScoreBean  extends EMBean{
 	 * @return
 	 */
 	public Float getDepartmentWaittingScores(Integer id, Date time, Date time2) throws Exception{
-		Float bint = (Float) em.createNativeQuery("SELECT SUM(q.score) FROM scorerecord q LEFT JOIN employee e ON q.receiverid=e.workerid " +
+//		List<Integer> list = em.createNativeQuery("SELECT positionid FROM scoreexceptionlist WHERE status="+ScoreExceptionList.NO_UPPER_SCORE_LIMIT).getResultList();
+		String query = "SELECT SUM(q.score) FROM scorerecord q LEFT JOIN employee e ON q.receiverid=e.workerid " +
 				" WHERE e.departmentid="+id+ " AND q.status="+Scorerecord.WAITING+
-				" AND q.createdate >='"+HRUtil.parseDateToString(time)+"' AND q.createdate < '"+HRUtil.parseDateToString(time2)+"' ").getSingleResult();
+				" AND q.createdate >='"+HRUtil.parseDateToString(time)+"' AND q.createdate < '"+HRUtil.parseDateToString(time2)+"' " +
+						"AND e.positionid NOT IN (SELECT positionid FROM scoreexceptionlist WHERE status="+ScoreExceptionList.NO_UPPER_SCORE_LIMIT+")"; 
+		Float bint = (Float) em.createNativeQuery(query).getSingleResult();
 		return bint;
 	}
 
@@ -1611,7 +1726,112 @@ public class ScoreBean  extends EMBean{
 	public Float getDepartmentNotSubmitScores(Integer id, Date time, Date time2) throws Exception{
 		Float bint = (Float) em.createNativeQuery("SELECT SUM(q.score) FROM scorerecord q LEFT JOIN employee e ON q.receiverid=e.workerid " +
 				" WHERE e.departmentid="+id+ " AND q.status="+Scorerecord.CREATED+
-				" AND q.createdate >='"+HRUtil.parseDateToString(time)+"' AND q.createdate < '"+HRUtil.parseDateToString(time2)+"' ").getSingleResult();
+				" AND q.createdate >='"+HRUtil.parseDateToString(time)+"' AND q.createdate < '"+HRUtil.parseDateToString(time2)+"' "+
+				" AND e.positionid NOT IN (SELECT positionid FROM scoreexceptionlist WHERE status="+ScoreExceptionList.NO_UPPER_SCORE_LIMIT+")"
+				).getSingleResult();
 		return bint;
+	}
+
+	/**
+	 * 获取积分组的最开始父类组
+	 * @return
+	 */
+	public List<ScoreDivGroup> getParentScoreGroup() throws Exception{
+		return em.createNativeQuery("SELECT * FROM score_group WHERE pid is NULL ORDER BY name DESC",ScoreDivGroup.class).getResultList();
+	}
+
+	/**
+	 * 添加积分组
+	 * @param scoreNewGroup
+	 */
+	@Transactional(rollbackFor=Exception.class)
+	public void addScoreDivGroup(ScoreDivGroup scoreNewGroup,Account user) throws Exception{
+		if(scoreNewGroup.getName() == null)
+			throw new Exception("没有提供组名字");
+		scoreNewGroup.setLastUpdateDate(new Date());
+		em.persist(scoreNewGroup);
+		em.flush();
+		ScoreLog sl = new ScoreLog();
+		sl.setWho(user);
+		sl.setRecordid(scoreNewGroup.getId()+"");
+		sl.setAction(ScoreLog.CREATE);
+		sl.setRemark("添加新的积分组");
+		sl.setCreatetime(Calendar.getInstance().getTime());
+		em.persist(sl);
+	}
+
+	/**
+	 * 给一个积分组，获取它的子组合子组员工
+	 * @param e
+	 * @return
+	 * @throws Exception
+	 */
+	public EmpDepartments getAllChildrenAndEmployeeForScoreGroup(
+			EmpDepartments e) throws Exception{
+		String query = "select sg.id as sgid,sg.name as sdname ,e.id as eid,e.fullname as efullname from score_group sg left join score_group_mapper sgm on sg.id=sgm.scoregroupid left join employee e on sgm.empid=e.id " +
+				" WHERE sg.pid=" + e.getDeptId() + " order by sg.id";
+		List<Object[]> results = em.createNativeQuery(query).getResultList();
+		List<EmpDepartments> extras = new ArrayList<EmpDepartments>();
+		List<Employee> empList = new ArrayList<Employee>();
+		EmpDepartments group = new EmpDepartments();
+		for(Object[] obj:results){
+			Integer id = (Integer) obj[0];
+			if(id.toString().equals(group.getDeptId())){
+				if(obj[2] != null){
+					Employee emp = new Employee();
+					emp.setId((Integer)obj[2]);
+					emp.setFullname((String) obj[3]);
+					empList.add(emp);
+				}
+			}else{
+				if(group != null && group.getDeptId()!=null && !group.getDeptId().trim().equals("")){
+					if(empList.size()>0)
+						group.setEmps(empList);
+					extras.add(group);
+				}
+				group = new EmpDepartments();
+				group.setDeptId(id.toString());
+				group.setDept((String) obj[1]);
+				empList = new ArrayList<Employee>();
+				if(obj[2] != null){
+					Employee emp = new Employee();
+					emp.setId((Integer)obj[2]);
+					emp.setFullname((String) obj[3]);
+					empList.add(emp);
+				}
+			}
+		}
+		//添加最后一行记录
+		if(group != null && group.getDeptId()!=null && !group.getDeptId().trim().equals("")){
+			if(empList.size()>0)
+				group.setEmps(empList);
+			extras.add(group);
+		}
+		if(extras.size()>0)
+			e.setExtras(extras);
+		return e;
+	}
+
+	/**
+	 * 删除一个积分组和组成员
+	 * @param scoreNewGroup
+	 * @param user
+	 */
+	@Transactional
+	public void delScoreDivGroup(String gid, Account user) throws Exception {
+		Integer id = Integer.parseInt(gid);
+		ScoreDivGroup sdg = em.find(ScoreDivGroup.class, id);
+		//创建删除记录
+		ScoreLog sl = new ScoreLog();
+		sl.setWho(user);
+		sl.setAction(ScoreLog.CREATE);
+		sl.setRemark("删除了组:"+sdg.getName());
+		sl.setCreatetime(Calendar.getInstance().getTime());
+		
+		em.createNativeQuery("DELETE FROM score_group_mapper WHERE scoregroupid="+id).executeUpdate();
+		em.createNativeQuery("DELETE FROM score_group WHERE pid="+id).executeUpdate();
+		em.createNativeQuery("DELETE FROM score_group WHERE id="+id).executeUpdate();
+		
+		em.persist(sl);
 	}
 }

@@ -60,11 +60,11 @@
 							<stripes:submit name="defaultAction" value="更改"/>
 						</stripes:form>
 						<br/>
-						部门:${actionBean.departmentName }&nbsp;&nbsp;(人数:${actionBean.departmentWeekEmployee })<br/><br/>
+						部门:${actionBean.departmentName }&nbsp;&nbsp;(有分值上限人数:${actionBean.departmentWeekEmployee })<br/><br/>
 						部门总分:${actionBean.departmentWeekTotal }<br/><br/>
 						部门周总得分:${actionBean.departmentMonthScore }<br/><br/>
 						部门周被拒绝的条例扣押总分:${actionBean.departmentWeekReject }<br/><br/>
-						部门周等待审核总分:${actionBean.departmentWeekWaitting }<br/><br/>
+						部门周等待审核总分(仅限有上限的人):${actionBean.departmentWeekWaitting }<br/><br/>
 						部门周打了分但未提交的条例总分:${actionBean.departmentWeekNotSubmit }<br/><br/>
 						<span style="color:red;">部门周剩下分:${actionBean.departmentWeekRemain }</span>
 					</div>

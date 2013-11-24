@@ -82,6 +82,10 @@
 								</ss:secure>
 
 								<li>
+									<a href="${pageContext.request.contextPath}/actionbean/ScoreGroup.action" title="积分制编组">积分制编组</a>
+								</li>
+								
+								<li>
 									<a href="${pageContext.request.contextPath}/actionbean/DepartSum.action" title="部门总结">部门总结</a>
 								</li>
 								

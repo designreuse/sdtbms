@@ -10,6 +10,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -20,6 +22,11 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.util.StringUtils;
 
 import com.bus.dto.Account;
 import com.bus.dto.Contract;
@@ -28,17 +35,29 @@ import com.bus.dto.Employee;
 import com.bus.dto.Idmanagement;
 import com.bus.dto.Position;
 import com.bus.dto.Promoandtransfer;
+import com.bus.dto.vehicleprofile.VehicleBasicInfo;
 import com.bus.dto.vehicleprofile.VehicleProfile;
+import com.bus.dto.vehicleprofile.VehicleTechnicalDetail;
 import com.bus.services.HRBean;
 //import com.bus.services.VehicleBean;
 import com.bus.services.VehicleBean;
 
 public class ExcelFileSaver {
 	
+	private XSSFWorkbook wb = null;
 	private DataInputStream datais=null;
 	private BufferedReader bf=null;
 	public String strLine = "";
 	private int index = 0;
+	
+	public ExcelFileSaver(FileInputStream fis, boolean isExcel){
+		try{
+			wb = new XSSFWorkbook(fis);
+		}catch (Exception e){//Catch exception if any
+			System.err.println("Error: " + e.getMessage());
+		}
+	}
+	
 	
 	public ExcelFileSaver(FileInputStream fis){
 		try{
@@ -693,5 +712,5 @@ public class ExcelFileSaver {
 //		return str;
 //	}
 
-
+	
 }

@@ -108,8 +108,10 @@ public class DepartmentSummaryActionBean extends CustomActionBean{
 			Map<String,Scoresummary> summaryMap = new HashMap<String,Scoresummary>();
 			Map<String,Float> scoreMap = new HashMap<String,Float>();
 			for(Scorerecord sr :records){
-				if(sr.getScoretype().getType() == Scoretype.SCORE_TYPE_TEMP)
-					departmentMonthScore += sr.getScore();
+				if(sr.getScoretype().getType() == Scoretype.SCORE_TYPE_TEMP){
+					if(!scoreBean.isScorerUnlimited(sr.getReceiver().getEmployee()))
+						departmentMonthScore += sr.getScore();
+				}
 				Scoresummary temSum = null;
 				Float tempScore = null;
 				if(summaryMap.get(sr.getReceiver().getEmployee().getWorkerid()) == null){

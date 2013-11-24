@@ -43,6 +43,9 @@
  <class>com.bus.dto.score.Scoreapprover</class>
  <class>com.bus.dto.score.DepartmentScore</class>
  <class>com.bus.dto.score.ScoreExceptionList</class>
+ <class>com.bus.dto.score.ScoreDivGroup</class>
+ <class>com.bus.dto.score.ScoreGroupMapper</class>
+ 
  
  <class>com.bus.dto.application.ApplicationIdCards</class>
  <class>com.bus.dto.application.HRApplication</class>

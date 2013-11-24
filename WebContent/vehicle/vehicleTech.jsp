@@ -178,6 +178,7 @@ table>tr>td{
       		<stripes:text name="vtech.factorydate"  formatPattern="yyyy-MM-dd" class="datepickerClass"/>
       		<br/>
       		<stripes:select name="vtech.madein">
+      			<stripes:option value="">请选择</stripes:option>
       			<stripes:option value="国产">国产</stripes:option>
       			<stripes:option value="进口">进口</stripes:option>
       		</stripes:select>
@@ -225,10 +226,10 @@ table>tr>td{
       <td>排放标准:</td>
       <td><stripes:select name="vtech.releasestandard">
         <stripes:option  value="">请选择...</stripes:option>
-        <stripes:option  value="国 Ⅱ">国 Ⅱ</stripes:option>
-        <stripes:option value="国 Ⅲ">国 Ⅲ</stripes:option>
-        <stripes:option value="国 Ⅳ">国 Ⅳ</stripes:option>
-        <stripes:option value="国 Ⅴ">国 Ⅴ</stripes:option>
+        <stripes:option  value="国Ⅱ">国Ⅱ</stripes:option>
+        <stripes:option value="国Ⅲ">国Ⅲ</stripes:option>
+        <stripes:option value="国Ⅳ">国Ⅳ</stripes:option>
+        <stripes:option value="国Ⅴ">国Ⅴ</stripes:option>
         </stripes:select></td>
     </tr>
     <tr>
@@ -265,7 +266,7 @@ table>tr>td{
       <td colspan="5" style="text-align:center;">
       <stripes:radio value="气" checked="${actionBean.vtech.breakmode }" name="vtech.breakmode"/><label>气</label>
       <stripes:radio value="液" checked="${actionBean.vtech.breakmode }" name="vtech.breakmode"/><label>液</label>
-      <stripes:radio value="气一液" checked="${actionBean.vtech.breakmode }" name="vtech.breakmode"/><label>气一液</label>
+      <stripes:radio value="气－液" checked="${actionBean.vtech.breakmode }" name="vtech.breakmode"/><label>气－液</label>
        &nbsp;
        &nbsp;
        &nbsp;
@@ -316,7 +317,7 @@ table>tr>td{
       
       <stripes:checkbox checked="${actionBean.vtech.otherList }" value="底盘自动润滑" name="vtech.otherList"/><label>底盘自动润滑</label>
       <stripes:checkbox checked="${actionBean.vtech.otherList }" value="GPS" name="vtech.otherList"/><label>GPS</label>
-      <stripes:checkbox checked="${actionBean.vtech.otherList }" value="行车记录" name="vtech.otherList"/><label>行车记录</label>
+      <stripes:checkbox checked="${actionBean.vtech.otherList }" value="行车记录仪" name="vtech.otherList"/><label>行车记录仪</label>
       <stripes:checkbox checked="${actionBean.vtech.otherList }" value="空调器" name="vtech.otherList"/><label>空调器</label>
       </td>
       </tr>

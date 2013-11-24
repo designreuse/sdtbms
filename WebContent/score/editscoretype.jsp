@@ -65,7 +65,10 @@ function editScoretype(){
 									<td>评分对象:</td><td><stripes:text name="scoretype.scoreobject"  class="required"></stripes:text></td>
 								</tr>
 								<tr>	
-									<td>备注:</td><td><stripes:text name="scoretype.remark"></stripes:text></td>
+									<td>备注:</td>
+									<td>
+										<stripes:textarea name="scoretype.remark" cols="40" rows="7"/>
+									</td>
 								</tr>
 						</table>
 						</div>

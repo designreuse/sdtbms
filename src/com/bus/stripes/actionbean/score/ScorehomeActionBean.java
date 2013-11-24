@@ -45,6 +45,8 @@ public class ScorehomeActionBean extends CustomActionBean{
 	private List<DepartmentScore> departScores;
 	private List<DepartmentScore> depS;
 	
+	private Float addScore;
+	
 	private void loadLogs(){
 		try{
 			if(logdate == null)
@@ -73,6 +75,42 @@ public class ScorehomeActionBean extends CustomActionBean{
 				ds.setAvailable(ds.getBasescore() * count);
 			}
 			return new ForwardResolution("/score/departmentscoretable.jsp");
+		}catch(Exception e){
+			e.printStackTrace();
+			return defaultAction();
+		}
+	}
+	
+	@HandlesEvent(value="addScoresToDepartment")
+	@Secure(roles=Roles.ADMINISTRATOR)
+	public Resolution addScoresToDepartment(){
+		try{
+			if(addScore == null)
+				return defaultAction();
+			departScores = scoreBean.getAllDepartmentScores();
+			for(DepartmentScore ds:departScores){
+				int count = scoreBean.getScoreEmployeeCount(ds.getDepartment().getId());
+				ds.setAvailable(ds.getAvailable() + addScore*count);
+			}
+			return new ForwardResolution("/score/departmentscoretable.jsp");
+		}catch(Exception e){
+			e.printStackTrace();
+			return defaultAction();
+		}
+	}
+	
+	@HandlesEvent(value="setBaseScore")
+	@Secure(roles=Roles.ADMINISTRATOR)
+	public Resolution setBaseScore(){
+		try{
+			if(addScore == null)
+				return defaultAction();
+			departScores = scoreBean.getAllDepartmentScores();
+			for(DepartmentScore ds:departScores){
+				ds.setBasescore(addScore);
+			}
+			scoreBean.updateDepartmentScores(departScores);
+			return defaultAction();
 		}catch(Exception e){
 			e.printStackTrace();
 			return defaultAction();
@@ -119,6 +157,12 @@ public class ScorehomeActionBean extends CustomActionBean{
 	}
 	public void setDepS(List<DepartmentScore> depS) {
 		this.depS = depS;
+	}
+	public Float getAddScore() {
+		return addScore;
+	}
+	public void setAddScore(Float addScore) {
+		this.addScore = addScore;
 	}
 	
 	

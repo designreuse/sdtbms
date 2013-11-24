@@ -48,9 +48,10 @@ public class VehicleBean extends EMBean {
 	 */
 	public Map getVehicleProfiles(int pagenum, int lotsize) throws Exception {
 		Map map = new HashMap<String, Object>();
-		if (pagenum == -1 || pagenum == 0 || lotsize <= 20) {
+		if (pagenum == -1 || pagenum == 0 || lotsize == 0 ) {
 			pagenum = 1; lotsize =20;
 		}
+		System.out.println("In vBean getVehicleProfiles pagenum:"+pagenum);
 		List<VehicleProfile> list = em
 				.createQuery(
 						"SELECT q FROM VehicleProfile q WHERE q.status=? ORDER BY selfid").setParameter(1, VehicleProfile.statusA)
@@ -92,8 +93,8 @@ public class VehicleBean extends EMBean {
 	 * @param profile
 	 * @throws Exception
 	 */
-	@Transactional
-	public void saveVehicle(VehicleProfile profile, Account user) throws Exception {
+	@Transactional(rollbackFor=Exception.class)
+	public VehicleProfile saveVehicle(VehicleProfile profile, Account user) throws Exception {
 		VehicleLog vl = new VehicleLog();
 		vl.setCreatetime(Calendar.getInstance().getTime());
 		vl.setWho(user);
@@ -111,6 +112,8 @@ public class VehicleBean extends EMBean {
 		em.flush();
 		vl.setRecordid(profile.getId()+"");
 		em.persist(vl);
+		em.flush();
+		return profile;
 	}
 
 	/**
@@ -402,12 +405,27 @@ public class VehicleBean extends EMBean {
 							.createQuery("SELECT q FROM VehicleProfile q WHERE vid LIKE '%"+ HRUtil.removeNoneNumber(vid)+"%' AND selfid LIKE '%"+ HRUtil.removeNoneNumber(selfId)+"%' ")
 							.getSingleResult();
 			}catch(Exception e2){
-				System.out.println(e2.getMessage());
+//				System.out.println(e2.getMessage());
 				return null;
 			}
 		}
 	}
 
+	/**
+	 * 获取自编号为selfId的车辆
+	 * @param selfId
+	 * @return
+	 */
+	public VehicleProfile getVehicleProfileBySelfId(String selfId){
+		try{
+			return (VehicleProfile)em.createQuery("SELECT q FROM VehicleProfile q WHERE selfid = '"+selfId+"'")
+					.getSingleResult();
+		}catch(Exception e){
+			System.out.println(e.getMessage());
+			return null;
+		}
+	}
+	
 	/**
 	 * Save vehicle details from file See:ExcelFileSaver.java
 	 * @param saver
@@ -2173,4 +2191,152 @@ public class VehicleBean extends EMBean {
 		vl.setRemark("车辆事故记录");
 		em.persist(vl);
 	}
+
+	/**
+	 * 保存list车辆维修记录，同一辆车同一日的记录如果存在则不保存
+	 * @param vrrs
+	 * @throws Exception
+	 */
+	@Transactional(rollbackFor=Exception.class)
+	public void saveVehicleRepairRecords(List<VehicleRepairRecord> vrrs) throws Exception{
+		for(VehicleRepairRecord vrr:vrrs){
+			VehicleRepairRecord tem = null;
+			try{
+				String query = "SELECT * FROM vehicle_repair_record WHERE vid="+vrr.getVid().getId()+" AND rdate='"+vrr.getRdateStr()+"'";
+//				System.out.println(query);
+				tem = (VehicleRepairRecord) em.createNativeQuery(query,VehicleRepairRecord.class).getSingleResult();
+			}catch(Exception e){}
+			if(tem == null){
+				em.persist(vrr);
+			}else{
+				continue;
+			}
+		}
+	}
+
+	/**
+	 * 获取车辆维修记录
+	 * @param vid
+	 * @param date
+	 * @return
+	 * @throws Exception
+	 */
+	public VehicleRepairRecord getVehicleRepairRecord(String vid, Date date) throws Exception{
+		try{
+			String query = "SELECT * FROM vehicle_repair_record WHERE vid="+vid+" AND rdate='"+HRUtil.parseDateToString(date)+"'";
+//			System.out.println(query);
+			return (VehicleRepairRecord) em.createNativeQuery(query,VehicleRepairRecord.class).getSingleResult();
+		}catch(Exception e){
+			System.out.println("No vehicle record found. Error:"+e.getMessage());
+			return null;
+		}
+	}
+	
+	/**
+	 * 保存list车辆等级评定，同一车辆同一日的记录如果存在则不保留
+	 * @param vls
+	 * @throws Exception
+	 */
+	@Transactional(rollbackFor=Exception.class)
+	public void saveVehicleLevels(List<VehicleLevel> vls) throws Exception{
+		for(VehicleLevel vl : vls){
+			VehicleLevel tem = null;
+			try{
+				String query  = "SELECT * FROM vehicle_level WHERE vid="+vl.getVid().getId()+" AND date='"+vl.getDateStr()+"'";
+				tem = (VehicleLevel) em.createNativeQuery(query,VehicleLevel.class).getSingleResult();
+			}catch(Exception e){};
+			if(tem == null)
+				em.persist(vl);
+			else
+				continue;
+		}
+	}
+
+	/**
+	 * 保存List车辆使用记录，同一辆车的使用记录同一日不能重复
+	 * @param vurs
+	 */
+	@Transactional(rollbackFor=Exception.class)
+	public void saveVehicleUseRecords(List<VehicleUseRecord> vurs) throws Exception{
+		for(VehicleUseRecord vur:vurs){
+			VehicleUseRecord tem = null;
+			try{
+				String query = "SELECT * FROM vehicle_use_record WHERE vid="+vur.getVid().getId()+" AND date='"+vur.getDateStr()+"'";
+				tem = (VehicleUseRecord) em.createNativeQuery(query,VehicleUseRecord.class).getSingleResult();
+			}catch(Exception e){}
+			if(tem == null)
+				em.persist(vur);
+			else
+				continue;
+		}
+	}
+
+
+	/**
+	 * 保存List车辆事故记录，同一辆车的使用记录同一日不能重复
+	 * @param vats
+	 * @throws Exception
+	 */
+	@Transactional(rollbackFor=Exception.class)
+	public void saveVehicleAccidents(List<VehicleAccident> vats)  throws Exception{
+		for(VehicleAccident va:vats){
+			VehicleAccident tem = null;
+			try{
+				String query = "SELECT * FROM vehicle_accident WHERE vid="+va.getVid().getId()+" AND date='"+va.getDateStr()+"'";
+				tem = (VehicleAccident) em.createNativeQuery(query,VehicleAccident.class).getSingleResult();
+			}catch(Exception e){
+				tem = null;
+			}
+			if(tem == null)
+				em.persist(va);
+			else
+				continue;
+		}
+	}
+
+	/**
+	 * 保存list车辆主要部件变更记录
+	 * @param vparts
+	 * @throws Exception
+	 */
+	@Transactional(rollbackFor=Exception.class)
+	public void saveVehiclePartsRepairs(List<VehiclePartsRepair> vparts) throws Exception{
+		for(VehiclePartsRepair va:vparts){
+			VehiclePartsRepair tem = null;
+			try{
+				String query = "SELECT * FROM vehicle_parts_repair WHERE vid="+va.getVid().getId()+" AND changedate='"+va.getChangedateStr()+"'";
+				tem = (VehiclePartsRepair) em.createNativeQuery(query,VehiclePartsRepair.class).getSingleResult();
+			}catch(Exception e){
+				tem = null;
+			}
+			if(tem == null)
+				em.persist(va);
+			else
+				continue;
+		}
+	}
+
+	/**
+	 * 保存list车辆变更记录
+	 * @param vcs
+	 * @throws Exception
+	 */
+	@Transactional(rollbackFor=Exception.class)
+	public void saveVehicleChanges(List<VehicleChange> vcs) throws Exception{
+		for(VehicleChange va:vcs){
+			VehicleChange tem = null;
+			try{
+				String query = "SELECT * FROM vehicle_change WHERE vid="+va.getVid().getId()+" AND date='"+va.getDateStr()+"'";
+				tem = (VehicleChange) em.createNativeQuery(query,VehicleChange.class).getSingleResult();
+			}catch(Exception e){
+				tem = null;
+			}
+			if(tem == null)
+				em.persist(va);
+			else
+				continue;
+		}
+	}
+	
+	
 }
