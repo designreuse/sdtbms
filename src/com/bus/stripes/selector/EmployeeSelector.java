@@ -30,6 +30,8 @@ public class EmployeeSelector implements BMSSelector{
 	private Date workstartdate;
 	private String birthmonth;
 	
+	private String healthstatus;
+	
 	private Integer teamid;
 	
 	public void setWorkstartdate(Date workstartdate) {
@@ -44,11 +46,12 @@ public class EmployeeSelector implements BMSSelector{
 	@Override
 	public String getSelectorStatement() {
 		String query = "SELECT q FROM Employee q WHERE";
-		if(name != null){
+		set = 0;
+		if(name != null && !name.trim().equals("")){
 			query += " fullname LIKE '%"+name+"%'";
 			set++;
 		}
-		if(workerid != null){
+		if(workerid != null && !workerid.trim().equals("")){
 			if(set >0)
 				query += " AND";
 			query += " workerid='"+workerid+"'";
@@ -132,6 +135,12 @@ public class EmployeeSelector implements BMSSelector{
 			if(set > 0)
 				query += " AND";
 			query += " politicalstatus='"+politicalstatus+"'";
+			set++;
+		}
+		if(healthstatus != null){
+			if(set > 0)
+				query += " AND";
+			query += " healthstatus='"+healthstatus+"'";
 			set++;
 		}
 		if(marriage != null){
@@ -218,6 +227,7 @@ public class EmployeeSelector implements BMSSelector{
 				}
 			}
 		}
+
 		return query;
 	}
 	public String getName() {
@@ -322,6 +332,7 @@ public class EmployeeSelector implements BMSSelector{
 	public void setWorkerid(String workerid) {
 		this.workerid = workerid;
 	}
+	
 	public void setBirthmonth(String birthmonth){
 		this.birthmonth = birthmonth;
 	}
@@ -346,5 +357,13 @@ public class EmployeeSelector implements BMSSelector{
 	public void setTeamid(Integer teamid) {
 		this.teamid = teamid;
 	}
+	public String getHealthstatus() {
+		return healthstatus;
+	}
+	public void setHealthstatus(String healthstatus) {
+		this.healthstatus = healthstatus;
+	}
+	
+	
 
 }

@@ -11,6 +11,7 @@ import javax.persistence.Transient;
 
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
+import org.springframework.context.annotation.Scope;
 
 /**
  * Not actually exist, use to store the ranking page data from 
@@ -33,6 +34,7 @@ public class ScoreMemberRank implements Serializable{
 	private String name;
 	private Date firstworktime;
 	private String positionName;
+	private Integer countsum;
 	
 //	@Id
 //	@Column(name="id")
@@ -138,5 +140,23 @@ public class ScoreMemberRank implements Serializable{
 	}
 	public void setPerformancescore(Long performancescore) {
 		this.performancescore = performancescore;
+	}
+	
+	@Transient
+	public Integer getCountsum(){
+		return this.countsum;
+	}
+	public void setCountsum(Integer countsum){
+		this.countsum = countsum;
+	}
+	
+	@Transient
+	public Integer getPercent(){
+		if(countsum != null && countsum > 0){
+			float result = (float)rank/(float)countsum * 100F;
+			return Math.round(result);
+		}
+		else
+			return 0;
 	}
 }

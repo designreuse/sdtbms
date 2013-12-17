@@ -6,9 +6,10 @@
 <stripes:layout-render name="../default.jsp">
 	
     <stripes:layout-component name="contents">
+    <script type="text/javascript" src="${pageContext.request.contextPath}/js/custom/scoreListBuilder.js"></script>
     <script type="text/javascript" src="${pageContext.request.contextPath}/js/score.js"></script>
     <link href="${pageContext.request.contextPath}/css/custom_general.css" rel="stylesheet" media="all" />
-    
+    <link href="${pageContext.request.contextPath}/css/custom/scoreListBuilder.css" rel="stylesheet" title="style"/>
     <style type="text/css">
     	.readonly{
     		background-color:#CCCCBB;
@@ -24,17 +25,37 @@
     border-bottom: 1px solid #333333;
     border-left: 1px solid #CCCCCC;
    }
+    .divtitle { width:550px; height:25px; border:1px solid #000; margin:0px;}
+	.divtitle div { float:left;}
+   
+	.tiaoli{ font-size:18px; font-weight:900; width:240px; height:22px; text-align:center; border-right:1px solid #000; margin-top:3px; }
+	.fenzhi{ font-size:18px; font-weight:900; height:22px; width:55px;text-align:center; border-right:1px solid #000;  margin-top:3px;}
+	.zhushi{ font-size:18px; font-weight:900; height:22px; width:180px;text-align:center; margin-top:3px; }
+	.divbobycontent { clear:both; width:550px; height:43px; border:1px solid #000; }
+	.divbobycontent div { float:left;}
+
+	.tiaoli2 { font-size:11px; width:240px; height:40px ;*height:38px; text-align:center;vertical-align; border-right:1px solid #000;padding-top:4px;*padding-top:6px; }
+	.fenzhi2 { font-size:11px; width:55px; height:43px; text-align:center; border-right:1px solid #000;}
+	.zhushi2 { font-size:11px; width:253px; height:43px;}
+	
+	.inputscore { height:34px; width:52px; border:none; text-align:center; margin-top:3px; background-color:#FFF}
+	.inputscore2 { height:34px; width:52px; border:none; text-align:center; margin-top:3px; background-color:#f2f2f2}
+	.texrarearemark { border:none; width:248px; *width:251px; height:38px; *height:41px;}
+	
     </style>
     <script type="text/javascript">
-    	function openSelectEmpWindow(names,workerids,extras,multi){
+   
+	
+	     function openSelectEmpWindow(names,workerids,extras,multi){
     		var link="";
         	if(multi == true)
-        		link = "${pageContext.request.contextPath}/actionbean/EmployeeSelector.action?score=yes&eleIdOne="+names+"&eleIdTwo="+workerids+"&extra="+extras+"&multi="+multi;
+        		link = "${pageContext.request.contextPath}/actionbean/EmployeeSelector.action?score=yes&eleIdOne="+names+"&eleIdTwo="+workerids+"&extra="+extras+"&getEmployeeScoreSelectionList=";
         	else
         		link = "${pageContext.request.contextPath}/actionbean/EmployeeSelector.action?score=yes&eleIdOne="+names+"&eleIdTwo="+workerids+"&extra="+extras;
-			window.open(link,"_blank","fullscreen=no,scrollbars=1,width=400,height=600");
+			window.open(link,"_blank","fullscreen=no,scrollbars=1,width=600,height=600");
         }
         $(document).ready(function(){
+        	
         	$('#selectAll').click(function(){
 				if(this.checked){
 					$('#dataForm :checkbox').each(function(){
@@ -60,9 +81,8 @@
 					giveScores();
 				}
 			});
-// 			$('#itemlist').change(function(){
-// 				$('#filter').click();
-// 			});
+
+			
 			function giveScores(){
 				var ele = $('#givescores');
 				$(ele).hide();					
@@ -88,13 +108,14 @@
 					$('#givescores').show();
 				},3000);
 			}
+
 			
 			$("#setScoreDialog").dialog({
 				autoOpen: false,
 				bgiframe: true,
 				resizable: true,
 // 				height:100,
-				width:400,
+				width:580,
 				modal: true,
 				overlay: {
 					backgroundColor: '#000',
@@ -104,13 +125,14 @@
 					'确定':function(){
 						var valOk = true;
 						$(this).find(":input[type=text]").each(function(){
-							var temScore = $.trim($(this).val())
+							var temScore = $.trim($(this).val());
+							//alert(temScore);
 							if(temScore == ""){
 								valOk = false;
-								alert("null");
+								alert("分值不能为空！");
 							}else if(parseFloat(temScore) <= 0 || parseFloat(temScore) >= 1000){
 								valOk = false;
-								alert("值不能小于或等于0,或值过大");
+								alert("分值不能小于或等于0,或值过大");
 							}else if($(this).next().val() == "绩效"){
 // 								alert("绩效分");
 								var s = parseFloat(temScore);
@@ -122,12 +144,26 @@
 						});
 						if(!valOk)
 							return false;
-						$(this).find("ul li>input").each(function(){
+						
+						$(this).find("div.fenzhi2>input").each(function(){
 							var score  = $(this).val();
 							var name = $(this).attr('name');
-							$('#dataForm input[name="'+name+'"]').val(score);
+							//alert(score + "   " + name);
+							$('#dataForm input[name="'+name+'"]').val(score);	
 						});
-						giveScores();
+
+
+												
+						//添加 积分 注释
+						$(this).find("div.zhushi2>textarea").each(function(){
+							var recordRemark  = $(this).val();
+							var recordRemarkname = $(this).attr('name');
+							//alert(recordRemark+"  " + recordRemarkname);						
+							$('#dataForm input[name="'+recordRemarkname+'"]').val(recordRemark);
+		
+						});
+						
+ 						giveScores();
 						$(this).dialog('close');
 					},
 					'取消': function() {
@@ -163,20 +199,33 @@
 		function checkZeroScores(checked){
 			var htmlstr = "";
 			$(checked).each(function(){
+				var references = $(this).parent().parent().children(":nth-child(2)").html();
 				var types = $(this).parent().parent().children(":nth-child(3)").html();
-				var words = $(this).parent().parent().children(":nth-child(4)").html().split("<input");
+//				var words = $(this).parent().parent().children(":nth-child(4)").html().split("<input");
+				var words = $(this).parent().parent().children(":nth-child(4)").html().split("<");
 // 				alert($(this).parent().parent().children(":nth-child(4)").html());
 // 				alert(words[0]);
 				var item = $(this).parent().parent().children(":nth-child(5)").html();
 // 				var scoreValue = $(this).parent().parent().children(":nth-child(4)").children().first().val();
 				var scoreValue = words[0];
 				var valueName = $(this).parent().parent().children(":nth-child(4)").children().first().attr('name');
+				var valueName2 = $(this).parent().parent().children(":nth-child(9)").children().first().attr('name');
 				if(parseFloat(scoreValue) == 0){
-					htmlstr += "<li>条例:"+item+"<br/>分值:<input type='text' name='"+valueName+"'/><input type='hidden' value='"+types+"'/></li><br/>";
+//					htmlstr += "<li>条例:"+item+"<br/>分值:<input type='text' name='"+valueName+"'/><input type='hidden' value='"+types+"'/></li><br/>";
+//					htmlstr += "<li>条例:"+item+"<br/>分值:<input type='text' name='"+valueName+"'/><input type='hidden' value='"+types+"'/>&nbsp;&nbsp;注释:<input type='text' name='"+valueName2+"' style='width:180px;' /></li><br/>";
+//					htmlstr += "<li><div>条例:"+item+"</div><br/>分值:<input type='text' name='"+valueName+"'/><input type='hidden' value='"+types+"'/>&nbsp;&nbsp;注释:<textarea name='"+valueName2+"' cols='20' rows='1' style='margin-top:3px;' /></li><br/>";
+                    htmlstr += "<div class='divbobycontent'><div class='tiaoli2'>"+item+"</div><div class='fenzhi2'><input type='text' class='inputscore' name='"+valueName+"' /><input type='hidden' value='"+types+"'/></div><div class='zhushi2'><textarea class='texrarearemark' name='"+valueName2+"'/></div></div>";
 				}
+				else{
+//					htmlstr += "<li>条例:"+item+"<br/>注释:<input type='text' name='"+valueName2+"' style='width:180px;' /></li><br/>";
+//					htmlstr += "<li><div>条例:"+item+"</div><br/>注释:<textarea name='"+valueName2+"' cols='20' rows='1' style='margin-top:3px;' /></li><br/>";
+					htmlstr += "<div class='divbobycontent'><div class='tiaoli2'>"+item+"</div><div class='fenzhi2'><input type='text' class='inputscore2' name='"+valueName+"' value='"+scoreValue+"' readonly='true' /><input type='hidden' value='"+types+"'/></div><div class='zhushi2'><textarea class='texrarearemark' name='"+valueName2+"'  /></div></div>";
+					}
+				
 			});
 			if(htmlstr != ""){
-				$('#setScoreDialog').html("<ul>"+htmlstr+"</ul>");
+				//$('#setScoreDialog').html("<ul>"+htmlstr+"</ul>");
+				$('#setScoreDialog').html("<div class='divtitle'><div class='tiaoli'>条例</div><div class='fenzhi'>分值</div><div class='zhushi'>注释</div></div><div class='divboby'>"+htmlstr+"</div>");
 				return true;
 			}else{
 				return false;
@@ -276,10 +325,6 @@
 									<Label class='selector'>给分人:</Label>
 									<br/>
 									&nbsp;&nbsp;&nbsp;&nbsp;名称:<stripes:text readonly="true" name="employee.fullname" style="background-color:#CCCCBB;"  id="employeenamefromid1"/>工号:<stripes:text name="employee.workerid" readonly="true" id="checkWorkerId1" style="background-color:#CCCCBB;"/>
-<%-- 									<a href="javascript:void;" id="checkWorkerId">(查)</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?checkworkerid="/>| --%>
-<%-- 									<a href="javascript:void;" id="getNameById1">获取</a><input type="hidden" value="${pageContext.request.contextPath}/actionbean/Employee.action?getnamebyid="/>| --%>
-									<input type="hidden" value="" id="extra1"/>
-<!-- 									<a href="javascript:void;" onclick="openSelectEmpWindow('employeenamefromid1','checkWorkerId1','extra1',false)">从列表选择</a> -->
 								</div>
 								<div>
 									<Label class='selector'>受分人:</Label>
@@ -361,7 +406,8 @@
 							<td>${st.period}</td>
 							<td>${st.scoreobject}</td>
 							<td>${st.examine}</td>
-							<td>${st.remark}</td>
+							<td>${st.remark}<input type="hidden" name="recordRemark[${color}].remark" value="" /></td>
+		                    							
 						</tr>
 						<c:set var="color" value="${color + 1}" scope="page"/>
 					</c:forEach>
@@ -375,6 +421,8 @@
 				</div>
 				<div id="setScoreDialog">
 					
+				</div>
+				<div id="selectEmpDialog">
 				</div>
 				<!-- End of main content -->
 			</div>

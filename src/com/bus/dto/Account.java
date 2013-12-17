@@ -30,6 +30,7 @@ public class Account  implements Serializable{
 	private String employee;
 	private Date registerdate;
 	private String status;
+	private String email;
 	private Set<Accountgroup> groups;
 
 	@Column(name="username",nullable=false,length=64)
@@ -95,5 +96,14 @@ public class Account  implements Serializable{
 
 	public void setGroups(Set<Accountgroup> groups) {
 		this.groups = groups;
+	}
+
+	@Column(name="email")
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 }

@@ -1,0 +1,159 @@
+
+body{
+background-image: url(../../images/bg-tile.jpg);
+}
+
+#maincontent{
+width:100%;
+text-align:center;
+}
+
+
+#title{
+display:inline-block;
+width:600px;
+}
+
+
+#imageTitle{
+display:inline-block;
+background-image: url(../../images/sdt-logo.png);
+width:111px;
+height:97px;
+padding:0px;
+}
+
+.nameTitle{
+font-size:46pt;
+color:#DBDBDB;
+font-weight:bold;
+}
+
+#nav{
+background-color:#000000;
+color:#FFF;
+padding-bottom: 5px;
+}
+
+.searchBtn {
+  background: #de38c5;
+  background-image: -webkit-linear-gradient(top, #de38c5, #472bb8);
+  background-image: -moz-linear-gradient(top, #de38c5, #472bb8);
+  background-image: -ms-linear-gradient(top, #de38c5, #472bb8);
+  background-image: -o-linear-gradient(top, #de38c5, #472bb8);
+  background-image: linear-gradient(to bottom, #de38c5, #472bb8);
+  -webkit-border-radius: 28;
+  -moz-border-radius: 28;
+  border-radius: 28px;
+  font-family: Arial;
+  color: #ffffff;
+  font-size: 9pt;
+  padding: 3px 7px 3px 8px;
+  text-decoration: none;
+}
+
+.searchBtn:hover {
+  background: #fc3cdf;
+  background-image: -webkit-linear-gradient(top, #fc3cdf, #d9345d);
+  background-image: -moz-linear-gradient(top, #fc3cdf, #d9345d);
+  background-image: -ms-linear-gradient(top, #fc3cdf, #d9345d);
+  background-image: -o-linear-gradient(top, #fc3cdf, #d9345d);
+  background-image: linear-gradient(to bottom, #fc3cdf, #d9345d);
+  text-decoration: none;
+}
+
+.data{
+padding-top:50px;
+}
+
+.data table{
+margin:0 auto;
+border-collapse: collapse;
+border-color: grey;
+border-spacing:2px;
+}
+
+.data table thead th{
+text-align:center;
+vertical-align:middle;
+background-color: #6B011A;
+height:50px;
+color:#fff;
+font-size:20pt;
+font-weight:bold;
+border-right: solid 1px #524A3B; 
+border-bottom: solid 1px #524A3B;
+padding:5px 5px 2px 8px;
+}
+
+.data table tbody{
+background-color:#e4e0d9;
+}
+
+.data table tbody td{
+text-align:center;
+vertical-align: middle;
+font-size:12pt;
+padding:5px 5px 2px 8px;
+border-right: solid 1px #796d55; 
+border-bottom: solid 1px #796d55;
+}
+
+.data td.rank strong{
+height: 21px;
+float: left;
+line-height: 21px;
+display: block;
+color: #424242;
+text-align: center;
+border-radius: 3px;
+margin: 0 0 0 7px;
+padding: 0 8px;
+background-color: #f2d55d;
+}
+
+.data td.highlight{
+color:#6B011A;
+}
+
+.table tbody tr:hover{
+background-color: yellow;
+}
+
+/*
+下面的是员工详细资料查看用的
+*/
+#empSearchBox{
+position:fixed;
+float:left;
+width:200px;
+background-color: #000000;
+color:#fff;
+padding:20px 10px 20px 10px;
+margin-top:150px;
+text-align:center;
+z-index:999;
+}
+
+#empResult{
+padding:5px;
+}
+
+#empResult ul li{
+padding:3px;
+}
+
+#empResult ul li a{
+color:#fff;
+}
+
+.data table.nameCard tr td{
+text-align:left !important;
+height:27px;
+}
+
+.backToScoreSystem{
+float:left;
+color:red;
+font-size:14pt;
+}

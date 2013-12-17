@@ -16,7 +16,7 @@ form ul{
 	list-style-type:none;
 /*	width:100%;*/
 }
-/*
+
 form li{
 	display:block;
 	margin:0;
@@ -44,7 +44,7 @@ form li div, form li span{
 form li span{
 	float:left;
 }
-*/
+
 	/* Inputs */
 
 input.text, input.file, textarea.textarea, select.select {

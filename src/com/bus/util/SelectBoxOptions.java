@@ -13,6 +13,7 @@ import com.bus.dto.Groups;
 import com.bus.dto.Position;
 import com.bus.dto.Qualification;
 import com.bus.dto.Workertype;
+import com.bus.dto.score.ScoreDivGroup;
 
 public class SelectBoxOptions {
 
@@ -21,6 +22,12 @@ public class SelectBoxOptions {
 		list.add(new SelectBoxOption("未婚","未婚"));
 		list.add(new SelectBoxOption("已婚","已婚"));
 		list.add(new SelectBoxOption("离异","离异"));
+		return list;
+	}
+	
+	public static List<SelectBoxOption> getHealthstatus(){
+		List<SelectBoxOption> list = new ArrayList<SelectBoxOption>();
+		list.add(new SelectBoxOption("健康","健康"));
 		return list;
 	}
 
@@ -229,6 +236,16 @@ public class SelectBoxOptions {
 		List<SelectBoxOption> list = new ArrayList<SelectBoxOption>();
 		for(Action a:groupActions){
 			SelectBoxOption s = new SelectBoxOption(a.getDescription(),a.getId()+"");
+			list.add(s);
+		}
+		return list;
+	}
+
+	public static List<SelectBoxOption> getScoregroups(
+			List<ScoreDivGroup> allScoreGroups) {
+		List<SelectBoxOption> list = new ArrayList<SelectBoxOption>();
+		for(ScoreDivGroup g:allScoreGroups){
+			SelectBoxOption s = new SelectBoxOption(g.getName(),g.getId()+"");
 			list.add(s);
 		}
 		return list;

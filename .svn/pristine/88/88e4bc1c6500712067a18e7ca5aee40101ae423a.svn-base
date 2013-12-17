@@ -1,0 +1,21 @@
+package com.bus.util;
+
+import java.io.FileInputStream;
+
+import com.bus.dto.Account;
+import com.bus.services.HRBean;
+import com.bus.services.ScoreBean;
+
+public class ExcelScoreUpload extends ExcelFile{
+
+	public void saveScore2007(HRBean hrBean, ScoreBean scoreBean, Account user) {
+//		wb07.getSheetAt(0)
+	}
+
+	public void saveScore2003(HRBean hrBean, ScoreBean scoreBean, Account user) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
+}

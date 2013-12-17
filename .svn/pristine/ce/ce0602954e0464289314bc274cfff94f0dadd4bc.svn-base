@@ -1,0 +1,510 @@
+package com.bus.util;
+
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.util.StringUtils;
+
+import com.bus.dto.Account;
+import com.bus.dto.vehicleprofile.VehicleAccident;
+import com.bus.dto.vehicleprofile.VehicleBasicInfo;
+import com.bus.dto.vehicleprofile.VehicleChange;
+import com.bus.dto.vehicleprofile.VehicleLevel;
+import com.bus.dto.vehicleprofile.VehiclePartsRepair;
+import com.bus.dto.vehicleprofile.VehicleProfile;
+import com.bus.dto.vehicleprofile.VehicleRepairRecord;
+import com.bus.dto.vehicleprofile.VehicleTechnicalDetail;
+import com.bus.dto.vehicleprofile.VehicleUseRecord;
+import com.bus.services.VehicleBean;
+
+public class VehicleProfileExcelFile {
+
+	private XSSFWorkbook wb = null;
+	private FormulaEvaluator evaluator = null;
+	
+	public VehicleProfileExcelFile(FileInputStream fis){
+		try{
+			wb = new XSSFWorkbook(fis);
+		}catch (Exception e){//Catch exception if any
+			System.err.println("Error: " + e.getMessage());
+		}
+	}
+	
+	/**
+	 * 从Excel2007文件保存车辆档案
+	 * @param vBean
+	 * @param user
+	 * @throws Exception
+	 */
+	public void saveVehicleProfileFromExcel(VehicleBean vBean,Account user) throws Exception{
+		evaluator = wb.getCreationHelper().createFormulaEvaluator();
+		
+		//第一页基础资料
+		VehicleProfile vp = getVehicleProfileFromSheet(wb.getSheetAt(0),user,"长途");
+		VehicleProfile vpTemp =  vBean.getVehicleProfileByVid(vp.getVid());
+		if(vpTemp == null)
+			vp = vBean.saveVehicle(vp, user);
+		else
+			vp = vBean.saveVehicle(vpTemp, user);
+		
+		VehicleBasicInfo vbi = vBean.getVehicleBasicInfoByVehicleId(vp.getId());
+		if(vbi == null)
+			vbi = getVehicleBasicInfoFromSheet(wb.getSheetAt(0),vp, new VehicleBasicInfo());
+		else
+			vbi = getVehicleBasicInfoFromSheet(wb.getSheetAt(0),vp, vbi);
+		vbi.setCreator(user);
+		vBean.saveVehicleBasicInfo(vbi, user);
+		
+		//第二页技术档案
+		VehicleTechnicalDetail vtd = vBean.getVehicleTechnicalDetailByVehicleId(vp.getId());
+		if(vtd == null)
+			vtd = getVehicleTechnicalDetailFromSheet(wb.getSheetAt(1),vp,new VehicleTechnicalDetail());
+		else
+			vtd = getVehicleTechnicalDetailFromSheet(wb.getSheetAt(1),vp,vtd);
+		vtd.setCreator(user);
+		vBean.saveVehicleTechDetail(vtd, user);
+		
+		//第三页 车辆维修登记表
+		List<VehicleRepairRecord> vrrs = getVehicleRepairRecords(wb.getSheetAt(2),vp,user);
+		vBean.saveVehicleRepairRecords(vrrs);
+		
+		//第四页 车辆总部件换成
+		List<VehiclePartsRepair> vparts = getVehiclePartsRepairs(wb.getSheetAt(3),vp,user);
+		vBean.saveVehiclePartsRepairs(vparts);
+		
+		//第五页 车辆等级评定登记表
+		List<VehicleLevel> vls = getVehicleLevel(wb.getSheetAt(4),vp,user);
+		vBean.saveVehicleLevels(vls);
+		
+		//第六页 车辆变更登记表
+		List<VehicleChange> vcs = getVehicleChanges(wb.getSheetAt(5),vp,user);
+		vBean.saveVehicleChanges(vcs);
+		
+		//第七页 车辆使用记录表
+		List<VehicleUseRecord> vurs = getVehicleUseRecords(wb.getSheetAt(6),vp,user);
+		vBean.saveVehicleUseRecords(vurs);
+		
+		//第八页 车辆交通事故记录
+		List<VehicleAccident> vats = getVehicleAccidents(wb.getSheetAt(7),vp,user);
+		vBean.saveVehicleAccidents(vats);
+		
+		System.out.println("Saved "+ vp.getVid());
+	}
+
+	private List<VehicleChange> getVehicleChanges(XSSFSheet sheet,
+			VehicleProfile vp, Account user) throws Exception{
+		int rowNumber = 0;
+		Iterator<Row> rows = sheet.rowIterator();
+		List<VehicleChange> list = new ArrayList<VehicleChange>();
+		while(rows.hasNext()){
+			Row row = null;
+			row = rows.next();
+			if(rowNumber++ < 2)
+				continue;
+			if(row.getLastCellNum() < 3)
+				continue;
+			if(!isExcelDate(row.getCell(0))){
+				continue;
+			}
+			VehicleChange vpr = new VehicleChange();
+			vpr.setDate(row.getCell(0).getDateCellValue());
+			vpr.setDescription(row.getCell(2).getStringCellValue());
+			vpr.setCreator(user);
+			vpr.setReason(row.getCell(1).getStringCellValue());
+			vpr.setRegistrant(row.getCell(3).getStringCellValue());
+			vpr.setVid(vp);
+			list.add(vpr);
+		}
+		return list;
+	}
+
+	private List<VehiclePartsRepair> getVehiclePartsRepairs(XSSFSheet sheet,
+			VehicleProfile vp, Account user) throws Exception{
+		int rowNumber = 0;
+		Iterator<Row> rows = sheet.rowIterator();
+		List<VehiclePartsRepair> list = new ArrayList<VehiclePartsRepair>();
+		while(rows.hasNext()){
+			Row row = null;
+			row = rows.next();
+			if(rowNumber++ < 3)
+				continue;
+			if(row.getLastCellNum() < 3)
+				continue;
+			if(!isExcelDate(row.getCell(0))){
+				continue;
+			}
+			VehiclePartsRepair vpr = new VehiclePartsRepair();
+			vpr.setChangedate(row.getCell(0).getDateCellValue());
+			vpr.setCompany(row.getCell(2).getStringCellValue());
+			vpr.setCreator(user);
+			vpr.setDescription(row.getCell(1).getStringCellValue());
+			vpr.setRegistrant(row.getCell(3).getStringCellValue());
+			vpr.setVid(vp);
+			list.add(vpr);
+		}
+		return list;
+	}
+
+	private List<VehicleAccident> getVehicleAccidents(XSSFSheet sheet,
+			VehicleProfile vp, Account user) throws Exception{
+		int rowNumber = 0;
+		Iterator<Row> rows = sheet.rowIterator();
+		List<VehicleAccident> list = new ArrayList<VehicleAccident>();
+		while(rows.hasNext()){
+			Row row = null;
+			row = rows.next();
+			if(rowNumber++ < 3)
+				continue;
+			if(row.getLastCellNum() < 6)
+				continue;
+			if(row.getCell(0).getCellType() == Cell.CELL_TYPE_STRING ){
+				System.out.println("first value is String:"+row.getCell(0).toString());
+				continue;
+			}else if(!DateUtil.isCellDateFormatted(row.getCell(0))){
+				Date d = null;
+				try{
+					d = row.getCell(0).getDateCellValue();
+				}catch(Exception e){
+					d= null;
+				}
+				if(d == null){
+					System.out.println("VUR Row "+rowNumber+" first value not date:"+row.getCell(0).toString());
+					continue;
+				}
+			}
+			
+			VehicleAccident va = new VehicleAccident();
+			va.setAtype(row.getCell(2).getStringCellValue());
+			if(row.getCell(5).getCellType() == Cell.CELL_TYPE_NUMERIC)
+				va.setCost(row.getCell(5).getNumericCellValue());
+			va.setCreator(user);
+			va.setDate(row.getCell(0).getDateCellValue());
+			va.setDescription(row.getCell(4).getStringCellValue());
+			va.setPlace(row.getCell(1).getStringCellValue());
+			va.setRegistrant(row.getCell(6).getStringCellValue());
+			va.setResponsibility(row.getCell(3).getStringCellValue());
+			va.setVid(vp);
+			list.add(va);
+		}
+		return list;
+ 	}
+
+	private List<VehicleUseRecord> getVehicleUseRecords(XSSFSheet sheet,VehicleProfile vp, Account user) throws Exception{
+		int rowNumber = 0;
+		Iterator<Row> rows = sheet.rowIterator();
+		List<VehicleUseRecord> list = new ArrayList<VehicleUseRecord>();
+		while(rows.hasNext()){
+			Row row = null;
+			row = rows.next();
+			if(rowNumber++ < 3)
+				continue;
+			if(row.getLastCellNum() < 9)
+				continue;
+			if(row.getCell(0).getCellType() == Cell.CELL_TYPE_STRING ){
+				System.out.println("first value is String:"+row.getCell(0).toString());
+				continue;
+			}else if(!DateUtil.isCellDateFormatted(row.getCell(0))){
+				Date d = null;
+				try{
+					d = row.getCell(0).getDateCellValue();
+				}catch(Exception e){
+					d= null;
+				}
+				if(d == null){
+					System.out.println("VUR Row "+rowNumber+" first value not date:"+row.getCell(0).toString());
+					continue;
+				}
+			}
+			
+			VehicleUseRecord vur = new VehicleUseRecord();
+			vur.setCompany(row.getCell(7).getStringCellValue());
+			vur.setCreator(user);
+			vur.setDate(row.getCell(0).getDateCellValue());
+			if(row.getCell(6).getCellType() == Cell.CELL_TYPE_NUMERIC)
+				vur.setExceed(row.getCell(6).getNumericCellValue());
+			if(row.getCell(3).getCellType() == Cell.CELL_TYPE_NUMERIC)
+				vur.setFuel(row.getCell(3).getNumericCellValue());
+			if(row.getCell(2).getCellType() == Cell.CELL_TYPE_NUMERIC)
+				vur.setIntervalmileage(row.getCell(2).getNumericCellValue());
+			
+			evaluator.evaluateInCell(row.getCell(1)); //Calculate cell 1 's value
+//			Cell cell = evaluator.evaluateInCell(row.getCell(1)); //Calculate cell 1 's value
+//			row.getCell(1).setCellValue(cell.getNumericCellValue());
+			if(row.getCell(1).getCellType() == Cell.CELL_TYPE_NUMERIC)
+				vur.setMileage(row.getCell(1).getNumericCellValue());
+			vur.setRegistrant(row.getCell(8).getStringCellValue());
+			if(row.getCell(5).getCellType() == Cell.CELL_TYPE_NUMERIC)
+				vur.setRemine(row.getCell(5).getNumericCellValue());
+			if(row.getCell(4).getCellType() == Cell.CELL_TYPE_NUMERIC)
+				vur.setSetprice(row.getCell(4).getNumericCellValue());
+			vur.setVid(vp);
+			list.add(vur);
+		}
+		return list;
+	}
+
+	private List<VehicleLevel> getVehicleLevel(XSSFSheet sheet,
+			VehicleProfile vp, Account user) throws Exception{
+		int rowNumber = 0;
+		Iterator<Row> rows = sheet.rowIterator();
+		List<VehicleLevel> list = new ArrayList<VehicleLevel>();
+		while(rows.hasNext()){
+			Row row = null;
+			row = rows.next();
+			if(rowNumber++ < 2)
+				continue;
+			if(row.getLastCellNum() < 6)
+				continue;
+			if(row.getCell(0).getCellType() == Cell.CELL_TYPE_STRING || !DateUtil.isCellDateFormatted(row.getCell(0)))
+				continue;
+			VehicleLevel vlevel = new VehicleLevel();
+			vlevel.setDate(row.getCell(0).getDateCellValue());
+			vlevel.setCarlevel(row.getCell(4).getStringCellValue());
+			vlevel.setCompany(row.getCell(5).getStringCellValue());
+			vlevel.setCreator(user);
+			vlevel.setDescription(row.getCell(2).getStringCellValue());
+			if(row.getCell(1).getCellType() == Cell.CELL_TYPE_NUMERIC)
+				row.getCell(1).setCellType(Cell.CELL_TYPE_STRING);
+			vlevel.setDistance(row.getCell(1).getStringCellValue());
+			vlevel.setRegistrant(row.getCell(6).getStringCellValue());
+			vlevel.setTechlevel(row.getCell(3).getStringCellValue());
+			vlevel.setVid(vp);
+			list.add(vlevel);
+		}
+		return list;
+	}
+
+	private List<VehicleRepairRecord> getVehicleRepairRecords(XSSFSheet sheet, VehicleProfile vp,Account user) throws Exception{
+		int rowNumber = 0; //start at 3
+		Iterator<Row> rows = sheet.rowIterator();
+		List<VehicleRepairRecord> list = new ArrayList<VehicleRepairRecord>();
+		while(rows.hasNext()){
+			Row row = null;
+			if(rowNumber++ < 3){
+				row = rows.next();
+				continue;
+			}
+			row = rows.next();
+			if(row.getLastCellNum() < 5){
+				continue;
+			}
+			if(row.getCell(0).getCellType() != Cell.CELL_TYPE_STRING && DateUtil.isCellDateFormatted(row.getCell(0))){
+				System.out.println("cell is date "+row.getCell(0).toString());
+			}else{
+				System.out.println("cell isn't date"+row.getCell(0).toString());
+				continue;
+			}
+			VehicleRepairRecord vrr = new VehicleRepairRecord();
+			vrr.setCreator(user);
+			vrr.setDescription(row.getCell(2).getStringCellValue());
+			vrr.setRcompany(row.getCell(3).getStringCellValue());
+			vrr.setRdate(row.getCell(0).getDateCellValue());
+			vrr.setRegistrant(row.getCell(4).getStringCellValue());
+			vrr.setRtype(row.getCell(1).getStringCellValue());
+			vrr.setVid(vp);
+			list.add(vrr);
+		}
+		return list;
+	}
+
+	private VehicleTechnicalDetail getVehicleTechnicalDetailFromSheet(
+			XSSFSheet sheet, VehicleProfile vp, VehicleTechnicalDetail vtd) throws Exception{
+		vtd.setVid(vp);
+		vtd.setVtype(sheet.getRow(1).getCell(1).getStringCellValue());
+		vtd.setFactorycode(sheet.getRow(1).getCell(3).getStringCellValue());
+		
+		String factorydateAndMadeIn = sheet.getRow(1).getCell(5).getStringCellValue();
+		String[] fami = factorydateAndMadeIn.split("\\/", -1);
+		if(fami.length>0){
+			if(fami[0].length() > 4){
+				vtd.setFactorydate(HRUtil.parseDate(fami[0], "yyyy-MM-dd"));
+			}
+			if(fami.length == 2)
+				vtd.setMadein(fami[1]);
+			else{
+				String madein = getTickValue(factorydateAndMadeIn)[0];
+				if(madein == null || madein.trim().equals(""))
+					madein="国产";
+				vtd.setMadein(madein);
+			}
+		}
+		
+		vtd.setVincode(sheet.getRow(2).getCell(1).getStringCellValue());
+		vtd.setBasecode(sheet.getRow(2).getCell(3).getStringCellValue());
+		vtd.setVlevel(sheet.getRow(2).getCell(5).getStringCellValue());
+		
+		String[] size = getSize(sheet.getRow(3).getCell(1).getStringCellValue());
+		vtd.setVlength(size[0]);
+		vtd.setVwidth(size[1]);
+		vtd.setVheight(size[2]);
+		vtd.setWeight(sheet.getRow(3).getCell(3).getStringCellValue());
+//		vtd.setSitarrange(sheet.getRow(3).getCell(5).getStringCellValue());
+		vtd.setSitarrange("2+2");
+		
+		sheet.getRow(4).getCell(1).setCellType(Cell.CELL_TYPE_STRING);
+		vtd.setSits(sheet.getRow(4).getCell(1).getStringCellValue());
+		vtd.setDragweight(sheet.getRow(4).getCell(3).getStringCellValue());
+		vtd.setVaxis(sheet.getRow(4).getCell(5).getStringCellValue());
+		
+		vtd.setEnginecode(sheet.getRow(5).getCell(3).getStringCellValue());
+		vtd.setEnginemodel(sheet.getRow(5).getCell(1).getStringCellValue());
+		vtd.setFueltype(sheet.getRow(5).getCell(5).getStringCellValue());
+		
+		vtd.setEnginehorse(sheet.getRow(6).getCell(3).getStringCellValue());
+		vtd.setEnginepower(sheet.getRow(6).getCell(1).getStringCellValue());
+		
+		String release = getTickValue(sheet.getRow(6).getCell(5).getStringCellValue())[0];
+		if(release == null || release.trim().equals("")){
+			release = "国Ⅲ";
+		}
+		vtd.setReleasestandard(release);
+		
+		vtd.setDrivermode(sheet.getRow(7).getCell(1).getStringCellValue());
+		vtd.setTyre(sheet.getRow(7).getCell(3).getStringCellValue());
+//		vtd.setFrontlight(sheet.getRow(7).getCell(5).getStringCellValue());
+		vtd.setFrontlight("四灯制");
+		
+		vtd.setVariatormode(getTickValue(sheet.getRow(8).getCell(1).getStringCellValue())[0]);
+		vtd.setRetarder(getTickValue(sheet.getRow(8).getCell(3).getStringCellValue())[0]);
+		vtd.setTurner(getTickValue(sheet.getRow(8).getCell(5).getStringCellValue())[0]);
+		
+		String breakStr = sheet.getRow(9).getCell(1).getStringCellValue();
+		String breakmode = breakStr.substring(0,breakStr.indexOf("前轮"));
+		String backBreak = breakStr.substring(breakStr.indexOf("后轮：")+3,breakStr.length());
+		
+		vtd.setBreakmode(getTickValue(breakmode)[0]);
+		vtd.setFrontbreak("气囊");
+		vtd.setBackbreakList(Arrays.asList(getTickValue(backBreak)));
+		
+		vtd.setHangmodefront("非独立,气囊");
+		vtd.setHangmodeback("非独立,气囊");
+		vtd.setOtherList(Arrays.asList(getTickValue(sheet.getRow(11).getCell(1).getStringCellValue())));
+		return vtd;
+	}
+
+
+	private String[] getSize(String input) {
+		String[] ar = input.split("：",-1);
+		if(ar.length == 4){
+			String[] size = new String[3];
+			size[0] = HRUtil.removeNoneNumber(ar[1]);
+			size[1] = HRUtil.removeNoneNumber(ar[2]);
+			size[2] = HRUtil.removeNoneNumber(ar[3]);
+			return size;
+		}else{
+			System.out.println("parse size fail:"+input);
+			return new String[]{"","",""};
+		}
+	}
+
+
+	private String[] getTickValue(String input) {
+		char tick = '√';
+		int count = StringUtils.countOccurrencesOf(input, "√");
+		if(count == 0)
+			return new String[]{""};
+		int lastIndex = -1;
+		int firstIndex = -1;
+		List<String> list = new ArrayList<String>();
+		for (int i=input.length()-1; i >= 0 ; i--)
+	    {
+	        if (input.charAt(i) == tick){
+	             for(int j=i-1;j>=0;j--){
+	            	 if(lastIndex == -1 && input.charAt(j) != ' '){
+	            		 lastIndex = j;
+	            	 }else if(lastIndex != -1 && (input.charAt(j) == ' ' || input.charAt(j) == '/' || j==0)){
+	            		 if(j== 0)
+	            			 firstIndex = j;
+	            		 else
+	            			 firstIndex = j+1;
+	            	 }
+	            	 if(lastIndex != -1 && firstIndex != -1){
+	            		 list.add(input.substring(firstIndex,lastIndex+1).trim());
+	            		 firstIndex = -1;
+	            		 lastIndex = -1;
+	            		 i = j;
+	            		 break;
+	            	 }
+	             }
+	        }
+	    }
+		if(list.size() < 1)
+			list.add("");
+		return list.toArray(new String[list.size()]);
+	}
+
+
+	/**
+	 * 获取车辆档案基本资料，Excel的第一页
+	 * @param sheet
+	 * @param vp
+	 * @param vehicleBasicInfo
+	 * @return
+	 * @throws Exception
+	 */
+	private VehicleBasicInfo getVehicleBasicInfoFromSheet(XSSFSheet sheet,
+			VehicleProfile vp, VehicleBasicInfo vbi) throws Exception{
+		vbi.setVid(vp);
+		vbi.setCompanytype(sheet.getRow(9).getCell(1).getStringCellValue());
+		vbi.setMaintenancemile(sheet.getRow(16).getCell(1).getStringCellValue());
+		vbi.setMaster(sheet.getRow(7).getCell(1).getStringCellValue());
+		vbi.setOperatelevel(sheet.getRow(11).getCell(1).getStringCellValue());
+		vbi.setOperatemode(sheet.getRow(10).getCell(1).getStringCellValue());
+		vbi.setOperatenumber(sheet.getRow(8).getCell(1).getStringCellValue());
+		vbi.setOperaterange(sheet.getRow(12).getCell(1).getStringCellValue());
+		vbi.setOperateroute(sheet.getRow(14).getCell(1).getStringCellValue());
+		sheet.getRow(13).getCell(1).setCellType(Cell.CELL_TYPE_STRING);
+		String number = sheet.getRow(13).getCell(1).getStringCellValue();
+		while(number.length() < 9){
+			number = "0"+number;
+		}
+		vbi.setTransportnumber(number);
+		vbi.setSource(sheet.getRow(15).getCell(1).getStringCellValue());
+		return vbi;
+	}
+
+
+	/**
+	 * 获取车辆档案的初始值档案,Excel第一页
+	 * @param sheetAt
+	 * @return
+	 */
+	private VehicleProfile getVehicleProfileFromSheet(XSSFSheet sheet,Account user,String subCompany) throws Exception{
+		VehicleProfile vp = new VehicleProfile();
+		vp.setVid(sheet.getRow(2).getCell(1).getStringCellValue());
+		vp.setVcolor(sheet.getRow(2).getCell(2).getStringCellValue());
+		vp.setRegisterDate(sheet.getRow(2).getCell(3).getDateCellValue());
+		vp.setSubcompany(subCompany);
+		vp.setCreator(user);
+		vp.setStatus(VehicleProfile.statusA);
+		return vp;
+	}
+	
+	private boolean isExcelDate(Cell cell){
+		if(cell.getCellType() == Cell.CELL_TYPE_STRING ){
+			return false;
+		}else if(!DateUtil.isCellDateFormatted(cell)){
+			Date d = null;
+			try{
+				d = cell.getDateCellValue();
+			}catch(Exception e){
+				d= null;
+			}
+			if(d == null){
+				return false;
+			}
+		}
+		return true;
+	}
+}

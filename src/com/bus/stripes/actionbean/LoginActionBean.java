@@ -89,6 +89,7 @@ public class LoginActionBean implements ActionBean{
 		}
 		context.setRoles(roles);
 		}catch(Exception e){
+			e.printStackTrace();
 			System.out.println(e.getMessage());
 		}
 		

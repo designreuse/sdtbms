@@ -10,9 +10,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
+
 
 import com.bus.dto.Account;
 import com.bus.util.HRUtil;
@@ -32,10 +34,17 @@ public class Scorerecord  implements Serializable{
 	private Account creator;
 	private int status;
 	
+	@Transient
+	private int excepStatus;
+	
+	private ScorerecordRemark remark;
+	
 	public static final int APPROVED = 0;
 	public static final int WAITING = 1;
 	public static final int REJECTED = 2;
 	public static final int CREATED = 3;
+	
+
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -106,6 +115,13 @@ public class Scorerecord  implements Serializable{
 		return HRUtil.parseDateToString(scoredate);
 	}
 	
+	@Transient
+	public String getCreatedatestr(){
+		if(createdate == null)
+			return "";
+		return HRUtil.parseDateToString(createdate);
+	}
+	
 	@Column(name="score")
 	public Float getScore() {
 		return score;
@@ -113,10 +129,28 @@ public class Scorerecord  implements Serializable{
 	public void setScore(Float score) {
 		this.score = score;
 	}
+	
+	@Column(name="status")
 	public int getStatus() {
 		return status;
 	}
 	public void setStatus(int status) {
 		this.status = status;
+	}
+	
+	@Transient
+	public int getExcepStatus() {
+		return excepStatus;
+	}
+	public void setExcepStatus(int excepStatus) {
+		this.excepStatus = excepStatus;
+	}
+	@ManyToOne
+	@JoinColumn(name="remarkid",referencedColumnName="id")
+	public ScorerecordRemark getRemark() {
+		return remark;
+	}
+	public void setRemark(ScorerecordRemark remark) {
+		this.remark = remark;
 	}
 }

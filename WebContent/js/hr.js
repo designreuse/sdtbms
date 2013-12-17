@@ -426,7 +426,6 @@ function hrNewDocumentValidation(formid){
 		return false;
 }
 
-
 //验证工号、身份证、邮箱、邮编
 function validate(inputId,checkType,check,errorMsg){
 	var ele = $('#'+inputId);

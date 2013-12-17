@@ -74,7 +74,7 @@ public class ScoredetailActionBean extends CustomActionBean{
 			if(recordDate == null)
 				recordDate = new Date();
 			member = scoreBean.getScoreMemberByWorkerid(workerid);
-			records = scoreBean.getRecords(member,recordDate);
+			records = scoreBean.getRecords(member,recordDate, new Date());
 			return defaultAction();
 		}catch(Exception e){
 			return context.errorResolution("获取员工详细积分错误","请联系管理员."+e.getMessage());
@@ -143,7 +143,8 @@ public class ScoredetailActionBean extends CustomActionBean{
 			return sum;
 		else{
 			for(Scorerecord r:records){
-				sum += r.getScoretype().getScore();
+				if(r != null && r.getScoretype() != null && r.getScoretype().getScore() != null)
+					sum += r.getScoretype().getScore();
 			}
 		}
 		return sum;

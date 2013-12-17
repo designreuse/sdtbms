@@ -81,9 +81,11 @@
 								</li>
 								</ss:secure>
 
+								<ss:secure roles="score_group_edit">
 								<li>
-									<a href="${pageContext.request.contextPath}/actionbean/ScoreGroup.action" title="积分制编组">积分制编组</a>
+									<a href="${pageContext.request.contextPath}/actionbean/ScoreGroup.action" title="积分组编制">积分组编制</a>
 								</li>
+								</ss:secure>
 								
 								<li>
 									<a href="${pageContext.request.contextPath}/actionbean/DepartSum.action" title="部门总结">部门总结</a>

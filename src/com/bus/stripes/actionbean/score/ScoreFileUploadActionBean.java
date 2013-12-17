@@ -43,6 +43,7 @@ public class ScoreFileUploadActionBean extends CustomActionBean{
 	
 	@DefaultHandler
 	public Resolution defaultAction(){
+		if(D) System.out.println("Uploading score file 4");
 		return new ForwardResolution("/score/batchitems.jsp");
 	}
 
@@ -50,17 +51,29 @@ public class ScoreFileUploadActionBean extends CustomActionBean{
 	@Secure(roles=Roles.SCORE_ITEMS_FILE_UPLOAD)
 	public Resolution itemsupload(){
 		try{
+			if(D) System.out.println("Uploading score file 3");
 			if(itemsfile != null){
-				ScoreExcelFileProcessor saver  = new ScoreExcelFileProcessor(((FileInputStream)itemsfile.getInputStream()));
-				String str = saver.saveItems(scoreBean,context.getUser());
-				if(!str.equals("")){
-					return new ForwardResolution("/actionbean/Error.action").addParameter("error", "<span style='color:red;'>出错:某些条例导入失败</span>")
-							.addParameter("description", "这些条例没有被上传:<br/>\n" + str);
+				ExcelScoreUpload saver = new ExcelScoreUpload();
+				if(saver.isExcelFile2007(itemsfile.getFileName())){
+					saver.init((FileInputStream)itemsfile.getInputStream(), true);
+					saver.uploadScoreitems2007(scoreBean, context.getUser());
+				}else if(saver.isExcelFile2003(itemsfile.getFileName())){
+					saver.init((FileInputStream)itemsfile.getInputStream(), false);
+					saver.uploadScoreitems2003(scoreBean, context.getUser());
+				}else{
+					__log("Not excel file");
+					success = -1;
+					msg = "不是Excel文件";
+					return defaultAction();
 				}
+				success = 1;
+				msg = "上传成功";
 			}
-			
 		}catch(Exception e){
 			e.printStackTrace();
+			success = -1;
+			msg = "上传出错"+e.getMessage();
+			return context.errorResolution("上传出错", e.getMessage());
 		}
 		return defaultAction();
 	}
@@ -68,45 +81,67 @@ public class ScoreFileUploadActionBean extends CustomActionBean{
 	@HandlesEvent(value="scoreupload")
 	@Secure(roles=Roles.SCORE_SCORES_FILE_UPLOAD)
 	public Resolution scoreupload(){
-		JsonObject json = new JsonObject();
 		try{
-			//old txt format upload
-//			if(scorefile != null){
-//				ScoreExcelFileProcessor saver  = new ScoreExcelFileProcessor(((FileInputStream)scorefile.getInputStream()));
-//				String str="";
-//				try{
-//					str = saver.saveScores(hrBean,scoreBean,context.getUser());
-//				}catch(Exception e){
-//					str = e.getMessage();
-//				}
-//				if(!str.equals("")){
-//					return new ForwardResolution("/actionbean/Error.action").addParameter("error", "<span style='color:red;'>出错:某些积分导入失败</span>")
-//							.addParameter("description", "分没有被上传:<br/>\n" + str);
-//				}else{
-//					success = 1;
-//				}
-//			}
-			
-			//New excel Format upload
+			if(D) System.out.println("Uploading score file 2");
 			if(scorefile != null){
 				ExcelScoreUpload saver  = new ExcelScoreUpload();
 				if(saver.isExcelFile2007(scorefile.getFileName())){
-					System.out.println("Is excel 2007 file");
+					__log("Is excel 2007 file");
 					saver.init(((FileInputStream)scorefile.getInputStream()),true);
 					saver.saveScore2007(hrBean,scoreBean,context.getUser());
 				}else if(saver.isExcelFile2003(scorefile.getFileName())){
-					System.out.println("Is excel 2003 file");
+					__log("Is excel 2003 file");
 					saver.init(((FileInputStream)scorefile.getInputStream()),false);
 					saver.saveScore2003(hrBean,scoreBean,context.getUser());
 				}else{
-					System.out.println("Not excel file");
+					__log("Not excel file");
+					success = -1;
+					msg = "不是Excel文件";
+					return defaultAction();
 				}
 			}
 			success = 1;
 			msg = "上传成功";
 		}catch(Exception e){
 			e.printStackTrace();
+			success = -1;
+			msg = "上传出错"+e.getMessage();
 			return context.errorResolution("上传出错", e.getMessage());
+		}
+		return defaultAction();
+	}
+	
+	@HandlesEvent(value="driverScoreFileUpload")
+	@Secure(roles = Roles.SCORE_SCORES_FILE_UPLOAD)
+	public Resolution driverScoreFileUpload(){
+		try{
+			if(D) System.out.println("Uploading score file");
+			if(scorefile != null){
+				ExcelScoreUpload saver  = new ExcelScoreUpload();
+				if(saver.isExcelFile2007(scorefile.getFileName())){
+					saver.init(((FileInputStream)scorefile.getInputStream()),true);
+					saver.saveDriverScore2007(hrBean,scoreBean,context.getUser());
+					success = 1;
+					msg = "上传成功";
+				}else if(saver.isExcelFile2003(scorefile.getFileName())){
+					saver.init(((FileInputStream)scorefile.getInputStream()),false);
+					saver.saveDriverScore2003(hrBean,scoreBean,context.getUser());
+					success = 1;
+					msg = "上传成功";
+				}else{
+					System.out.println("Not excel file");
+					success = -1;
+					msg = "不是Excel文件";
+				}
+			}else{
+				success = -1;
+				msg = "没有文件上传";
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+			success = -1;
+			msg = "上传出错.<br/>"+e.getMessage();
+			return context.errorResolution("上传出错", msg);
 		}
 		return defaultAction();
 	}

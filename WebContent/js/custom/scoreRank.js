@@ -1,0 +1,46 @@
+$(document).ready(function(){
+    $(".datepickerClass").datepicker({
+    	changeMonth: true,
+		changeYear: true,
+		dateFormat: 'yy-mm-dd' 
+    });
+
+    $('#empSearchBox .searchBtn').click(function(){
+		var name = $('#empSearchBox input').eq(0).val();
+		var workerid =$('#empSearchBox input').eq(1).val();
+		var link = $('#formSearch').attr('action');
+		var params = "name="+name+"&workerid="+workerid+"&getMembers=";
+		$.ajax({
+			url:link, dataType:'text', type:'post',data:params,
+			success:function(response){
+				var json = $.parseJSON(response);
+				if(json.result == "0"){
+					alert(json.msg);
+				}else if(json.result == "1"){
+					var html = "<ul>";
+					var jArray = json.data;
+					for(var i=0; i<jArray.length;i++){
+						html += "<li>" +
+							"<a href='/bms/actionbean/Empscore.action?memberDetail=&workerid="+jArray[i].workerid+"'> " +
+								jArray[i].name + "---" + jArray[i].workerid + "</a>" + 
+							"</li>";
+					}
+					html += "</ul>";
+					$('#empResult').html(html);
+				}
+			}
+		});
+    });
+    
+    $('#scoreGroupSelect').hide();
+    $('#scoreMasterGroupSelect').change(function(){
+    	var val = $('#scoreMasterGroupSelect').val();
+    	if(val == 4)
+    		$('#scoreGroupSelect').show();
+    	else{
+    		$('#scoreGroupSelect').val("");
+    		$('#scoreGroupSelect').hide();
+    	}
+    });
+    $('#scoreMasterGroupSelect').change();
+});

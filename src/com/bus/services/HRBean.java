@@ -66,8 +66,6 @@ public class HRBean{
 	}
 
 	public Account login(Account account) {
-		// String pass = HRUtil.getStringMD5(account.getPassword() +
-		// accountKey);
 		Account acc;
 		try {
 			acc = (Account) em
@@ -80,7 +78,7 @@ public class HRBean{
 			}
 			return acc;
 		} catch (Exception e) {
-			// e.printStackTrace();
+			 e.printStackTrace();
 			System.out.println("No user found");
 			return new Account();
 		}
@@ -1124,7 +1122,19 @@ public class HRBean{
 	public List<Department> getAllActiveDepartment() throws Exception{
 		String statement = "SELECT distinct department.id AS id, department.name AS name, department.remark AS remark, department.pid AS pid" +
 				" FROM employee JOIN department ON employee.departmentid = department.id " +
-				" WHERE employee.status='A' AND department.pid IS NULL ORDER BY department.name";
+				" WHERE employee.status='A' AND department.pid IS NULL ORDER BY department.name ";
+		List<Department> departments = em.createNativeQuery(statement, Department.class).getResultList();
+		return departments;
+	}
+
+	/**
+	 * Get all active departments. by native query
+	 * @return
+	 */
+	public List<Department> getAllActiveDepartmentWithChildren() throws Exception{
+		String statement = "SELECT distinct department.id AS id, department.name AS name, department.remark AS remark, department.pid AS pid" +
+				" FROM employee JOIN department ON employee.departmentid = department.id " +
+				" WHERE employee.status='A' ORDER BY department.id ASC ";
 		List<Department> departments = em.createNativeQuery(statement, Department.class).getResultList();
 		return departments;
 	}
@@ -1253,6 +1263,23 @@ public class HRBean{
 	public void deleteQualification(String optionlistselectedvalue) throws Exception {
 		Qualification q  = em.find(Qualification.class,Integer.parseInt(optionlistselectedvalue));
 		em.remove(q);
+	}
+	
+	
+	/**
+	 * 添加民族
+	 * @param et
+	 * @throws Exception
+	 */
+	@Transactional(rollbackFor=Exception.class)
+	public void saveEthnic(Ethnic et) throws Exception{
+		em.persist(et);
+	}
+
+	@Transactional(rollbackFor=Exception.class)
+	public void deleteEthnic(String optionlistselectedvalue) throws Exception {
+		Ethnic et  = em.find(Ethnic.class,Integer.parseInt(optionlistselectedvalue));
+		em.remove(et);
 	}
 
 }

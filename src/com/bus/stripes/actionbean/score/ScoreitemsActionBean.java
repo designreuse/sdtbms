@@ -13,6 +13,7 @@ import com.bus.dto.Accountgroup;
 import com.bus.dto.Action;
 import com.bus.dto.Actiongroup;
 import com.bus.dto.Employee;
+import com.bus.dto.score.ScorerecordRemark;
 import com.bus.dto.score.Scoresheets;
 import com.bus.dto.score.Scoretype;
 import com.bus.services.AccountBean;
@@ -40,27 +41,22 @@ import net.sourceforge.stripes.integration.spring.SpringBean;
 public class ScoreitemsActionBean extends CustomActionBean {
 
 	private HRBean hrBean;
-	public HRBean getHrBean() {
-		return hrBean;
-	}
+	public HRBean getHrBean() {return hrBean;}
 	@SpringBean
-	public void setHrBean(HRBean bean) {
-		this.hrBean = bean;
-	}
+	public void setHrBean(HRBean bean) {this.hrBean = bean;}
+	
 	private ScoreBean scoreBean;
-	public ScoreBean getScoreBean() {
-		return this.scoreBean;
-	}
-
+	public ScoreBean getScoreBean() {return this.scoreBean;}
 	@SpringBean
-	public void setScoreBean(ScoreBean bean) {
-		this.scoreBean = bean;
-	}
+	public void setScoreBean(ScoreBean bean) {this.scoreBean = bean;}
 
 	private Scoretype scoretype;
 	private List<Scoretype> scoretypes;
 	private List<Scoretype> selectedScoreTypes;
 	private List<Float> selectedScores;
+	
+
+	private List<ScorerecordRemark> recordRemark;  //积分注释
 	private List<Scoresheets> sheetList;
 	private String itemlist;
 	private ScoreitemSelector selector;
@@ -130,12 +126,6 @@ public class ScoreitemsActionBean extends CustomActionBean {
 		ForwardResolution fr = new ForwardResolution("/score/items.jsp");
 		fr.addParameter("pagenum", pagenum);
 		fr.addParameter("lotsize", lotsize);
-//		String receiverWorkerids = context.getRequest().getParameter(
-//				"receiverWorkerids");
-//		String receivers = context.getRequest().getParameter(
-//				"receivers");
-//		fr.addParameter("receiverWorkerids", receiverWorkerids);
-//		fr.addParameter("receivers", receivers);
 		return fr;
 	}
 
@@ -204,8 +194,6 @@ public class ScoreitemsActionBean extends CustomActionBean {
 		}
 		try {
 			String[] receiversArray = receiverWorkerids.split(",", -1);
-//			if (selectedScoreTypes.size() > 1)
-//				score = 0F;
 			
 			//检查是否这个部门今周的第一条奖分，是的话重设管理人员数目*部门基础分的总分值
 			List<Employee> scorers = new ArrayList<Employee>();
@@ -220,7 +208,6 @@ public class ScoreitemsActionBean extends CustomActionBean {
 			Employee curUser = hrBean.getEmployeeByWorkerId(context.getUser().getEmployee());
 			//如果员工不是审核人，应该检查是否有权限打分给其它员工
 			if(!scoreBean.isUserScoreApprover(curUser)){
-//				System.out.println("非审核人");
 				for(Employee e:scorers){
 					if(!scoreBean.checkEmployeeAllowToScore(e,curUser)){
 						nameList += e.getFullname()+",";
@@ -228,11 +215,9 @@ public class ScoreitemsActionBean extends CustomActionBean {
 				}
 				if(!nameList.equals("")){
 					json.addProperty("result", "0");
-					json.addProperty("msg", "没有权限分配分值给这些员工 :"+nameList);
+					json.addProperty("msg", "没有权限分配分值给这些员工,或者这些员工没有参加积分制 :"+nameList);
 					return new StreamingResolution("text/charset=utf-8;",json.toString());
 				}
-			}else{
-//				System.out.println("审核人");
 			}
 			
 			
@@ -246,9 +231,7 @@ public class ScoreitemsActionBean extends CustomActionBean {
 			for (Employee worker : scorers) {
 				scorer = worker;
 				if (!scoreBean.isScoreMemberExist(employee.getWorkerid())) {
-					if (hrBean.isWorkerExist(employee))
-						scoreBean
-								.createScoreMember(context.getUser(), employee);
+					scoreBean.createScoreMember(context.getUser(), employee);
 				}
 				if (!scoreBean.isScoreMemberExist(scorer.getWorkerid())) {
 					scoreBean.createScoreMember(context.getUser(), scorer);
@@ -257,11 +240,20 @@ public class ScoreitemsActionBean extends CustomActionBean {
 					scoredate = Calendar.getInstance().getTime();
 				}
 				countItems = 0;
+				
+
 				for(int i=0; i<selectedScoreTypes.size();i++){
-					if (selectedScoreTypes.get(i) != null && selectedScoreTypes.get(i).getId() != null) {
-						scoreBean.assignScoreTypeToScoreMember(
-								context.getUser(), employee.getWorkerid(),
-								scorer.getWorkerid(), selectedScoreTypes.get(i), scoredate, selectedScores.get(i));
+					if (selectedScoreTypes.get(i) != null && selectedScoreTypes.get(i).getId() != null ) {
+						if (recordRemark !=null && i < recordRemark.size()){					
+							scoreBean.assignScoreTypeToScoreMember(
+									context.getUser(), employee.getWorkerid(),
+									scorer.getWorkerid(), selectedScoreTypes.get(i), scoredate, selectedScores.get(i),recordRemark.get(i));
+						}
+						else{
+							scoreBean.assignScoreTypeToScoreMember(
+									context.getUser(), employee.getWorkerid(),
+									scorer.getWorkerid(), selectedScoreTypes.get(i), scoredate, selectedScores.get(i),null);
+						}				    
 						countItems ++;
 					}
 				}
@@ -274,6 +266,7 @@ public class ScoreitemsActionBean extends CustomActionBean {
 			json.addProperty("result", "0");json.addProperty("msg", "打分错误，"+"错误信息:"+e.getMessage());
 			json.addProperty("detail", e.getMessage());
 		}
+		
 		return new StreamingResolution("text/charset=utf-8;",json.toString());
 	}
 
@@ -489,4 +482,11 @@ public class ScoreitemsActionBean extends CustomActionBean {
 	public void setSelectedScores(List<Float> selectedScores) {
 		this.selectedScores = selectedScores;
 	}
+	public List<ScorerecordRemark> getRecordRemark() {
+		return recordRemark;
+	}
+	public void setRecordRemark(List<ScorerecordRemark> recordRemark) {
+		this.recordRemark = recordRemark;
+	}
+
 }

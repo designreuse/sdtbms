@@ -51,6 +51,7 @@ public class Employee implements Serializable{
 	private String homeaddress;
 	private String postcode;
 	private String marriage;
+	private String healthstatus;  //健康状况
 	private String qualification;
 	private Date firstworktime;
 	private String workertype;
@@ -96,6 +97,7 @@ public class Employee implements Serializable{
 		this.homeaddress = e.getHomeaddress();
 		this.postcode = e.getPostcode();
 		this.marriage = e.getMarriage();
+		this.healthstatus = e.getHealthstatus(); //健康状况
 		this.qualification = e.getQualification();
 		this.firstworktime = e.getFirstworktime();
 		this.workertype = e.getWorkertype();
@@ -311,6 +313,15 @@ public class Employee implements Serializable{
 
 	public void setMarriage(String marriage) {
 		this.marriage = marriage;
+	}
+	
+	@Column(name="healthstatus",length=8)
+	public String getHealthstatus() {
+		return healthstatus;
+	}
+
+	public void setHealthstatus(String healthstatus) {
+		this.healthstatus = healthstatus;
 	}
 
 	@Column(name="qualification",length=16)

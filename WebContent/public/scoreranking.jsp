@@ -9,122 +9,64 @@
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/ui/ui.core.js"></script>
 <%-- <script type="text/javascript" src="${pageContext.request.contextPath}/js/score.js"></script> --%>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/ui/ui.datepicker.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/custom/scoreRank.js"></script>
 <link href="${pageContext.request.contextPath}/css/ui/ui.base.css" rel="stylesheet" media="all" />   
 <link href="${pageContext.request.contextPath}/css/custom_general.css" rel="stylesheet" media="all" />
+<link href="${pageContext.request.contextPath}/css/custom/scoreRank.css" rel="stylesheet" media="all" />   
 <title>员工积分详细查看</title>
 
-<style>
-.title{
-font-size:46px;
-font-weight:bold;
-color:#FF0000;
-padding:10px;
-text-align:center;
-}
-
-.searchdivsummary{
-text-align:center;
-}
-
-.searchdiv{
-padding-top:10px;
-padding-bottom:10px;
-}
-
-.data table{
-font-size:18px;
-}
-
-.data table thead th{
-padding:20px;
-font-size:25px;
-text-align:center;
-color:RGB(71,75,163);
-border-bottom: 1px solid black !important;
-}
-
-.data table tbody td{
-padding:10px;
-text-align:center;
-border-bottom: 1px solid black !important;
-}
-
-.data table tbody tr:hover{
-background-color: yellow;
-}
-
-.highlight{
-font-weight: bold;
-color:purple;
-}
-
-.rank{
-color:red;
-font-style:italic;
-font-weight:bold;
-}
-</style>
 </head>
 <body>
-<script type="text/javascript">
-$(document).ready(function(){
-    $(".datepickerClass").datepicker({
-    	changeMonth: true,
-		changeYear: true,
-		dateFormat: 'yy-mm-dd' 
-    });
-
-});
-</script>
-<div class="maincontent">
-	<div class="title">积分排名查询</div>
-	<hr/>
-	<div class="searchdivsummary">
-		<stripes:form beanclass="com.bus.stripes.actionbean.score.ScoreViewPublicActionBean">
-			<div class="searchdiv">
-				选择日期:<stripes:text name="scoreSelector.recordDate" formatPattern="yyyy-MM-dd" class="datepickerClass"/>&nbsp;&nbsp;&nbsp;
-				<stripes:radio value="0" name="scoreSelector.selecttype"/>按历史总分排
-				<stripes:radio value="1" name="scoreSelector.selecttype"/>按年总分排
-				<stripes:radio value="2" name="scoreSelector.selecttype"/>按月总分排
-			</div>
-			<div class="searchdiv">
-				分值类型:<stripes:select name="scoreSelector.scoretype">
-					<stripes:option value="0">临时分</stripes:option>
-					<stripes:option value="1">固定分</stripes:option>
-					<stripes:option value="2">绩效分</stripes:option>
-					<stripes:option value="3">总分</stripes:option>
-				</stripes:select>
-			</div>
-			<div class="searchdiv">
-				自选时间段:<stripes:text name="scoreSelector.recordStartDate" formatPattern="yyyy-MM-dd" class="datepickerClass"/>-->
-				<stripes:text name="scoreSelector.recordEndDate" formatPattern="yyyy-MM-dd" class="datepickerClass"/>
-			</div>
-			<div class="searchdiv">
-				部门:<stripes:select name="scoreSelector.department"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.departments}" label="label" value="value"/></stripes:select>
-				职位:<stripes:text name="scoreSelector.position"/>
-<%-- 				分组:<stripes:select name="scoreSelector.selectedGroup"><stripes:option value="">不限....</stripes:option><stripes:options-collection collection="${actionBean.scoregroups}" label="name" value="id"/></stripes:select> --%>
-				分组:<stripes:select name="scoreSelector.rankGroup">
+<div id="empSearchBox">
+		名称:<input type="text" name="name"/><br/>
+		工号:<input type="text" name="workerid"/><br/>
+		<button id="findEmp" class="searchBtn">查找</button>
+		<div id="empResult">
+			
+		</div>
+</div>
+<div id="maincontent">
+	<div id="title"><div id="imageTitle"></div><span class='nameTitle'>积分排名查询</span></div>
+	<stripes:form id="formSearch" beanclass="com.bus.stripes.actionbean.score.ScoreViewPublicActionBean">
+	<div id="nav">
+		<div class="backToScoreSystem"><a href="${pageContext.request.contextPath}/actionbean/Scoreitems.action">点击返回系统</a></div>
+		分组:
+		<stripes:select name="scoreSelector.rankGroup" id="scoreMasterGroupSelect">
 					<stripes:option value="0">主任级</stripes:option>
 					<stripes:option value="1">管理人员</stripes:option>
-					<stripes:option value="2">维修工</stripes:option>
+<%-- 					<stripes:option value="2">维修工</stripes:option> --%>
 					<stripes:option value="3">服务员</stripes:option>
 					<stripes:option value="4">驾驶员</stripes:option>
-				</stripes:select>
-			</div>
-			<div class="searchdiv">
-				顺序:<stripes:radio value="0" name="scoreSelector.order"/>高到底
-				<stripes:radio value="1" name="scoreSelector.order"/>低到高
-				<stripes:submit name="getRankingRecords" value="提交"/>&nbsp;&nbsp;<stripes:submit name="getRankingRecordsInTimeRange" value="按自选时间段提交"/>
-			</div>
-		</stripes:form>		
+					<stripes:option value="5">车队长</stripes:option>
+		</stripes:select>
+		<stripes:select name="scoreSelector.scoreGroup" id="scoreGroupSelect">
+				<stripes:option value=""></stripes:option>
+				<stripes:options-collection collection="${actionBean.scoreGroups}" value="id" label="name"/>
+		</stripes:select>
+		日期(从):<stripes:text name="scoreSelector.recordStartDate" formatPattern="yyyy-MM-dd" class="datepickerClass"/>
+				(到):<stripes:text name="scoreSelector.recordEndDate" formatPattern="yyyy-MM-dd" class="datepickerClass"/>
+		<stripes:submit name="ranking" class="searchBtn" value="排名搜索"/>
 	</div>
-	<hr/>
+	<div>
+		分值类型:
+		<stripes:select name="scoreSelector.scoretype">
+			<stripes:option value="0">临时分</stripes:option>
+			<stripes:option value="1">固定分</stripes:option>
+			<stripes:option value="2">绩效分</stripes:option>
+			<stripes:option value="3">总分</stripes:option>
+		</stripes:select>
+		顺序:
+		<stripes:radio value="0" name="scoreSelector.order"/>高到底
+		<stripes:radio value="1" name="scoreSelector.order"/>低到高
+	</div>
+	</stripes:form>
 	
 	<div class="data">
 								<table>
 									<thead>
 										<tr>
 											<th>排名</th>
+											<th>百分比</th>
 											<th>工号</th>
 											<th>姓名</th>
 											<th>工龄</th>
@@ -146,7 +88,8 @@ $(document).ready(function(){
 												<tr class="alt">
 												</c:otherwise>
 											</c:choose>
-												<td class="rank">${summary.rank}</td>
+												<td class="rank"><strong>${summary.rank}</strong></td>
+												<td class="rank">${summary.percent}%</td>
 												<td>${summary.workerid}</td>
 												<td><a href="/bms/actionbean/Empscore.action?memberDetail=&workerid=${summary.workerid}">${summary.name}</a></td>
 												<td>${summary.workage}</td>

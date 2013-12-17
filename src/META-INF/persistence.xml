@@ -4,12 +4,11 @@
     xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
    http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
     version="2.0">
- 
-<persistence-unit name="shundebuspersistenceunit" transaction-type="RESOURCE_LOCAL">
-	<!--     <exclude-unlisted-classes>false</exclude-unlisted-classes> -->
-	 <provider>org.hibernate.ejb.HibernatePersistence</provider>
-<!-- 	<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider> -->
-
+ <persistence-unit name="shundebuspersistenceunit" transaction-type="RESOURCE_LOCAL">
+<!-- <persistence-unit name="shundebuspersistenceunit" transaction-type="JTA"> -->
+    <provider>org.hibernate.ejb.HibernatePersistence</provider>
+    <non-jta-data-source>java:/jdbc/sdbms</non-jta-data-source>
+<!-- 	 <jar-file>models.jar</jar-file> -->
 <!--  <jta-data-source>sdbms</jta-data-source>     -->
  <class>com.bus.dto.Employee</class>
  <class>com.bus.dto.Account</class>
@@ -45,6 +44,7 @@
  <class>com.bus.dto.score.ScoreExceptionList</class>
  <class>com.bus.dto.score.ScoreDivGroup</class>
  <class>com.bus.dto.score.ScoreGroupMapper</class>
+ <class>com.bus.dto.score.ScorerecordRemark</class>
  
  
  <class>com.bus.dto.application.ApplicationIdCards</class>
@@ -81,15 +81,13 @@
 
  
  <class>com.bus.dto.common.ContractImg</class>
-
+ 
  <properties>
+  <property name="hibernate.archive.autodetection" value="class, hbm" />
   <property name="hibernate.show_sql" value="false" />
   <property name="hibernate.format_sql" value="true" />
-  <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-  <property name="hibernate.connection.url" value="jdbc:postgresql://localhost/sdbms"/>
-  <property name="hibernate.connection.username" value="postgres"/>
-  <property name="hibernate.connection.password" value="root"/>
   <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
+  <property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform" />
 <!--   <property name="hibernate.hbm2ddl.auto" value="create" /> -->
 <!--   <property name="hibernate…flush_before_completion" value="true"/> -->
   <property name="hibernate.c3p0.min_size" value="5" />

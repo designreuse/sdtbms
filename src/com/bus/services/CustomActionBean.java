@@ -14,6 +14,7 @@ import net.sourceforge.stripes.integration.spring.SpringBean;
 
 public class CustomActionBean implements ActionBean,Permission{
 
+	protected final static boolean D = true;
 	protected MyActionBeanContext context;
 	public MyActionBeanContext getContext() { return context; }
 	public void setContext(ActionBeanContext context) { this.context = (MyActionBeanContext)context; }
@@ -43,4 +44,14 @@ public class CustomActionBean implements ActionBean,Permission{
 			return false;
 		}
 	}
+	
+	public void __log(String str){
+		if(D) System.out.println(str);
+	}
+	
+	public static boolean isD() {
+		return D;
+	}
+	
+	
 }

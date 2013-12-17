@@ -17,6 +17,7 @@ import com.bus.dto.Department;
 import com.bus.dto.Employee;
 import com.bus.dto.Idmanagement;
 import com.bus.dto.vehicleprofile.VehicleTeam;
+import com.bus.scheduler.SimpleExample;
 import com.bus.services.CustomActionBean;
 import com.bus.services.HRBean;
 import com.bus.stripes.selector.EmployeeSelector;
@@ -76,6 +77,8 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 	private List<SelectBoxOption> placebelongs;
 	private List<SelectBoxOption> typeoptions;
 	
+	private List<SelectBoxOption> healthstatus; // 健康状态
+	
 	private Contract empContract; //Inside new employee dialog
 	
 	private List<String> idcardtype;
@@ -127,6 +130,11 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 	public List<SelectBoxOption> getQualification() {
 		return qualification;
 	}
+	
+	public List<SelectBoxOption> getHealthstatus() {
+		return healthstatus;
+	}
+	
 	public List<SelectBoxOption> getDepartment() {
 		return department;
 	}
@@ -178,6 +186,8 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 		this.specialPeople = SelectBoxOptions.getSelectBoxFromFixOptions(bean.getOptionListById(8));
 		this.placebelongs = SelectBoxOptions.getSelectBoxFromFixOptions(bean.getOptionListById(9));
 		
+		this.healthstatus = SelectBoxOptions.getSelectBoxFromFixOptions(bean.getOptionListById(10)); //健康状况
+		
 		this.setDriverteams(bean.getAllVehicleTeams());
 		
 		typeoptions = SelectBoxOptions.getSelectBoxFromFixOptions(bean.getOptionListById(7));
@@ -214,7 +224,6 @@ public class EmployeeActionBean extends CustomActionBean implements ValidationEr
 	public Resolution defaultAction(){
 		loadOptionList();
 		initData();
-//		employee = TestData.getEmployeeTestData();
 		return new ForwardResolution("/hr/employee.jsp").addParameter("pagenum", pagenum);
 	}
 	

@@ -12,10 +12,10 @@ public class ScoreitemSelector implements BMSSelector{
 		int set = 0;
 		String query = "";
 		if(itemlist != null){
-			query = "SELECT distinct q FROM Scoretype q, Scoresheetmapper m,Scoresheets s WHERE (m.sheet.id="+itemlist+" OR (s.id="+ itemlist+ " AND m.sheet.id=s.parent.id)) AND q.id=m.type.id ";
+			query = "SELECT distinct q FROM Scoretype q, Scoresheetmapper m,Scoresheets s WHERE q.status=1 AND (m.sheet.id="+itemlist+" OR (s.id="+ itemlist+ " AND m.sheet.id=s.parent.id)) AND q.id=m.type.id ";
 			set++;
 		}else
-			query = "SELECT q FROM Scoretype q  WHERE ";
+			query = "SELECT q FROM Scoretype q  WHERE q.status=1 AND ";
 		if(reference != null){
 			if(set > 0)
 				query += " AND";

@@ -1,0 +1,46 @@
+.selector{
+	font-size:15px;
+	color:rgb(153, 23, 23);
+}
+
+/*
+Datepicker 相关
+*/
+.ui-datepicker{
+	z-index : 99999 !important;	
+}
+
+.ui-datepicker-calendar{
+	width:200px !important;	
+}
+
+.ui-datepicker-calendar td{
+	width:15px;
+	height:15px;
+	padding:2px;
+}
+
+.ui-datepicker-calendar th{
+	width:25px;
+	height:20px;
+	padding:2px;
+}
+
+.ui-datepicker>div>a>span.ui-icon{
+	display:inline !important;
+}
+
+
+#page-header, #page-header #page-header-wrapper, #page-header #page-header-wrapper #navigation {
+    z-index: 999 !important;
+}
+
+/*
+居中Content里的自拟定标题用
+*/
+div.mainContentTitle{
+	text-align: center;
+	font-size: 20pt;
+	color: red;
+	font-weight: bold;
+}

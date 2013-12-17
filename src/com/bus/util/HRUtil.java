@@ -101,7 +101,7 @@ public class HRUtil {
 	 */
 	public static String parseDateToString(Date date){
 		if(date == null)
-			return "";
+			return HRUtil.parseDateToString(new Date());
 		Calendar c = Calendar.getInstance();
 		c.setTime(date);
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -176,7 +176,17 @@ public class HRUtil {
 		  int targetWeek = targetCalendar.get(Calendar.WEEK_OF_YEAR);
 		  int targetYear = targetCalendar.get(Calendar.YEAR);
 		  return week == targetWeek && year == targetYear;
-		}
+	}
+	
+	/**
+	 * 返回今个星期的第一天日期
+	 * @return
+	 */
+	public static Date getFirstDateForCurrentWeek(){
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_WEEK,cal.getFirstDayOfWeek());
+		return cal.getTime();
+	}
 	
 	/**
 	 * 排序一个Map对象。对他们的值进行排序，不是key

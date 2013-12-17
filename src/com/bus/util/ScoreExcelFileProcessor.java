@@ -77,18 +77,4 @@ public class ScoreExcelFileProcessor extends ExcelFileProcessor {
 		return str;
 	}
 
-	/**
-	 * Return "" if no errors, else will be written inside the returned string.
-	 * <br/> need 7 columns
-	 * <br/>id, scoredate, reference, nameOfSender, workeridOfSender, nameOfReceiver, workeridOfReceiver, [score]
-	 * @param hrBean
-	 * @param scoreBean
-	 * @param user
-	 * @return
-	 */
-	public String saveScores(HRBean hrBean, ScoreBean scoreBean, Account user) throws Exception {
-		String str = scoreBean.saveMassScores(this,hrBean,user);
-		return str;
-	}
-
 }

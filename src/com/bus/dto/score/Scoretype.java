@@ -31,18 +31,22 @@ public class Scoretype  implements Serializable{
 	public final static String SCORE_TYPE_PERFORMENCE_STR = "绩效";
 	public final static int SCORE_TYPE_PROJECT = 3;
 	public final static String SCORE_TYPE_PROJECT_STR = "项目";
+	public final static int DELETED = 0;
+	public final static int ACTIVE = 1;
 	
 	private Integer id;
 	private Date createdate;
 	private Float score;
 	private String description;
 	private Integer type;
+	
 	private Account account;
 	private String reference;
 	private String period;
 	private String examine; 
 	private String scoreobject;
 	private String remark;
+	private Integer status=1;
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -142,5 +146,12 @@ public class Scoretype  implements Serializable{
 	}
 	public void setRemark(String remark) {
 		this.remark = remark;
+	}
+	@Column(name="status")
+	public Integer getStatus() {
+		return status;
+	}
+	public void setStatus(Integer status) {
+		this.status = status;
 	}
 }

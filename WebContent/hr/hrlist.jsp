@@ -59,6 +59,7 @@
 								<tr class="alt">
 							</c:otherwise>
 						</c:choose>
+						<tr>
 							<td>${opt.name}<input type="hidden" name="optionlistid" value="${opt.id}"/></td>
 							<td><stripes:select name="optionlistselectedvalue"><stripes:options-collection collection="${opt.optionList}" label="label" value="value"/></stripes:select></td>
 							<td><stripes:text name="optionlistnewdata"/></td>
@@ -107,6 +108,24 @@
 							</td>
 					</tr>
 					</stripes:form>
+					
+					<stripes:form beanclass="com.bus.stripes.actionbean.HRListEditorActionBean">
+					<tr>
+						<td>民族</td>
+							<td><stripes:select name="optionlistselectedvalue"><stripes:options-collection collection="${actionBean.ethnics}" label="name" value="id"/></stripes:select></td>
+							<td><stripes:text name="optionlistnewdata"/></td>
+							<td>
+								<ss:secure roles="employee_property_list_rm">
+								<stripes:submit name="deleteEthnic" value="删除"/>
+								</ss:secure>
+								
+								<ss:secure roles="employee_property_list_add">
+								<stripes:submit name="createEthnic" value="添加"/>
+								</ss:secure>
+							</td>
+					</tr>
+					</stripes:form>
+					
 					</tbody>
 				</table>
 				</div>

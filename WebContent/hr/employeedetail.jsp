@@ -184,10 +184,10 @@ label.tabSubTitle{
 						</tr>
 						<tr>
 							<td rowspan=1>姓名:</td><td rowspan=1><stripes:text name="employee.fullname"/></td>
-							<td colspan=2 rowspan=9 style="text-align: center;vertical-align:none;">
+							<td colspan=2 rowspan=8 style="text-align: center;vertical-align:none;">
 								<div>
 									<stripes:hidden name="employee.id"/>
-									<img src="${actionBean.context.hrhostidfile}profilepic/${actionBean.employee.image.name}" height="240px" width="180px" alt="读取失败" />
+									<img src="${actionBean.context.hrhostidfile}profilepic/${actionBean.employee.image.name}" height="210px" width="180px" alt="读取失败" />
 								</div>
 							</td>
 						</tr>
@@ -198,7 +198,7 @@ label.tabSubTitle{
 						<tr><td>出生年月:</td><td><stripes:text name="employee.dob"  formatPattern="yyyy-MM-dd" class="datepickerClass"/></td></tr>
 						<tr><td>身份证:</td><td><stripes:text name="employee.identitycode"/></td></tr>
 						<tr><td>婚姻状况:</td><td><stripes:select name="employee.marriage"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.marriage}" label="label" value="value"/></stripes:select></td></tr>
-						<tr><td>手机号码:</td><td><stripes:text name="employee.mobilenumber"/></td></tr>
+						<tr><td>手机号码:</td><td><stripes:text name="employee.mobilenumber"/></td><td>健康状况:</td><td><stripes:select name="employee.healthstatus"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.healthstatus}" label="label" value="value"/></stripes:select></td></tr>
 						<tr>
 							<td>民族:</td><td><stripes:select name="employee.ethnic"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.ethnic}" label="label" value="value"/></stripes:select></td>
 							<td>政治面貌:</td><td><stripes:select name="employee.politicalstatus"><stripes:option value="">请选择....</stripes:option><stripes:options-collection collection="${actionBean.politicalStatus}" label="label" value="value"/></stripes:select></td>

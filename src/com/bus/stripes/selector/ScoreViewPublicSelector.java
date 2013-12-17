@@ -21,37 +21,73 @@ public class ScoreViewPublicSelector implements BMSSelector{
 	public static final int RANK_WEI_XIU_GONG = 2;
 	public static final int RANK_FU_WU_YUAN = 3;
 	public static final int RANK_JIA_SHI_YUAN = 4;
-	
-	private Date recordDate;
+	public static final int RANK_CHE_DUI_ZHANG = 5;
 	
 	private Date recordStartDate;
 	private Date recordEndDate;
-	private Integer selecttype;
 	private Integer scoretype;
 	private Integer order;
 	private Integer rankGroup;
-	
-	private Integer selectedGroup;
-	
-	private Integer department;
-	private String position;
+	private Integer scoreGroup;
 	
 	@Override
 	public String getSelectorStatement() {
-		if(recordDate == null){
-			recordDate = new Date();
+		if(recordStartDate == null){
+			try{
+				Calendar cal = Calendar.getInstance();
+				cal.set(Calendar.WEEK_OF_YEAR,1);
+				cal.set(Calendar.DAY_OF_WEEK,1);
+				recordStartDate = cal.getTime();
+			}catch(Exception e){
+				recordStartDate = Calendar.getInstance().getTime();
+			}
 		}
-		Calendar c = Calendar.getInstance();
-		c.setTime(recordDate);
+		if(recordEndDate == null){
+			recordEndDate = Calendar.getInstance().getTime();
+		}
+		if(rankGroup == null){
+			rankGroup = 4;
+		}
 		String scoretypeselection = getScoreTypeQuery();
-		String query = "SELECT scoresummary.workerid AS workercode,SUM(fixscore) AS fixscore, SUM(score+projectscore) AS tempscore, SUM(performancescore) AS performancescore, SUM(fixscore+score+performancescore+projectscore) AS totalscore, RANK() OVER ("+scoretypeselection+") AS rank, COUNT(scoresummary.workerid) AS count," +
-				" employee.fullname AS name, employee.firstworktime AS firstworktime," +
-				" position.name AS positionname " +
-				" FROM scoresummary JOIN employee ON scoresummary.workerid=employee.workerid" +
-				" JOIN position ON employee.positionid = position.id" +
-				" WHERE EXTRACT(month FROM date)="+(c.get(Calendar.MONTH)+1) +
-						" GROUP BY scoresummary.workerid, employee.fullname, employee.firstworktime, position.name";
+		String rankGroupStatement = getRankGroupQuery();
+		String query = "";
+		if(rankGroup == 4 && scoreGroup != null){
+			query = "SELECT scoresummary.workerid AS workercode,SUM(fixscore) AS fixscore, SUM(score+projectscore) AS tempscore, SUM(performancescore) AS performancescore, SUM(fixscore+score+performancescore+projectscore) AS totalscore, RANK() OVER ("+scoretypeselection+") AS rank, COUNT(scoresummary.workerid) AS count," +
+					" employee.fullname AS name, employee.firstworktime AS firstworktime," +
+					" position.name AS positionname " +
+					" FROM scoresummary LEFT JOIN employee ON scoresummary.workerid=employee.workerid" +
+					" LEFT JOIN position ON employee.positionid = position.id" +
+					" LEFT JOIN score_group_mapper ON employee.id=score_group_mapper.empid" +
+					" WHERE scoresummary.date BETWEEN '"+HRUtil.parseDateToString(recordStartDate)+"' AND '"+HRUtil.parseDateToString(recordEndDate)+"' " +
+					" AND score_group_mapper.scoregroupid="+ scoreGroup + 
+							" GROUP BY scoresummary.workerid, employee.fullname, employee.firstworktime, position.name";
+		}else{
+			query = "SELECT scoresummary.workerid AS workercode,SUM(fixscore) AS fixscore, SUM(score+projectscore) AS tempscore, SUM(performancescore) AS performancescore, SUM(fixscore+score+performancescore+projectscore) AS totalscore, RANK() OVER ("+scoretypeselection+") AS rank, COUNT(scoresummary.workerid) AS count," +
+					" employee.fullname AS name, employee.firstworktime AS firstworktime," +
+					" position.name AS positionname " +
+					" FROM scoresummary LEFT JOIN employee ON scoresummary.workerid=employee.workerid" +
+					" LEFT JOIN position ON employee.positionid = position.id" +
+					" WHERE scoresummary.date BETWEEN '"+HRUtil.parseDateToString(recordStartDate)+"' AND '"+HRUtil.parseDateToString(recordEndDate)+"' " +
+					rankGroupStatement + 
+							" GROUP BY scoresummary.workerid, employee.fullname, employee.firstworktime, position.name";
+		}
+//		System.out.println(query);
 		return query;
+	}
+
+	private String getRankGroupQuery() {
+		if(rankGroup == RANK_CHE_DUI_ZHANG){
+			return " AND employee.joblevel='中管' AND position.name LIKE '%车队长%'";
+		}else if(rankGroup == RANK_FU_WU_YUAN){
+			return " AND position.name LIKE '%服务员%'";
+		}else if(rankGroup == RANK_GUAN_LI_YUAN){
+			return " AND employee.joblevel='管'";
+		}else if(rankGroup == RANK_JIA_SHI_YUAN){
+			return " AND employee.joblevel!='管' AND position.name LIKE '%驾驶员%'";
+		}else if(rankGroup == RANK_ZHU_REN_JI){
+			return " AND employee.joblevel='中管' AND position.name NOT LIKE '%车队长%'";
+		}else
+			return" AND employee.joblevel!='管' AND position.name LIKE '%驾驶员%'"; 
 	}
 
 	private String getOrderString() {
@@ -82,98 +118,7 @@ public class ScoreViewPublicSelector implements BMSSelector{
 		}
 		return scoretypeselection;
 	}
-
-	public String getNormalStatement(){
-		if(recordDate == null){
-			recordDate = new Date();
-		}
-		Calendar c = Calendar.getInstance();
-		c.setTime(recordDate);
-		String scoretypeselection = getScoreTypeQuery();
-		String query = "SELECT scoresummary.workerid AS workercode,SUM(fixscore) AS fixscore, SUM(score+projectscore) AS tempscore, SUM(fixscore+score+performancescore+projectscore) AS totalscore, SUM(performancescore) AS performancescore, RANK() OVER ("+scoretypeselection+") AS rank, COUNT(scoresummary.workerid) AS count," +
-				" employee.fullname AS name, employee.firstworktime AS firstworktime," +
-				" position.name AS positionname " +
-				" FROM scoresummary LEFT JOIN employee ON scoresummary.workerid=employee.workerid"+
-				" LEFT JOIN position ON employee.positionid = position.id";
-//		if(selectedGroup != null){
-//			query += 	" JOIN positiongroup ON positiongroup.scoregroupid=" +selectedGroup+ " AND positiongroup.positionid = employee.positionid";
-//		}
-		
-		if(selecttype == null)
-			selecttype = 2;
-		if(selecttype == TYPE_BY_HISTORY){
-			//order in history
-			query += " WHERE position.name IS NOT NULL ";
-		}else if(selecttype == TYPE_BY_YEAR){
-			//order in year
-			query += "  WHERE EXTRACT(year FROM date)="+c.get(Calendar.YEAR); 
-		}else{
-			//order in month
-			query += "  WHERE EXTRACT(month FROM date)="+(c.get(Calendar.MONTH)+1);
-		}
-		if(rankGroup != null){
-			if(rankGroup == RANK_ZHU_REN_JI){
-				query += " AND employee.joblevel='中管'";
-			}else if(rankGroup == RANK_GUAN_LI_YUAN){
-				query += " AND employee.joblevel='管'";
-			}else if(rankGroup == RANK_JIA_SHI_YUAN){
-				query += " AND position.name LIKE '%驾驶员%'";
-			}else if(rankGroup == RANK_WEI_XIU_GONG){
-//				query += " AND position.name LIKE '%驾驶员%'";
-			}else if(rankGroup == RANK_FU_WU_YUAN){
-				query += " AND position.name LIKE '%服务员%'";
-			}
-		}
-		
-		if(department != null){
-			query += " AND employee.departmentid="+department;
-		}
-		if(position != null){
-			query += " AND position.name LIKE '%"+position+"%'";
-		}
-		
-		query += " GROUP BY scoresummary.workerid, employee.fullname, employee.firstworktime, position.name";
-		return query;
-	}
 	
-	public String getInTimeRangeStatement(){
-		if(recordStartDate == null || recordEndDate == null){
-			return getNormalStatement();
-		}else{
-			Calendar start = Calendar.getInstance();
-			start.setTime(recordStartDate);
-			Calendar end = Calendar.getInstance();
-			end.setTime(recordEndDate);
-			String query = "SELECT scoresummary.workerid AS workercode,SUM(fixscore) AS fixscore, SUM(score+projectscore) AS tempscore, SUM(performancescore) AS performancescore, SUM(fixscore+score+performancescore+projectscore) AS totalscore, RANK() OVER ("+getScoreTypeQuery()+") AS rank, COUNT(scoresummary.workerid) AS count," +
-					" employee.fullname AS name, employee.firstworktime AS firstworktime," +
-					" position.name AS positionname " +
-					" FROM scoresummary JOIN employee ON scoresummary.workerid=employee.workerid" +
-					" JOIN position ON employee.positionid = position.id";
-			if(selectedGroup != null){
-				query += 	" JOIN positiongroup ON positiongroup.scoregroupid=" +selectedGroup+ " AND positiongroup.positionid = employee.positionid";
-			}
-			query +=" WHERE EXTRACT(month FROM date)>="+(start.get(Calendar.MONTH)+1)+
-					" AND EXTRACT(month FROM date)<="+(end.get(Calendar.MONTH)+1)+
-					" AND EXTRACT(year FROM date)>="+start.get(Calendar.YEAR)+
-					" AND EXTRACT(year FROM date)<="+end.get(Calendar.YEAR);
-			if(selectedGroup == null && department != null){
-				query += " AND employee.departmentid="+department;
-			}
-			if(selectedGroup == null && position != null){
-				query += " AND position.name LIKE '%"+position+"%'";
-			}
-			query += " GROUP BY scoresummary.workerid, employee.fullname, employee.firstworktime, position.name";
-			return query;
-		}
-	}
-	
-	public Date getRecordDate() {
-		return recordDate;
-	}
-
-	public void setRecordDate(Date recordDate) {
-		this.recordDate = recordDate;
-	}
 
 	public Date getRecordStartDate() {
 		return recordStartDate;
@@ -191,36 +136,12 @@ public class ScoreViewPublicSelector implements BMSSelector{
 		this.recordEndDate = recordEndDate;
 	}
 
-	public Integer getSelecttype() {
-		return selecttype;
-	}
-
-	public void setSelecttype(Integer selecttype) {
-		this.selecttype = selecttype;
-	}
-
 	public Integer getOrder() {
 		return order;
 	}
 
 	public void setOrder(Integer order) {
 		this.order = order;
-	}
-
-	public Integer getDepartment() {
-		return department;
-	}
-
-	public void setDepartment(Integer department) {
-		this.department = department;
-	}
-
-	public String getPosition() {
-		return position;
-	}
-
-	public void setPosition(String position) {
-		this.position = position;
 	}
 
 	public static int getTypeByHistory() {
@@ -246,14 +167,6 @@ public class ScoreViewPublicSelector implements BMSSelector{
 
 	public void setScoretype(Integer scoretype) {
 		this.scoretype = scoretype;
-	}
-
-	public Integer getSelectedGroup() {
-		return selectedGroup;
-	}
-
-	public void setSelectedGroup(Integer selectedGroup) {
-		this.selectedGroup = selectedGroup;
 	}
 
 	public Integer getRankGroup() {
@@ -286,6 +199,18 @@ public class ScoreViewPublicSelector implements BMSSelector{
 
 	public static int getRankJiaShiYuan() {
 		return RANK_JIA_SHI_YUAN;
+	}
+
+	public Integer getScoreGroup() {
+		return scoreGroup;
+	}
+
+	public void setScoreGroup(Integer scoreGroup) {
+		this.scoreGroup = scoreGroup;
+	}
+
+	public static int getRankCheDuiZhang() {
+		return RANK_CHE_DUI_ZHANG;
 	}
 	
 }
